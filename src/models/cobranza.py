@@ -16,8 +16,9 @@ if TYPE_CHECKING:
 class Cobranza(AuditoriaMixin, Base):
     __tablename__ = "cobranzas"
     __table_args__ = (
+        CheckConstraint("dia BETWEEN 1 AND 5", name="chk_dia"),
         CheckConstraint("orden BETWEEN 1 AND 3", name="chk_orden"),
-        UniqueConstraint("id_expediente", "orden", name="uq_orden"),
+        UniqueConstraint("id_expediente", "dia", "orden", name="uq_dia_orden"),
     )
 
     id: Mapped[int] = mapped_column(
@@ -35,6 +36,11 @@ class Cobranza(AuditoriaMixin, Base):
         nullable=False
     )
 
+    dia: Mapped[int] = mapped_column(
+        SmallInteger,
+        nullable=False
+    )
+
     orden: Mapped[int] = mapped_column(
         SmallInteger,
         nullable=False
@@ -47,10 +53,6 @@ class Cobranza(AuditoriaMixin, Base):
 
     medio: Mapped[str | None] = mapped_column(
         String(50)
-    )
-
-    resultado: Mapped[str | None] = mapped_column(
-        String(100)
     )
 
     comentarios: Mapped[str | None] = mapped_column(

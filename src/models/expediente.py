@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import Date, ForeignKey, String, Text
+from sqlalchemy import Boolean, Date, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.base import Base
@@ -34,6 +34,13 @@ class Expediente(AuditoriaMixin, Base):
     id_usuario: Mapped[int | None] = mapped_column(
         ForeignKey("usuarios.id_usuario", onupdate="CASCADE", ondelete="RESTRICT"),
         nullable=True
+    )
+
+    estado: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=True,
+        server_default="true"
     )
 
     cliente: Mapped["Cliente"] = relationship(
