@@ -17,8 +17,10 @@ class UsuarioUpdate(SchemaBase):
     correo  : str  | None = None
     activo  : bool | None = None
     id_rol  : int  | None = None
+    firma   : str  | None = None
 
 class UsuarioRead(UsuarioBase):
 
-    id  : int
-    rol : RolRead
+    id    : int
+    rol   : RolRead
+    firma : str | None = None

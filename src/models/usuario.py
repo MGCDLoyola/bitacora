@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -54,6 +54,11 @@ class Usuario(AuditoriaMixin, Base):
 
     ultimo_acceso: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True)
+    )
+
+    firma: Mapped[str | None] = mapped_column(
+        Text, 
+        nullable=True
     )
 
     rol: Mapped["Rol"] = relationship(

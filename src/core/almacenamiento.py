@@ -4,11 +4,15 @@ from pathlib import Path
 from src.core.config import ARCHIVOS_BASE_DIR
 from src.models.cliente import Cliente
 from src.models.expediente import Expediente
+from src.models.usuario import Usuario
 
 
 def carpeta_cliente(cliente: Cliente) -> Path:
     nombre_carpeta = f"{cliente.interlocutor} - {cliente.nombre}"
     return Path(ARCHIVOS_BASE_DIR) / nombre_carpeta
+
+def carpeta_firmas(usuario: Usuario) -> Path:
+    return Path(ARCHIVOS_BASE_DIR) / "firmas" / str(usuario.id)
 
 def carpeta_expediente(cliente: Cliente, expediente: Expediente) -> Path:
     fecha_str = expediente.fecha_creacion.strftime("%d-%m-%Y")
