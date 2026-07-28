@@ -7,12 +7,11 @@ from src.core.exceptions import ConflictoNegocio, NoEncontrado
 from src.core.config import MAX_DIAS, MAX_GESTIONES_DIA
 
 from src.models.cobranza import Cobranza
+from src.models.expediente import Expediente
 
 from src.schemas.cobranza import CobranzaCreate, CobranzaUpdate
 
 from src.services.base import BaseService
-from src.services.consolidacion import ConsolidacionService
-
 
 class CobranzaService(BaseService):
 
@@ -162,6 +161,8 @@ class CobranzaService(BaseService):
             cobranza.dia == MAX_DIAS
             and cobranza.orden == MAX_GESTIONES_DIA
         ):
-            ConsolidacionService(self.session).preconsolidar(
-                cobranza.id_expediente
-            )
+            expediente = self.session.get(Expediente, cobranza.id_expediente)
+
+            expediente.fecha_consolidacion = date.today()
+
+            self._guardar(expediente)
