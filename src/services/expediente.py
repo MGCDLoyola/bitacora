@@ -2,20 +2,19 @@ from datetime import date
 import shutil
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from src.models.expediente import Expediente
-from src.models.usuario import Usuario
 
 from src.core.almacenamiento import carpeta_expediente
+from src.core.exceptions import NoEncontrado
+
+from src.services.usuario import UsuarioService
+from src.services.base import BaseService
 
 from collections.abc import Sequence
 
 
-class ExpedienteService:
-
-    def __init__(self, session: Session):
-        self.session = session
+class ExpedienteService(BaseService):
 
     def listar(self) -> Sequence[Expediente]:
 
@@ -31,9 +30,16 @@ class ExpedienteService:
             .all()
         )
 
-    def obtener(self, id_expediente: int) -> Expediente | None:
+    def obtener(self, id_expediente: int) -> Expediente:
 
-        return self.session.get(Expediente, id_expediente)
+        expediente = self.session.get(Expediente, id_expediente)
+
+        if expediente is None:
+            raise NoEncontrado(
+                f"No existe un expediente con id '{id_expediente}'."
+            )
+
+        return expediente
 
     def buscar(
         self,
@@ -64,27 +70,15 @@ class ExpedienteService:
 
     def asignar(self, id_expediente: int, id_usuario: int | None) -> Expediente:
 
-        expediente = self.session.get(Expediente, id_expediente)
-
-        if expediente is None:
-            raise ValueError(f"No existe un expediente con id '{id_expediente}'")
+        expediente = self.obtener(id_expediente)
 
         if id_usuario is not None:
 
-            usuario = self.session.get(Usuario, id_usuario)
-
-            if usuario is None:
-                raise ValueError(f"No existe un usuario con id '{id_usuario}'")
-
-            if not usuario.activo:
-                raise ValueError(f"El usuario '{usuario.nombre}' no está activo")
-
-            if usuario.rol.nombre != "Cobranza":
-                raise ValueError(f"El usuario '{usuario.nombre}' no tiene rol de Cobranza")
+            UsuarioService(self.session).obtener(id_usuario, activos = True, cobranza = True)
 
         expediente.id_usuario = id_usuario
 
-        self.session.commit()
+        self._guardar(expediente)
 
         return expediente
 
@@ -105,10 +99,7 @@ class ExpedienteService:
 
     def eliminar(self, id_expediente: int) -> None:
 
-        expediente = self.session.get(Expediente, id_expediente)
-
-        if expediente is None:
-            raise ValueError(f"No existe un expediente con id '{id_expediente}'")
+        expediente = self.obtener(id_expediente)
 
         cliente = expediente.cliente
 
@@ -118,4 +109,4 @@ class ExpedienteService:
             shutil.rmtree(carpeta)
 
         self.session.delete(expediente)
-        self.session.commit()
+        self._commit()

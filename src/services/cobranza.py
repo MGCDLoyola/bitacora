@@ -1,16 +1,14 @@
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from src.models.cobranza import Cobranza
 from src.schemas.cobranza import CobranzaCreate, CobranzaUpdate
+from src.core.exceptions import NoEncontrado, ConflictoNegocio
+from src.services.base import BaseService
 
 from collections.abc import Sequence
 
 
-class CobranzaService:
-
-    def __init__(self, session: Session):
-        self.session = session
+class CobranzaService(BaseService):
 
     def listar_por_expediente(self, id_expediente: int) -> Sequence[Cobranza]:
 
@@ -27,9 +25,15 @@ class CobranzaService:
             .all()
         )
 
-    def obtener(self, id_cobranza: int) -> Cobranza | None:
+    def obtener(self, id_cobranza: int) -> Cobranza:
+        cobranza = self.session.get(Cobranza, id_cobranza)
 
-        return self.session.get(Cobranza, id_cobranza)
+        if cobranza is None:
+            raise NoEncontrado(
+                f"No existe una cobranza con id '{id_cobranza}'."
+            )
+
+        return cobranza
 
     def crear(self, id_expediente: int, id_usuario: int, data: CobranzaCreate) -> Cobranza:
 
@@ -44,8 +48,8 @@ class CobranzaService:
         )
 
         if siguiente_orden is None:
-            raise ValueError(
-                f"El expediente '{id_expediente}' ya tiene las 3 gestiones de cobranza permitidas"
+            raise ConflictoNegocio(
+                f"El expediente '{id_expediente}' ya tiene las 3 gestiones de cobranza permitidas."
             )
 
         cobranza = Cobranza(
@@ -58,32 +62,28 @@ class CobranzaService:
         )
 
         self.session.add(cobranza)
-        self.session.commit()
+        self._guardar(cobranza)
 
         return cobranza
 
+
     def actualizar(self, id_cobranza: int, data: CobranzaUpdate) -> Cobranza:
 
-        cobranza = self.session.get(Cobranza, id_cobranza)
-
-        if cobranza is None:
-            raise ValueError(f"No existe una cobranza con id '{id_cobranza}'")
+        cobranza = self.obtener(id_cobranza)
 
         cambios = data.model_dump(exclude_unset=True)
 
         for campo, valor in cambios.items():
             setattr(cobranza, campo, valor)
 
-        self.session.commit()
+        self._guardar(cobranza)
 
         return cobranza
 
     def eliminar(self, id_cobranza: int) -> None:
 
-        cobranza = self.session.get(Cobranza, id_cobranza)
-
-        if cobranza is None:
-            raise ValueError(f"No existe una cobranza con id '{id_cobranza}'")
+        cobranza = self.obtener(id_cobranza)
 
         self.session.delete(cobranza)
-        self.session.commit()
+
+        self._commit()

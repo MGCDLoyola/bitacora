@@ -1,18 +1,17 @@
 import random
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from src.models.usuario import Usuario
 from src.schemas.usuario import UsuarioCreate, UsuarioUpdate
+from src.core.exceptions import NoEncontrado, OperacionInvalida
+
+from src.services.base import BaseService
 
 from collections.abc import Sequence
 
 
-class UsuarioService:
-
-    def __init__(self, session: Session):
-        self.session = session
+class UsuarioService(BaseService):
 
     def listar(self) -> Sequence[Usuario]:
 
@@ -28,6 +27,26 @@ class UsuarioService:
             .all()
         )
 
+    def obtener(self, id_usuario: int, activos: bool = False, cobranza: bool = False) -> Usuario:
+        usuario = self.session.get(Usuario, id_usuario)
+
+        if usuario is None:
+            raise NoEncontrado(
+                f"No existe el usuario con id '{id_usuario}'."
+            )
+
+        if not usuario.activo and activos:
+            raise OperacionInvalida(
+                f"El usuario con id '{id_usuario}' no esta activo"
+            )
+
+        if usuario.rol.nombre != "Cobranza" and cobranza:
+            raise OperacionInvalida(
+                f"El usuario con id '{id_usuario}' no tiene rol de Cobranza"
+            )
+
+        return usuario
+
     def crear(self, data: UsuarioCreate) -> tuple[Usuario, str]:
 
         existente = self.session.scalar(
@@ -36,7 +55,9 @@ class UsuarioService:
         )
 
         if existente is not None:
-            raise ValueError(f"Ya existe un usuario con el correo '{data.correo}'")
+            raise OperacionInvalida(
+                f"Ya existe un usuario con el correo '{data.correo}'"
+            )
 
         codigo = f"{random.randint(0, 999999):06d}"
 
@@ -50,16 +71,13 @@ class UsuarioService:
         usuario.set_password(codigo)
 
         self.session.add(usuario)
-        self.session.commit()
+        self._guardar(usuario)
 
         return usuario, codigo
 
     def actualizar(self, id_usuario: int, data: UsuarioUpdate) -> Usuario:
 
-        usuario = self.session.get(Usuario, id_usuario)
-
-        if usuario is None:
-            raise ValueError(f"No existe un usuario con id '{id_usuario}'")
+        usuario = self.obtener(id_usuario)
 
         cambios = data.model_dump(exclude_unset=True)
 
@@ -70,11 +88,11 @@ class UsuarioService:
             )
 
             if existente is not None:
-                raise ValueError(f"Ya existe un usuario con el correo '{cambios['correo']}'")
+                raise OperacionInvalida(f"Ya existe un usuario con el correo '{cambios['correo']}'")
 
         for campo, valor in cambios.items():
             setattr(usuario, campo, valor)
 
-        self.session.commit()
+        self._commit()
 
         return usuario

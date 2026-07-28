@@ -1,15 +1,14 @@
 from sqlalchemy import or_, select
-from sqlalchemy.orm import Session
 
 from src.models.cliente import Cliente
+from src.core.exceptions import NoEncontrado
+
+from src.services.base import BaseService
 
 from collections.abc import Sequence
 
 
-class ClienteService:
-
-    def __init__(self, session: Session):
-        self.session = session
+class ClienteService(BaseService):
 
     def listar(self) -> Sequence[Cliente]:
 
@@ -25,9 +24,13 @@ class ClienteService:
             .all()
         )
 
-    def obtener(self, interlocutor: str) -> Cliente | None:
+    def obtener(self, interlocutor: str) -> Cliente:
+        cliente = self.session.get(Cliente, interlocutor)
 
-        return self.session.get(Cliente, interlocutor)
+        if cliente is None:
+            raise NoEncontrado(
+                f"No se encontró el cliente {interlocutor}."
+            )
 
     def buscar(self, termino: str) -> Sequence[Cliente]:
 

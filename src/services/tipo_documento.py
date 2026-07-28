@@ -1,15 +1,13 @@
 from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from src.models.tipo_documento import TipoDocumento
+
+from src.services.base import BaseService
 
 from collections.abc import Sequence
 
 
-class TipoDocumentoService:
-
-    def __init__(self, session: Session):
-        self.session = session
+class TipoDocumentoService(BaseService):
 
     def listar(self) -> Sequence[TipoDocumento]:
 
