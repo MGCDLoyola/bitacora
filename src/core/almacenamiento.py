@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 
 from src.core.config import ARCHIVOS_BASE_DIR
@@ -15,10 +16,26 @@ def carpeta_expediente(cliente: Cliente, expediente: Expediente) -> Path:
     return carpeta_cliente(cliente) / nombre_carpeta
 
 def carpeta_vencimiento(cliente: Cliente, expediente: Expediente) -> Path:
-    return carpeta_expediente(cliente, expediente) / "1. Vencimiento"
+    return carpeta_expediente(cliente, expediente) / "1. Información"
 
-def carpeta_gestion(cliente: Cliente, expediente: Expediente, orden: int) -> Path:
-    return carpeta_expediente(cliente, expediente) / "3. Gestiones" / f"Gestion {orden}"
+def carpeta_gestion(
+    cliente: Cliente,
+    expediente: Expediente,
+    fecha_gestion: date,
+    intento: int
+) -> Path:
+    fecha_str = fecha_gestion.strftime("%d-%m-%Y")
+
+    return (
+        carpeta_expediente(cliente, expediente)
+        / "3. Gestiones"
+        / fecha_str
+        / f"Intento {intento}"
+    )
+
 
 def carpeta_cierre(cliente: Cliente, expediente: Expediente) -> Path:
     return carpeta_expediente(cliente, expediente) / "2. Cierre"
+
+def carpeta_consolidacion (cliente: Cliente, expediente: Expediente) -> Path:
+    return carpeta_expediente(cliente, expediente) / "4. Consolidación"
