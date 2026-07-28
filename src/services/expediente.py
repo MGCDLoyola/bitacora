@@ -1,10 +1,13 @@
 from datetime import date
+import shutil
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.models.expediente import Expediente
 from src.models.usuario import Usuario
+
+from src.core.almacenamiento import carpeta_expediente
 
 from collections.abc import Sequence
 
@@ -99,3 +102,20 @@ class ExpedienteService:
             .scalars()
             .all()
         )
+
+    def eliminar(self, id_expediente: int) -> None:
+
+        expediente = self.session.get(Expediente, id_expediente)
+
+        if expediente is None:
+            raise ValueError(f"No existe un expediente con id '{id_expediente}'")
+
+        cliente = expediente.cliente
+
+        carpeta = carpeta_expediente(cliente, expediente)
+
+        if carpeta.exists():
+            shutil.rmtree(carpeta)
+
+        self.session.delete(expediente)
+        self.session.commit()
