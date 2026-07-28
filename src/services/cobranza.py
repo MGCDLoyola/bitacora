@@ -54,7 +54,6 @@ class CobranzaService:
             orden=siguiente_orden,
             fecha=data.fecha,
             medio=data.medio,
-            resultado=data.resultado,
             comentarios=data.comentarios
         )
 

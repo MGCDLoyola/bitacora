@@ -79,7 +79,7 @@ class ExpedienteService:
             if usuario.rol.nombre != "Cobranza":
                 raise ValueError(f"El usuario '{usuario.nombre}' no tiene rol de Cobranza")
 
-        expediente.id_usuario_asignado = id_usuario
+        expediente.id_usuario = id_usuario
 
         self.session.commit()
 

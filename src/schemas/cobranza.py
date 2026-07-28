@@ -7,7 +7,6 @@ class CobranzaBase(SchemaBase):
 
     fecha       : datetime
     medio       : str | None = None
-    resultado   : str | None = None
     comentarios : str | None = None
 
 class CobranzaCreate(CobranzaBase):
@@ -18,7 +17,6 @@ class CobranzaUpdate(SchemaBase):
 
     fecha       : datetime | None = None
     medio       : str | None = None
-    resultado   : str | None = None
     comentarios : str | None = None
 
 class CobranzaRead(CobranzaBase):
