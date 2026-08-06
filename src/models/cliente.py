@@ -18,6 +18,11 @@ class Cliente(AuditoriaMixin, Base):
         primary_key=True
     )
 
+    central: Mapped[str] = mapped_column(
+        String(10),
+        nullable=False
+    )
+
     nombre: Mapped[str] = mapped_column(
         String(255),
         nullable=False
@@ -27,7 +32,7 @@ class Cliente(AuditoriaMixin, Base):
         String(255)
     )
 
-    telefono: Mapped[str | None] = mapped_column(
+    contrato: Mapped[str | None] = mapped_column(
         String(50)
     )
 
