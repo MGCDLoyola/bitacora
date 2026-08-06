@@ -32,6 +32,46 @@ class ClienteService(BaseService):
                 f"No se encontró el cliente {interlocutor}."
             )
 
+        return cliente
+
+    def crear(
+        self,
+        interlocutor: str,
+        central: str,
+        nombre: str,
+        correo: str | None,
+        contrato: str | None
+    ) -> Cliente:
+
+        cliente = Cliente(
+            interlocutor=interlocutor,
+            central=central,
+            nombre=nombre,
+            correo=correo,
+            contrato=contrato
+        )
+
+        self._guardar(cliente)
+
+        return cliente
+
+
+    def actualizar(
+        self,
+        interlocutor: str,
+        correo: str | None,
+        contrato: str | None
+    ) -> Cliente:
+
+        cliente = self.obtener(interlocutor)
+
+        cliente.correo = correo
+        cliente.contrato = contrato
+
+        self._commit()
+
+        return cliente
+
     def buscar(self, termino: str) -> Sequence[Cliente]:
 
         patron = f"%{termino}%"
