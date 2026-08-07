@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 class Cobranza(AuditoriaMixin, Base):
     __tablename__ = "cobranzas"
     __table_args__ = (
-        CheckConstraint("dia BETWEEN 1 AND 5", name="chk_dia"),
+        CheckConstraint("dia BETWEEN 1 AND 4", name="chk_dia"),
         CheckConstraint("orden BETWEEN 1 AND 3", name="chk_orden"),
         UniqueConstraint("id_expediente", "dia", "orden", name="uq_dia_orden"),
     )
