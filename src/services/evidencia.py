@@ -49,7 +49,7 @@ class EvidenciaService(BaseService):
         expediente = cobranza.expediente
         cliente = expediente.cliente
 
-        carpeta = carpeta_gestion(cliente, expediente, cobranza.orden)
+        carpeta = carpeta_gestion(cliente, expediente, cobranza.fecha.date(), cobranza.orden)
 
         uuid_archivo = uuid.uuid4()
         extension = Path(archivo.filename).suffix
