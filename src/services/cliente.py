@@ -51,6 +51,8 @@ class ClienteService(BaseService):
             contrato=contrato
         )
 
+        self.session.add(cliente)
+
         self._guardar(cliente)
 
         return cliente

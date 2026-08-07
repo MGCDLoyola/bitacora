@@ -37,9 +37,35 @@ def carpeta_gestion(
         / f"Intento {intento}"
     )
 
-
 def carpeta_cierre(cliente: Cliente, expediente: Expediente) -> Path:
     return carpeta_expediente(cliente, expediente) / "2. Cierre"
 
-def carpeta_consolidacion (cliente: Cliente, expediente: Expediente) -> Path:
+def carpeta_consolidacion(cliente: Cliente, expediente: Expediente) -> Path:
     return carpeta_expediente(cliente, expediente) / "4. Consolidación"
+
+
+def crear_carpeta_cliente(cliente: Cliente) -> None:
+    carpeta_cliente(cliente).mkdir(parents=True, exist_ok=True)
+
+def crear_carpeta_firmas(usuario: Usuario) -> None:
+    carpeta_firmas(usuario).mkdir(parents=True, exist_ok=True)
+
+def crear_carpeta_expediente(cliente: Cliente, expediente: Expediente) -> None:
+    carpeta_expediente(cliente, expediente).mkdir(parents=True, exist_ok=True)
+
+def crear_carpeta_vencimiento(cliente: Cliente, expediente: Expediente) -> None:
+    carpeta_vencimiento(cliente, expediente).mkdir(parents=True, exist_ok=True)
+
+def crear_carpeta_gestion(
+    cliente: Cliente,
+    expediente: Expediente,
+    fecha_gestion: date,
+    intento: int
+) -> None:
+    carpeta_gestion(cliente, expediente, fecha_gestion, intento).mkdir(parents=True, exist_ok=True)
+
+def crear_carpeta_cierre(cliente: Cliente, expediente: Expediente) -> None:
+    carpeta_cierre(cliente, expediente).mkdir(parents=True, exist_ok=True)
+
+def crear_carpeta_consolidacion(cliente: Cliente, expediente: Expediente) -> None:
+    carpeta_consolidacion(cliente, expediente).mkdir(parents=True, exist_ok=True)
