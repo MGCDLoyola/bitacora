@@ -1,5 +1,6 @@
 from collections.abc import Sequence
 from datetime import date
+from pathlib import Path
 
 from sqlalchemy import select
 
@@ -92,9 +93,15 @@ class CobranzaService(BaseService):
 
         cobranza = self.obtener(id_cobranza)
 
+        rutas = [Path(evidencia.ruta_archivo) for evidencia in cobranza.evidencias]
+
         self.session.delete(cobranza)
 
         self._commit()
+
+        for ruta in rutas:
+            if ruta.exists():
+                ruta.unlink()
 
     def _dia(self, id_expediente: int) -> int:
 

@@ -124,8 +124,9 @@ class ExpedienteService(BaseService):
 
         carpeta = carpeta_expediente(cliente, expediente)
 
+        self.session.delete(expediente)
+
+        self._commit()
+
         if carpeta.exists():
             shutil.rmtree(carpeta)
-
-        self.session.delete(expediente)
-        self._commit()
