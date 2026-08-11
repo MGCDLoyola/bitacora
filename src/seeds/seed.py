@@ -1,6 +1,7 @@
 from src.core.database import SessionLocal
 
 from src.seeds.roles import seed_roles
+from src.seeds.tipos_documento import seed_tipos_documento
 
 
 def main() -> None:
@@ -8,7 +9,7 @@ def main() -> None:
     session = SessionLocal()
 
     try:
-        seed_roles(session)
+        seed_tipos_documento(session)
 
     finally:
         session.close()
