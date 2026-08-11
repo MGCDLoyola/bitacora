@@ -8,7 +8,7 @@ from src.models.usuario import Usuario
 
 
 def carpeta_cliente(cliente: Cliente) -> Path:
-    nombre_carpeta = f"{cliente.interlocutor} - {cliente.nombre}"
+    nombre_carpeta = f"{cliente.nombre} - {cliente.interlocutor}"
     return Path(ARCHIVOS_BASE_DIR) / nombre_carpeta
 
 def carpeta_firmas(usuario: Usuario) -> Path:
