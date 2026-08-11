@@ -90,6 +90,6 @@ def procesar_informacion(session: Session, mailbox: Mailbox) -> None:
 
         crear_carpeta_vencimiento(cliente, expediente)
 
-        destino = carpeta_vencimiento(cliente, expediente) / f"{mensaje['id']}.eml"
+        destino = carpeta_vencimiento(cliente, expediente) / f"{cliente.nombre} - {expediente.fecha_incumplimiento}.eml"
 
         mailbox.descargar_correo(mensaje["id"], destino)
