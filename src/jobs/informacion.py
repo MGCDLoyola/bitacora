@@ -1,4 +1,5 @@
 import re
+import uuid
 import logging
 from datetime import date
 
@@ -9,12 +10,15 @@ from mgc_graph import Mailbox
 
 from src.models.cliente import Cliente
 from src.models.expediente import Expediente
+from src.models.documento import Documento
+from src.models.tipo_documento import TipoDocumento
 from src.core.almacenamiento import crear_carpeta_vencimiento, carpeta_vencimiento
 
 logger = logging.getLogger(__name__)
 
 ASUNTO_SUSPENSION = "Suspensión del Servicio por Incumplimiento de pago"
 PATRON_CONTRATO = re.compile(r"MGC-CR-[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*", re.IGNORECASE)
+TIPO_DOCUMENTO_INFORMACION = "Prueba de Vencimiento"
 
 
 def extraer_contrato(cuerpo: str) -> str | None:
@@ -73,11 +77,63 @@ def relacionar_correo_expediente(session: Session, mensaje: dict) -> Expediente 
     return expediente
 
 
+def obtener_tipo_documento_informacion(session: Session) -> TipoDocumento | None:
+    stmt = select(TipoDocumento).where(TipoDocumento.nombre == TIPO_DOCUMENTO_INFORMACION)
+    return session.execute(stmt).scalar_one_or_none()
+
+
+def registrar_documento_informacion(
+    session: Session,
+    expediente: Expediente,
+    uuid_archivo: uuid.UUID,
+    ruta_archivo,
+    nombre_original: str,
+    id_tipo_documento: int
+) -> Documento | None:
+
+    if expediente.id_usuario is None:
+        logger.warning(
+            "Expediente '%s' sin usuario asignado, no se registra el documento en Documentos",
+            expediente.interlocutor
+        )
+        return None
+
+    documento = Documento(
+        id_expediente=expediente.id,
+        id_usuario=expediente.id_usuario,
+        id_tipo_documento=id_tipo_documento,
+        uuid_archivo=uuid_archivo,
+        nombre_original=nombre_original,
+        ruta_archivo=str(ruta_archivo)
+    )
+
+    session.add(documento)
+
+    return documento
+
+
 def procesar_informacion(session: Session, mailbox: Mailbox) -> None:
 
     hoy = date.today()
 
+    tipo_documento = obtener_tipo_documento_informacion(session)
+
+    if tipo_documento is None:
+        raise ValueError(
+            f"No existe el tipo de documento '{TIPO_DOCUMENTO_INFORMACION}'."
+        )
+
     mensajes = mailbox.buscar_enviados(ASUNTO_SUSPENSION, hoy)
+
+    print(f"Correos encontrados: {len(mensajes)}")
+
+    for mensaje in mensajes:
+        print(
+            "ID:", mensaje["id"],
+            "| CONTRATO:", extraer_contrato(
+                mensaje.get("body", {}).get("content", "")
+            )
+        )
 
     for mensaje in mensajes:
 
@@ -90,6 +146,24 @@ def procesar_informacion(session: Session, mailbox: Mailbox) -> None:
 
         crear_carpeta_vencimiento(cliente, expediente)
 
-        destino = carpeta_vencimiento(cliente, expediente) / f"{cliente.nombre} - {expediente.fecha_incumplimiento}.eml"
+        uuid_archivo = uuid.uuid4()
+        nombre_original = f"{cliente.nombre} - {expediente.fecha_incumplimiento}.eml"
+        destino = carpeta_vencimiento(cliente, expediente) / f"{uuid_archivo}.eml"
 
         mailbox.descargar_correo(mensaje["id"], destino)
+
+        try:
+            registrar_documento_informacion(
+                session,
+                expediente,
+                uuid_archivo,
+                destino,
+                nombre_original,
+                tipo_documento.id
+            )
+            session.commit()
+        except Exception:
+            session.rollback()
+            if destino.exists():
+                destino.unlink()
+            raise
