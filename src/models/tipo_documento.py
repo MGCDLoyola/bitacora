@@ -24,10 +24,6 @@ class TipoDocumento(AuditoriaMixin, Base):
         nullable=False
     )
 
-    descripcion: Mapped[str | None] = mapped_column(
-        Text
-    )
-
     documentos: Mapped[list["Documento"]] = relationship(
         "Documento",
         back_populates="tipo_documento"
