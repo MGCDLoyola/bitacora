@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from .cobranza import Cobranza
     from .evidencia import Evidencia
     from .expediente import Expediente
+    from .sesion import Sesion
 
 class Usuario(AuditoriaMixin, Base):
     __tablename__ = "usuarios"
@@ -83,6 +84,11 @@ class Usuario(AuditoriaMixin, Base):
 
     expedientes_asignados: Mapped[list["Expediente"]] = relationship(
         "Expediente",
+        back_populates="usuario"
+    )
+
+    sesiones: Mapped[list["Sesion"]] = relationship(
+        "Sesion",
         back_populates="usuario"
     )
 

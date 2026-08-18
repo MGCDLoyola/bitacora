@@ -7,7 +7,7 @@ from alembic import context
 
 from src.core.config import DATABASE_URL
 from src.core.base import Base
-from src.models import Rol, Usuario, Cliente, Expediente, TipoDocumento, Documento, Cobranza, Evidencia
+from src.models import Rol, Usuario, Cliente, Expediente, TipoDocumento, Documento, Cobranza, Evidencia, Sesion
 
 config = context.config
 config.set_main_option("sqlalchemy.url", DATABASE_URL)

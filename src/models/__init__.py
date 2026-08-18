@@ -6,6 +6,7 @@ from .tipo_documento import TipoDocumento
 from .documento import Documento
 from .cobranza import Cobranza
 from .evidencia import Evidencia
+from .sesion import Sesion
 
 __all__ = [
     "Rol",
@@ -16,4 +17,5 @@ __all__ = [
     "Documento",
     "Cobranza",
     "Evidencia",
+    "Sesion",
 ]
