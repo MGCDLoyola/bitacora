@@ -49,3 +49,15 @@ def cambiar_password(
     )
 
     response.delete_cookie(NOMBRE_COOKIE_SESION)
+
+
+@router.post("/logout", status_code=204)
+def logout(
+    response: Response,
+    sesion: Sesion = Depends(sesion_actual),
+    session: Session = Depends(get_session)
+):
+    servicio = AuthService(session)
+    servicio.logout(sesion)
+
+    response.delete_cookie(NOMBRE_COOKIE_SESION)

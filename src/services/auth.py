@@ -64,3 +64,8 @@ class AuthService(BaseService):
 
         self.session.delete(sesion_actual)
         self._commit()
+
+    def logout(self, sesion_actual: Sesion) -> None:
+
+        self.session.delete(sesion_actual)
+        self._commit()
