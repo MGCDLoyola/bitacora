@@ -23,3 +23,6 @@ class NoAutorizado(BitacoraError):
 
 class CambioPasswordRequerido(BitacoraError):
     pass
+
+class PermisoDenegado(BitacoraError):
+    pass

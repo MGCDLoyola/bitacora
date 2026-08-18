@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from src.core.config import NOMBRE_COOKIE_SESION
 from src.core.database import get_session
-from src.core.exceptions import CambioPasswordRequerido, NoAutorizado
+from src.core.exceptions import CambioPasswordRequerido, NoAutorizado, PermisoDenegado
 from src.models.sesion import Sesion
 from src.models.usuario import Usuario
 
@@ -48,3 +48,12 @@ def usuario_actual(
         )
 
     return sesion.usuario
+
+def requiere_rol(*roles: str):
+    def dependencia(usuario: Usuario = Depends(usuario_actual)) -> Usuario:
+        if usuario.rol.nombre not in roles:
+            raise PermisoDenegado(
+                "No tienes permiso para realizar esta acción."
+            )
+        return usuario
+    return dependencia
