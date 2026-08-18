@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import select
 
 from src.core.config import SESION_DURACION_HORAS
-from src.core.exceptions import NoAutorizado
+from src.core.exceptions import NoAutorizado, OperacionInvalida
 from src.models.sesion import Sesion
 from src.models.usuario import Usuario
 
@@ -38,3 +38,29 @@ class AuthService(BaseService):
         self._guardar(sesion)
 
         return usuario, sesion
+
+    def cambiar_password(
+        self,
+        usuario: Usuario,
+        sesion_actual: Sesion,
+        password_actual: str,
+        password_nueva: str
+    ) -> None:
+
+        if not usuario.check_password(password_actual):
+            raise NoAutorizado(
+                "La contraseña actual es incorrecta."
+            )
+
+        if password_actual == password_nueva:
+            raise OperacionInvalida(
+                "La nueva contraseña debe ser diferente a la actual."
+            )
+
+        usuario.set_password(password_nueva)
+
+        if usuario.requiere_cambio_password:
+            usuario.ultimo_acceso = datetime.now(timezone.utc)
+
+        self.session.delete(sesion_actual)
+        self._commit()

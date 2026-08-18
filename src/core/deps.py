@@ -6,15 +6,15 @@ from sqlalchemy.orm import Session
 
 from src.core.config import NOMBRE_COOKIE_SESION
 from src.core.database import get_session
-from src.core.exceptions import NoAutorizado
+from src.core.exceptions import CambioPasswordRequerido, NoAutorizado
 from src.models.sesion import Sesion
 from src.models.usuario import Usuario
 
 
-def usuario_actual(
+def sesion_actual(
     id_sesion: uuid.UUID | None = Cookie(default=None, alias=NOMBRE_COOKIE_SESION),
     session: Session = Depends(get_session)
-) -> Usuario:
+) -> Sesion:
 
     if id_sesion is None:
         raise NoAutorizado(
@@ -33,6 +33,18 @@ def usuario_actual(
         session.commit()
         raise NoAutorizado(
             "La sesión ha expirado."
+        )
+
+    return sesion
+
+
+def usuario_actual(
+    sesion: Sesion = Depends(sesion_actual)
+) -> Usuario:
+
+    if sesion.usuario.requiere_cambio_password:
+        raise CambioPasswordRequerido(
+            "Debes cambiar tu contraseña antes de continuar."
         )
 
     return sesion.usuario

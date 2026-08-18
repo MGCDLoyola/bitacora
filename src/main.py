@@ -3,7 +3,7 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from src.core.exceptions import BitacoraError, NoEncontrado, ConflictoNegocio, OperacionInvalida, NoAutorizado
+from src.core.exceptions import BitacoraError, NoEncontrado, ConflictoNegocio, OperacionInvalida, NoAutorizado, CambioPasswordRequerido
 from src.core.logging import configurar_logging
 from src.routers.auth import router as auth_router
 from src.routers.roles import router as roles_router
@@ -26,6 +26,11 @@ def handle_no_encontrado(request: Request, exc: NoEncontrado):
 @app.exception_handler(NoAutorizado)
 def handle_no_autorizado(request: Request, exc: NoAutorizado):
     return JSONResponse(status_code=401, content={"detail": exc.mensaje})
+
+
+@app.exception_handler(CambioPasswordRequerido)
+def handle_cambio_password_requerido(request: Request, exc: CambioPasswordRequerido):
+    return JSONResponse(status_code=403, content={"detail": exc.mensaje})
 
 
 @app.exception_handler(ConflictoNegocio)
