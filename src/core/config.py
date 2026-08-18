@@ -27,3 +27,4 @@ MAX_GESTIONES_DIA = 3
 
 SESION_DURACION_HORAS = int(os.getenv("SESION_DURACION_HORAS", "8"))
 COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"
+NOMBRE_COOKIE_SESION = "id_sesion"

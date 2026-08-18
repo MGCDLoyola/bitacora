@@ -1,15 +1,13 @@
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
-from src.core.config import COOKIE_SECURE, SESION_DURACION_HORAS
+from src.core.config import COOKIE_SECURE, NOMBRE_COOKIE_SESION, SESION_DURACION_HORAS
 from src.core.database import get_session
 from src.schemas.auth import LoginRequest
 from src.schemas.usuario import UsuarioRead
 from src.services.auth import AuthService
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
-
-NOMBRE_COOKIE_SESION = "id_sesion"
 
 
 @router.post("/login", response_model=UsuarioRead)
