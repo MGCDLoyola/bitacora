@@ -3,8 +3,9 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from src.core.exceptions import BitacoraError, NoEncontrado, ConflictoNegocio, OperacionInvalida
+from src.core.exceptions import BitacoraError, NoEncontrado, ConflictoNegocio, OperacionInvalida, NoAutorizado
 from src.core.logging import configurar_logging
+from src.routers.auth import router as auth_router
 from src.routers.roles import router as roles_router
 
 configurar_logging()
@@ -13,12 +14,18 @@ logger = logging.getLogger("bitacora")
 
 app = FastAPI()
 
+app.include_router(auth_router)
 app.include_router(roles_router)
 
 
 @app.exception_handler(NoEncontrado)
 def handle_no_encontrado(request: Request, exc: NoEncontrado):
     return JSONResponse(status_code=404, content={"detail": exc.mensaje})
+
+
+@app.exception_handler(NoAutorizado)
+def handle_no_autorizado(request: Request, exc: NoAutorizado):
+    return JSONResponse(status_code=401, content={"detail": exc.mensaje})
 
 
 @app.exception_handler(ConflictoNegocio)

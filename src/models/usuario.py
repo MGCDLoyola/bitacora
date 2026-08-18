@@ -92,6 +92,10 @@ class Usuario(AuditoriaMixin, Base):
         back_populates="usuario"
     )
 
+    @property
+    def requiere_cambio_password(self) -> bool:
+        return self.ultimo_acceso is None
+
     def set_password(self, password: str) -> None:
         self.password_hash = generate_password_hash(password)
 

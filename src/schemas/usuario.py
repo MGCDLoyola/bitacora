@@ -24,3 +24,4 @@ class UsuarioRead(UsuarioBase):
     id    : int
     rol   : RolRead
     firma : str | None = None
+    requiere_cambio_password : bool

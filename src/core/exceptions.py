@@ -15,3 +15,6 @@ class ConflictoNegocio(BitacoraError):
 
 class OperacionInvalida(BitacoraError):
     pass
+
+class NoAutorizado(BitacoraError):
+    pass
