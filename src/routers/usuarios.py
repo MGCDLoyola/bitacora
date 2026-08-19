@@ -12,6 +12,7 @@ from src.core.exceptions import ErrorEnvioCredenciales, OperacionInvalida
 from src.core.plantillas import correo_alta_usuario
 from src.models.usuario import Usuario
 from src.schemas.usuario import UsuarioCreate, UsuarioRead
+from src.services.firma import FirmaService
 from src.services.usuario import UsuarioService
 
 
@@ -85,18 +86,19 @@ def subir_firma(
     usuario_actual: Usuario = Depends(usuario_actual),
     session: Session = Depends(get_session),
 ):
-    if archivo.content_type != "image/png":
-        raise OperacionInvalida(
-            "La firma debe estar en formato PNG."
-        )
 
     contenido = archivo.file.read()
+
+    try:
+        firma_procesada = FirmaService.procesar(contenido)
+    except ValueError as exc:
+        raise OperacionInvalida(str(exc)) from exc
 
     servicio = UsuarioService(session)
 
     servicio.guardar_firma(
         usuario=usuario_actual,
-        contenido=contenido
+        contenido=firma_procesada
     )
 
     return usuario_actual
