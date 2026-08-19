@@ -123,7 +123,7 @@ def procesar_informacion(session: Session, mailbox: Mailbox) -> None:
             f"No existe el tipo de documento '{TIPO_DOCUMENTO_INFORMACION}'."
         )
 
-    mensajes = mailbox.buscar_enviados(ASUNTO_SUSPENSION, hoy)
+    mensajes = mailbox.buscar(ASUNTO_SUSPENSION, hoy, carpeta='SentItems')
 
     print(f"Correos encontrados: {len(mensajes)}")
 
