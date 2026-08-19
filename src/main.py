@@ -9,10 +9,12 @@ from src.core.exceptions import (BitacoraError,
                                  OperacionInvalida, 
                                  NoAutorizado, 
                                  CambioPasswordRequerido,
-                                 PermisoDenegado)
+                                 PermisoDenegado,
+                                 ErrorEnvioCredenciales)
 from src.core.logging import configurar_logging
 from src.routers.auth import router as auth_router
 from src.routers.roles import router as roles_router
+from src.routers.usuarios import router as usuarios_router
 
 configurar_logging()
 
@@ -22,6 +24,7 @@ app = FastAPI()
 
 app.include_router(auth_router)
 app.include_router(roles_router)
+app.include_router(usuarios_router)
 
 
 @app.exception_handler(NoEncontrado)
@@ -41,6 +44,22 @@ def handle_cambio_password_requerido(request: Request, exc: CambioPasswordRequer
 @app.exception_handler(PermisoDenegado)
 def handle_permiso_denegado(request: Request, exc: PermisoDenegado):
     return JSONResponse(status_code=403, content={"detail": exc.mensaje})
+
+@app.exception_handler(ErrorEnvioCredenciales)
+def handle_error_envio_credenciales(
+    request: Request,
+    exc: ErrorEnvioCredenciales
+):
+    logger.error(
+        "Error al enviar credenciales en %s: %s",
+        request.url.path,
+        exc.mensaje
+    )
+
+    return JSONResponse(
+        status_code=500,
+        content={"detail": exc.mensaje}
+    )
 
 @app.exception_handler(ConflictoNegocio)
 def handle_conflicto(request: Request, exc: ConflictoNegocio):

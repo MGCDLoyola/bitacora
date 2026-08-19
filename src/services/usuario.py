@@ -1,4 +1,4 @@
-import random
+import secrets
 
 from sqlalchemy import select
 
@@ -59,7 +59,7 @@ class UsuarioService(BaseService):
                 f"Ya existe un usuario con el correo '{data.correo}'"
             )
 
-        codigo = f"{random.randint(0, 999999):06d}"
+        codigo = f"{secrets.randbelow(1_000_000):06d}"
 
         usuario = Usuario(
             nombre=data.nombre,

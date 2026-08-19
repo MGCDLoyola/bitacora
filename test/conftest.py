@@ -134,3 +134,37 @@ def sesion_expirada(db, usuario_normal):
     if existe is not None:
         db.delete(existe)
         db.commit()
+
+@pytest.fixture
+def usuario_administrador(db, rol_administrador):
+
+    usuario = Usuario(
+        id_rol=rol_administrador.id,
+        nombre="Test Etapa8 Administrador",
+        correo=f"test_admin_{uuid.uuid4().hex[:8]}@bitacora.test",
+        activo=True,
+        ultimo_acceso=datetime.now(timezone.utc)
+    )
+
+    usuario.set_password("PasswordAdmin123")
+
+    db.add(usuario)
+    db.commit()
+    db.refresh(usuario)
+
+    yield usuario
+
+    _borrar_usuario_y_sesiones(db, usuario)
+
+@pytest.fixture
+def usuario_creado(db):
+    correo = "diego.loyola@mgcmexico.com.mx"
+
+    yield correo
+
+    usuario = db.scalar(
+        select(Usuario).where(Usuario.correo == correo)
+    )
+
+    if usuario is not None:
+        _borrar_usuario_y_sesiones(db, usuario)

@@ -10,6 +10,14 @@ from src.core.exceptions import CambioPasswordRequerido, NoAutorizado, PermisoDe
 from src.models.sesion import Sesion
 from src.models.usuario import Usuario
 
+from src.core.config import (
+    GRAPH_TENANT_ID,
+    GRAPH_CLIENT_ID,
+    GRAPH_CLIENT_SECRET,
+    GRAPH_MAILBOX,
+)
+from mgc_graph import GraphAuth, GraphClient, Mail, Mailbox
+
 
 def sesion_actual(
     id_sesion: uuid.UUID | None = Cookie(default=None, alias=NOMBRE_COOKIE_SESION),
@@ -57,3 +65,26 @@ def requiere_rol(*roles: str):
             )
         return usuario
     return dependencia
+
+def graph_client() -> GraphClient:
+
+    auth = GraphAuth(
+        GRAPH_TENANT_ID,
+        GRAPH_CLIENT_ID,
+        GRAPH_CLIENT_SECRET,
+        verify_ssl=False
+    )
+
+    return GraphClient(auth)
+
+def mail(
+    client: GraphClient = Depends(graph_client)
+) -> Mail:
+
+    return Mail(client, GRAPH_MAILBOX)
+
+def mailbox(
+    client: GraphClient = Depends(graph_client)
+) -> Mailbox:
+
+    return Mailbox(client, GRAPH_MAILBOX)

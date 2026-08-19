@@ -26,3 +26,7 @@ class CambioPasswordRequerido(BitacoraError):
 
 class PermisoDenegado(BitacoraError):
     pass
+
+
+class ErrorEnvioCredenciales(BitacoraError):
+    pass
