@@ -13,6 +13,9 @@ from src.services.base import BaseService
 from collections.abc import Sequence
 
 
+NOMBRE_FIRMA = "firma.png"
+
+
 class UsuarioService(BaseService):
 
     def listar(self) -> Sequence[Usuario]:
@@ -99,21 +102,18 @@ class UsuarioService(BaseService):
 
         return usuario
 
-    def guardar_firma(self, usuario: Usuario, contenido: bytes) -> str:
+    def guardar_firma(self, usuario: Usuario, contenido: bytes) -> None:
 
         carpeta = carpeta_firmas(usuario)
         crear_carpeta_firmas(usuario)
 
-        nombre = "firma.png"
-        ruta = carpeta / nombre
+        ruta = carpeta / NOMBRE_FIRMA
 
         ruta.write_bytes(contenido)
 
-        usuario.firma = nombre
+        usuario.firma = True
 
         self._commit()
-
-        return nombre
 
     def obtener_firma(self, usuario: Usuario) -> Path:
         if not usuario.firma:
@@ -121,7 +121,7 @@ class UsuarioService(BaseService):
                 "El usuario no tiene una firma registrada."
             )
 
-        ruta = carpeta_firmas(usuario) / usuario.firma
+        ruta = carpeta_firmas(usuario) / NOMBRE_FIRMA
 
         if not ruta.is_file():
             raise NoEncontrado(
