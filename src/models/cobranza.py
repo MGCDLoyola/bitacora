@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, SmallInteger, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, SmallInteger, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.base import Base
@@ -48,6 +48,11 @@ class Cobranza(AuditoriaMixin, Base):
 
     fecha: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
+        nullable=False
+    )
+
+    contacto: Mapped[bool] = mapped_column(
+        Boolean,
         nullable=False
     )
 

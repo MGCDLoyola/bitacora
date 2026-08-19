@@ -47,6 +47,10 @@ class Expediente(AuditoriaMixin, Base):
         server_default="true"
     )
 
+    comentarios: Mapped[str | None] = mapped_column(
+        Text
+    )
+
     cliente: Mapped["Cliente"] = relationship(
         "Cliente",
         back_populates="expedientes"
