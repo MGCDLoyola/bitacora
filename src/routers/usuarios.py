@@ -89,16 +89,11 @@ def subir_firma(
 
     contenido = archivo.file.read()
 
-    try:
-        firma_procesada = FirmaService.procesar(contenido)
-    except ValueError as exc:
-        raise OperacionInvalida(str(exc)) from exc
-
     servicio = UsuarioService(session)
 
     servicio.guardar_firma(
         usuario=usuario_actual,
-        contenido=firma_procesada
+        contenido=contenido
     )
 
     return usuario_actual

@@ -9,6 +9,7 @@ from src.core.exceptions import NoEncontrado, OperacionInvalida
 from src.core.almacenamiento import crear_carpeta_firmas, carpeta_firmas
 
 from src.services.base import BaseService
+from src.services.firma import FirmaService
 
 from collections.abc import Sequence
 
@@ -104,12 +105,17 @@ class UsuarioService(BaseService):
 
     def guardar_firma(self, usuario: Usuario, contenido: bytes) -> None:
 
+        try:
+            procesada = FirmaService.procesar(contenido)
+        except ValueError as exc:
+            raise OperacionInvalida(str(exc)) from exc
+
         carpeta = carpeta_firmas(usuario)
         crear_carpeta_firmas(usuario)
 
         ruta = carpeta / NOMBRE_FIRMA
 
-        ruta.write_bytes(contenido)
+        ruta.write_bytes(procesada)
 
         usuario.firma = True
 
