@@ -1,13 +1,14 @@
 import logging
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from mgc_graph import Mail, Mailbox, MailError, MailboxError
 
 from src.core.database import get_session
-from src.core.deps import mail, mailbox, requiere_rol
-from src.core.exceptions import ErrorEnvioCredenciales
+from src.core.deps import mail, mailbox, requiere_rol, usuario_actual
+from src.core.exceptions import ErrorEnvioCredenciales, OperacionInvalida
 from src.core.plantillas import correo_alta_usuario
 from src.models.usuario import Usuario
 from src.schemas.usuario import UsuarioCreate, UsuarioRead
@@ -77,3 +78,40 @@ def crear_usuario(
             )
 
     return usuario
+
+@router.post("/me/firma", response_model=UsuarioRead)
+def subir_firma(
+    archivo: UploadFile = File(...),
+    usuario_actual: Usuario = Depends(usuario_actual),
+    session: Session = Depends(get_session),
+):
+    if archivo.content_type != "image/png":
+        raise OperacionInvalida(
+            "La firma debe estar en formato PNG."
+        )
+
+    contenido = archivo.file.read()
+
+    servicio = UsuarioService(session)
+
+    servicio.guardar_firma(
+        usuario=usuario_actual,
+        contenido=contenido
+    )
+
+    return usuario_actual
+
+@router.get("/me/firma")
+def obtener_firma(
+    usuario_actual: Usuario = Depends(usuario_actual),
+    session: Session = Depends(get_session),
+):
+    servicio = UsuarioService(session)
+
+    ruta = servicio.obtener_firma(usuario_actual)
+
+    return FileResponse(
+        path=ruta,
+        media_type="image/png",
+        filename="firma.png",
+    )

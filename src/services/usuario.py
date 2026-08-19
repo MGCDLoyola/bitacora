@@ -1,10 +1,12 @@
 import secrets
 
 from sqlalchemy import select
+from pathlib import Path
 
 from src.models.usuario import Usuario
 from src.schemas.usuario import UsuarioCreate, UsuarioUpdate
 from src.core.exceptions import NoEncontrado, OperacionInvalida
+from src.core.almacenamiento import crear_carpeta_firmas, carpeta_firmas
 
 from src.services.base import BaseService
 
@@ -96,3 +98,34 @@ class UsuarioService(BaseService):
         self._commit()
 
         return usuario
+
+    def guardar_firma(self, usuario: Usuario, contenido: bytes) -> str:
+
+        carpeta = carpeta_firmas(usuario)
+        crear_carpeta_firmas(usuario)
+
+        nombre = "firma.png"
+        ruta = carpeta / nombre
+
+        ruta.write_bytes(contenido)
+
+        usuario.firma = nombre
+
+        self._commit()
+
+        return nombre
+
+    def obtener_firma(self, usuario: Usuario) -> Path:
+        if not usuario.firma:
+            raise NoEncontrado(
+                "El usuario no tiene una firma registrada."
+            )
+
+        ruta = carpeta_firmas(usuario) / usuario.firma
+
+        if not ruta.is_file():
+            raise NoEncontrado(
+                "No se encontró el archivo de firma del usuario."
+            )
+
+        return ruta
