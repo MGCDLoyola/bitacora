@@ -7,8 +7,13 @@ class ExpedienteBase(SchemaBase):
 
     fecha_incumplimiento: date | None = None
 
+class ExpedienteUpdate(SchemaBase):
+
+    comentarios: str | None = None
+
 class ExpedienteRead(ExpedienteBase):
 
-    id      : int
-    cliente : ClienteRead
-    usuario : UsuarioRead | None = None
+    id          : int
+    cliente     : ClienteRead
+    usuario     : UsuarioRead | None = None
+    comentarios : str | None = None

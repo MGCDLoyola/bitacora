@@ -4,8 +4,8 @@ from pathlib import Path
 
 from sqlalchemy import select
 
-from src.core.exceptions import ConflictoNegocio, NoEncontrado
-from src.core.config import MAX_DIAS, MAX_GESTIONES_DIA
+from src.core.exceptions import ConflictoNegocio, NoEncontrado, OperacionInvalida
+from src.core.config import HORARIOS_GESTION, MAX_DIAS, MAX_GESTIONES_DIA
 
 from src.models.cobranza import Cobranza
 from src.models.expediente import Expediente
@@ -55,6 +55,8 @@ class CobranzaService(BaseService):
             id_expediente=id_expediente,
             dia=dia
         )
+
+        self._validar_horario(orden, data.fecha)
 
         cobranza = Cobranza(
             id_expediente=id_expediente,
@@ -158,6 +160,14 @@ class CobranzaService(BaseService):
             )
 
         return orden
+
+    def _validar_horario(self, orden: int, fecha) -> None:
+        inicio = HORARIOS_GESTION[orden]
+        if fecha.hour < inicio:
+            raise OperacionInvalida(
+                f"El intento {orden} solo se puede registrar "
+                f"a partir de las {inicio}:00 horas."
+            )
 
     def _cierre(
         self,

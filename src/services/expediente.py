@@ -8,6 +8,8 @@ from src.models.expediente import Expediente
 from src.core.almacenamiento import carpeta_expediente
 from src.core.exceptions import NoEncontrado
 
+from src.schemas.expediente import ExpedienteUpdate
+
 from src.services.usuario import UsuarioService
 from src.services.base import BaseService
 
@@ -86,6 +88,23 @@ class ExpedienteService(BaseService):
             .scalars()
             .all()
         )
+
+    def actualizar(
+        self,
+        id_expediente: int,
+        data: ExpedienteUpdate
+    ) -> Expediente:
+
+        expediente = self.obtener(id_expediente)
+
+        cambios = data.model_dump(exclude_unset=True)
+
+        for campo, valor in cambios.items():
+            setattr(expediente, campo, valor)
+
+        self._guardar(expediente)
+
+        return expediente
 
     def asignar(self, id_expediente: int, id_usuario: int | None) -> Expediente:
 
