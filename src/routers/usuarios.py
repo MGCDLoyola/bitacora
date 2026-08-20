@@ -99,7 +99,11 @@ def actualizar_usuario(
     usuario_actual: Usuario = Depends(requiere_rol("Administrador")),
     session: Session = Depends(get_session),
 ):
-    return UsuarioService(session).actualizar(id_usuario, data)
+    return UsuarioService(session).actualizar(
+        id_usuario,
+        data,
+        usuario_actual
+    )
 
 @router.patch("/{id_usuario}/estado", response_model=UsuarioRead)
 def actualizar_estado_usuario(

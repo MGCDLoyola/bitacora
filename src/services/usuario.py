@@ -81,10 +81,19 @@ class UsuarioService(BaseService):
     def actualizar(
         self,
         id_usuario: int,
-        data: UsuarioUpdate
+        data: UsuarioUpdate,
+        usuario_actual: Usuario
     ) -> Usuario:
 
         usuario = self.obtener(id_usuario)
+
+        if (
+            usuario.rol.nombre == "Administrador"
+            and usuario.id != usuario_actual.id
+        ):
+            raise OperacionInvalida(
+                "Un Administrador no puede modificar a otro Administrador."
+            )
 
         cambios = data.model_dump(exclude_unset=True)
 
