@@ -128,7 +128,7 @@ def crear_cobranza(
 
 
 @router.post("/{id_expediente}/gestiones/{dia}/pdf")
-def generar_pdf_gestion(
+def generar_pdf_cobranza(
     id_expediente: int,
     dia: int,
     session: Session = Depends(get_session),
