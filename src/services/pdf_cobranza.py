@@ -1,3 +1,4 @@
+import uuid
 from pathlib import Path
 from datetime import timedelta
 
@@ -6,17 +7,23 @@ from mdb import PostgreSQL
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import select
 
-from src.core.almacenamiento import carpeta_gestion_dia, crear_carpeta_gestion_dia
+from src.core.almacenamiento import (
+    carpeta_cierre,
+    crear_carpeta_cierre,
+)
 from src.core.config import HORARIOS_GESTION, TABLA_V
 from src.core.exceptions import ConflictoNegocio, NoEncontrado
 from src.core.pdf import imagen_base64, renderizar_pdf
 
 from src.models.cobranza import Cobranza
+from src.models.documento import Documento
+from src.models.tipo_documento import TipoDocumento
 
 from src.services.base import BaseService
 from src.services.expediente import ExpedienteService
 
 from src.utils.money import money
+
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 LOGO_PATH = TEMPLATES_DIR / "assets" / "mgc_logo.png"
@@ -26,7 +33,7 @@ _entorno = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
 
 class PDFCobranzaService(BaseService):
 
-    NOMBRE_ARCHIVO = "Gestion.pdf"
+    NOMBRE_ARCHIVO = "Bitácora.pdf"
 
     def __init__(
         self,
@@ -143,11 +150,52 @@ class PDFCobranzaService(BaseService):
 
         pdf_bytes = renderizar_pdf(html)
 
-        carpeta = carpeta_gestion_dia(cliente, expediente, fecha_dia)
-        crear_carpeta_gestion_dia(cliente, expediente, fecha_dia)
+        # ---------------------------------------------------------
+        # Guardar bitácora en 2. Cierre
+        # ---------------------------------------------------------
 
-        ruta = carpeta / self.NOMBRE_ARCHIVO
+        crear_carpeta_cierre(cliente, expediente)
+
+        carpeta = carpeta_cierre(cliente, expediente)
+
+        nombre_documento = f"Bitácora {dia}.pdf"
+        ruta = carpeta / nombre_documento
 
         ruta.write_bytes(pdf_bytes)
+
+        # ---------------------------------------------------------
+        # Registrar documento en la base de datos
+        # ---------------------------------------------------------
+
+        tipo_documento = self.session.scalar(
+            select(TipoDocumento)
+            .where(TipoDocumento.nombre == f"Bitácora {dia}")
+        )
+
+        if tipo_documento is None:
+            if ruta.exists():
+                ruta.unlink()
+
+            raise ConflictoNegocio(
+                f"No existe el tipo de documento 'Bitácora {dia}'."
+            )
+
+        documento = Documento(
+            id_expediente=expediente.id,
+            id_usuario=responsable.id,
+            id_tipo_documento=tipo_documento.id,
+            uuid_archivo=uuid.uuid4(),
+            nombre_original=nombre_documento,
+            ruta_archivo=str(ruta),
+        )
+
+        self.session.add(documento)
+
+        try:
+            self._commit()
+        except Exception:
+            if ruta.exists():
+                ruta.unlink()
+            raise
 
         return ruta
