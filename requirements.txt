@@ -8,3 +8,5 @@ git+https://github.com/MGCDLoyola/MDB.git@v1.1.2
 git+https://github.com/MGCDLoyola/mgc-graph.git@v1.3.0
 Pillow
 opencv-python
+Jinja2
+playwright
