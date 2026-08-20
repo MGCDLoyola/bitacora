@@ -88,7 +88,7 @@ class PDFCobranzaService(BaseService):
             ],
         }
 
-        plantilla = _entorno.get_template("pdf_gestion.html")
+        plantilla = _entorno.get_template("pdf_cobranza.html")
 
         html = plantilla.render(**contexto)
 
