@@ -42,14 +42,14 @@ class EvidenciaService(BaseService):
 
         return evidencia
 
-    def crear(self, id_cobranza: int, id_usuario: int, archivo: UploadFile) -> Evidencia:
+    def crear(self, id_cobranza: int, id_usuario: int, tipo: str, archivo: UploadFile) -> Evidencia:
 
         cobranza = CobranzaService(self.session).obtener(id_cobranza)
 
         expediente = cobranza.expediente
         cliente = expediente.cliente
 
-        carpeta = carpeta_gestion(cliente, expediente, cobranza.fecha.date(), cobranza.orden)
+        carpeta = carpeta_gestion(cliente, expediente, cobranza.fecha.date(), cobranza.orden, tipo)
 
         uuid_archivo = uuid.uuid4()
         extension = Path(archivo.filename).suffix
@@ -58,6 +58,7 @@ class EvidenciaService(BaseService):
         evidencia = Evidencia(
             id_cobranza=id_cobranza,
             id_usuario=id_usuario,
+            tipo=tipo,
             uuid_archivo=uuid_archivo,
             nombre_original=archivo.filename,
             ruta_archivo=str(ruta_destino)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 from sqlalchemy.orm import Session
 
 from src.core.database import get_session
@@ -20,6 +20,7 @@ router = APIRouter(
 )
 def subir_evidencia(
     id_cobranza: int,
+    tipo: str = Form(...),
     archivo: UploadFile = File(...),
     session: Session = Depends(get_session),
     usuario_actual: Usuario = Depends(
@@ -31,6 +32,7 @@ def subir_evidencia(
     return servicio.crear(
         id_cobranza=id_cobranza,
         id_usuario=usuario_actual.id,
+        tipo=tipo,
         archivo=archivo
     )
 

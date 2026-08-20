@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import ForeignKey, String, Text, Uuid
+from sqlalchemy import CheckConstraint, ForeignKey, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.base import Base
@@ -15,6 +15,9 @@ if TYPE_CHECKING:
 
 class Evidencia(AuditoriaMixin, Base):
     __tablename__ = "evidencias"
+    __table_args__ = (
+        CheckConstraint("tipo IN ('AVISO', 'RESPUESTA')", name="chk_tipo_evidencia"),
+    )
 
     id: Mapped[int] = mapped_column(
         "id_evidencia",
@@ -23,6 +26,11 @@ class Evidencia(AuditoriaMixin, Base):
 
     id_cobranza: Mapped[int] = mapped_column(
         ForeignKey("cobranzas.id_cobranza", ondelete="CASCADE"),
+        nullable=False
+    )
+
+    tipo: Mapped[str] = mapped_column(
+        String(20),
         nullable=False
     )
 
