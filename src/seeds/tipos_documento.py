@@ -11,7 +11,8 @@ def seed_tipos_documento(session: Session) -> None:
         {"nombre": "Bitácora 3"},
         {"nombre": "Bitácora 4"},
         {"nombre": "Consolidación"},
-        {"nombre": "ZIP de Consolidación"}
+        {"nombre": "ZIP de Consolidación"},
+        {"nombre": "Estado de Cuenta SAP"},
     ]
 
     for datos in tipos:

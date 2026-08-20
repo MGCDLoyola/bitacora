@@ -21,6 +21,7 @@ from src.routers.usuarios import router as usuarios_router
 from src.routers.expedientes import router as expedientes_router
 from src.routers.evidencias import router as evidencias_router
 from src.routers.cobranzas import router as cobranzas_router
+from src.routers.documentos import router as documentos_router
 
 configurar_logging()
 
@@ -43,6 +44,7 @@ app.include_router(usuarios_router)
 app.include_router(expedientes_router)
 app.include_router(evidencias_router)
 app.include_router(cobranzas_router)
+app.include_router(documentos_router)
 
 
 @app.exception_handler(NoEncontrado)

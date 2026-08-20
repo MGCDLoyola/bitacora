@@ -1,8 +1,5 @@
 import uuid
 from pathlib import Path
-from datetime import timedelta
-
-from mdb import PostgreSQL
 
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import select
@@ -11,8 +8,9 @@ from src.core.almacenamiento import (
     carpeta_cierre,
     crear_carpeta_cierre,
 )
-from src.core.config import HORARIOS_GESTION, TABLA_V
+from src.core.config import HORARIOS_GESTION
 from src.core.exceptions import ConflictoNegocio, NoEncontrado
+from src.core.monto import obtener_montos_vencido
 from src.core.pdf import imagen_base64, renderizar_pdf
 
 from src.models.cobranza import Cobranza
@@ -35,53 +33,17 @@ class PDFCobranzaService(BaseService):
 
     NOMBRE_ARCHIVO = "Bitácora.pdf"
 
-    def __init__(
-        self,
-        session,
-        pg: PostgreSQL,
-    ):
-        super().__init__(session)
-        self.pg = pg
-
     def generar(self, id_expediente: int, dia: int) -> Path:
 
         expediente = ExpedienteService(self.session).obtener(id_expediente)
 
-        fecha_objetivo = (
-            expediente.fecha_creacion
-            + timedelta(days=dia - 1)
-        ).date()
-
-        filas = self.pg.consultar(
-            query=f'''
-                SELECT "Monto vencimiento" AS monto_vencimiento
-                FROM "{TABLA_V}"
-                WHERE "Interlocutor" = :interlocutor
-                AND "Fecha" <= :fecha_objetivo
-                ORDER BY "Fecha" DESC
-                LIMIT 1
-            ''',
-            params={
-                "interlocutor": expediente.interlocutor,
-                "fecha_objetivo": fecha_objetivo,
-            },
-            output="dict",
+        filas = obtener_montos_vencido(
+            interlocutor=expediente.interlocutor,
+            fecha_creacion=expediente.fecha_creacion.date(),
+            cantidad=dia,
         )
 
-        if not filas:
-            raise ConflictoNegocio(
-                f"No se encontró un vencimiento para el interlocutor "
-                f"'{expediente.interlocutor}' hasta la fecha "
-                f"{fecha_objetivo:%d/%m/%Y}."
-            )
-
-        monto_vencido = filas[0]["monto_vencimiento"]
-
-        if monto_vencido is None:
-            raise ConflictoNegocio(
-                f"El vencimiento del interlocutor "
-                f"'{expediente.interlocutor}' no tiene monto registrado."
-            )
+        monto_vencido = filas[-1]["monto_vencimiento"]
 
         cliente = expediente.cliente
 
