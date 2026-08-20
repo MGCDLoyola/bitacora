@@ -10,6 +10,10 @@ def seed_roles(session: Session) -> None:
             "descripcion": "Acceso completo al sistema."
         },
         {
+            "nombre": "Supervisor",
+            "descripcion": "Permite supervisar usuarios, expedientes y cobranzas."
+        },
+        {
             "nombre": "Visualizador",
             "descripcion": "Unicamente puede visualizar los documentos."
         },

@@ -11,7 +11,7 @@ from src.core.deps import mail, mailbox, requiere_rol, usuario_actual
 from src.core.exceptions import ErrorEnvioCredenciales, OperacionInvalida
 from src.core.plantillas import correo_alta_usuario
 from src.models.usuario import Usuario
-from src.schemas.usuario import UsuarioCreate, UsuarioRead, UsuarioUpdate
+from src.schemas.usuario import UsuarioCreate, UsuarioRead, UsuarioUpdate, UsuarioUpdateSupervisor
 from src.services.firma import FirmaService
 from src.services.usuario import UsuarioService
 
@@ -82,10 +82,14 @@ def crear_usuario(
 
 @router.get("", response_model=list[UsuarioRead])
 def listar_usuarios(
-    usuario_actual: Usuario = Depends(requiere_rol("Administrador")),
+    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor")),
     session: Session = Depends(get_session),
 ):
-    return UsuarioService(session).listar()
+    incluir_admin = usuario_actual.rol.nombre == "Administrador"
+
+    return UsuarioService(session).listar(
+        incluir_admin=incluir_admin
+    )
 
 
 @router.patch("/{id_usuario}", response_model=UsuarioRead)
@@ -96,6 +100,18 @@ def actualizar_usuario(
     session: Session = Depends(get_session),
 ):
     return UsuarioService(session).actualizar(id_usuario, data)
+
+@router.patch("/{id_usuario}/estado", response_model=UsuarioRead)
+def actualizar_estado_usuario(
+    id_usuario: int,
+    data: UsuarioUpdateSupervisor,
+    usuario_actual: Usuario = Depends(requiere_rol("Supervisor")),
+    session: Session = Depends(get_session),
+):
+    return UsuarioService(session).actualizar_supervisor(
+        id_usuario,
+        data
+    )
 
 @router.post("/me/firma", response_model=UsuarioRead)
 def subir_firma(

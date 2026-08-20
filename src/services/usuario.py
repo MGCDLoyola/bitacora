@@ -4,7 +4,7 @@ from sqlalchemy import select
 from pathlib import Path
 
 from src.models.usuario import Usuario
-from src.schemas.usuario import UsuarioCreate, UsuarioUpdate
+from src.schemas.usuario import UsuarioCreate, UsuarioUpdate, UsuarioUpdateSupervisor
 from src.core.exceptions import NoEncontrado, OperacionInvalida
 from src.core.almacenamiento import crear_carpeta_firmas, carpeta_firmas
 
@@ -19,19 +19,16 @@ NOMBRE_FIRMA = "firma.png"
 
 class UsuarioService(BaseService):
 
-    def listar(self) -> Sequence[Usuario]:
+    def listar(self, incluir_admin: bool = True) -> Sequence[Usuario]:
 
-        stmt = (
-            select(Usuario)
-            .order_by(Usuario.id)
-        )
+        stmt = select(Usuario)
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        if not incluir_admin:
+            stmt = stmt.where(Usuario.id_rol != 1)
+
+        stmt = stmt.order_by(Usuario.id)
+
+        return self.session.execute(stmt).scalars().all()
 
     def obtener(self, id_usuario: int, activos: bool = False, cobranza: bool = False) -> Usuario:
         usuario = self.session.get(Usuario, id_usuario)
@@ -81,7 +78,11 @@ class UsuarioService(BaseService):
 
         return usuario, codigo
 
-    def actualizar(self, id_usuario: int, data: UsuarioUpdate) -> Usuario:
+    def actualizar(
+        self,
+        id_usuario: int,
+        data: UsuarioUpdate
+    ) -> Usuario:
 
         usuario = self.obtener(id_usuario)
 
@@ -94,7 +95,32 @@ class UsuarioService(BaseService):
             )
 
             if existente is not None:
-                raise OperacionInvalida(f"Ya existe un usuario con el correo '{cambios['correo']}'")
+                raise OperacionInvalida(
+                    f"Ya existe un usuario con el correo '{cambios['correo']}'"
+                )
+
+        for campo, valor in cambios.items():
+            setattr(usuario, campo, valor)
+
+        self._guardar(usuario)
+
+        return usuario
+
+
+    def actualizar_supervisor(
+        self,
+        id_usuario: int,
+        data: UsuarioUpdateSupervisor
+    ) -> Usuario:
+
+        usuario = self.obtener(id_usuario)
+
+        if usuario.rol.nombre == "Administrador":
+            raise OperacionInvalida(
+                "Un Supervisor no puede modificar a un Administrador."
+            )
+
+        cambios = data.model_dump(exclude_unset=True)
 
         for campo, valor in cambios.items():
             setattr(usuario, campo, valor)

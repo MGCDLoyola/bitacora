@@ -85,7 +85,7 @@ def asignar_expediente(
     id_expediente: int,
     id_usuario: int | None = None,
     session: Session = Depends(get_session),
-    usuario_actual: Usuario = Depends(requiere_rol("Administrador")),
+    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor")),
 ):
     servicio = ExpedienteService(session)
 
@@ -96,7 +96,7 @@ def asignar_expediente(
 def eliminar_expediente(
     id_expediente: int,
     session: Session = Depends(get_session),
-    usuario_actual: Usuario = Depends(requiere_rol("Administrador")),
+    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor")),
 ):
     servicio = ExpedienteService(session)
 
