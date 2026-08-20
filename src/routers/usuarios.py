@@ -120,7 +120,9 @@ def actualizar_estado_usuario(
 @router.post("/me/firma", response_model=UsuarioRead)
 def subir_firma(
     archivo: UploadFile = File(...),
-    usuario_actual: Usuario = Depends(usuario_actual),
+    usuario_actual: Usuario = Depends(
+        requiere_rol("Administrador", "Supervisor", "Cobranza")
+    ),
     session: Session = Depends(get_session),
 ):
 
@@ -137,7 +139,9 @@ def subir_firma(
 
 @router.get("/me/firma")
 def obtener_firma(
-    usuario_actual: Usuario = Depends(usuario_actual),
+    usuario_actual: Usuario = Depends(
+        requiere_rol("Administrador", "Supervisor", "Cobranza")
+    ),
     session: Session = Depends(get_session),
 ):
     servicio = UsuarioService(session)

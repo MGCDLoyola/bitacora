@@ -27,7 +27,7 @@ def actualizar_cobranza(
     id_cobranza: int,
     data: CobranzaUpdate,
     session: Session = Depends(get_session),
-    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Cobranza")),
+    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor", "Cobranza")),
 ):
     servicio = CobranzaService(session)
 

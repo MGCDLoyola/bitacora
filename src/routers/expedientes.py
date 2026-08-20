@@ -73,7 +73,7 @@ def actualizar_expediente(
     id_expediente: int,
     data: ExpedienteUpdate,
     session: Session = Depends(get_session),
-    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Cobranza")),
+    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor", "Cobranza")),
 ):
     servicio = ExpedienteService(session)
 
@@ -119,7 +119,7 @@ def crear_cobranza(
     id_expediente: int,
     data: CobranzaCreate,
     session: Session = Depends(get_session),
-    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Cobranza")),
+    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor", "Cobranza")),
 ):
     ExpedienteService(session).obtener(id_expediente)
 
@@ -136,7 +136,7 @@ def generar_pdf_cobranza(
     dia: int,
     session: Session = Depends(get_session),
     pg: PostgreSQL = Depends(get_pg),
-    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Cobranza")),
+    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor", "Cobranza")),
 ):
     servicio = PDFCobranzaService(session, pg)
 
