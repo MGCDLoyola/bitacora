@@ -1,6 +1,7 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from src.core.database import get_session
@@ -10,6 +11,7 @@ from src.schemas.cobranza import CobranzaCreate, CobranzaRead
 from src.schemas.expediente import ExpedienteRead, ExpedienteUpdate
 from src.services.cobranza import CobranzaService
 from src.services.expediente import ExpedienteService
+from src.services.pdf_cobranza import PDFCobranzaService
 
 
 router = APIRouter(prefix="/expedientes", tags=["Expedientes"])
@@ -87,6 +89,17 @@ def asignar_expediente(
     return servicio.asignar(id_expediente, id_usuario)
 
 
+@router.delete("/{id_expediente}", status_code=204)
+def eliminar_expediente(
+    id_expediente: int,
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(requiere_rol("Administrador")),
+):
+    servicio = ExpedienteService(session)
+
+    servicio.eliminar(id_expediente)
+
+
 @router.get("/{id_expediente}/cobranzas", response_model=list[CobranzaRead])
 def listar_cobranzas(
     id_expediente: int,
@@ -113,11 +126,20 @@ def crear_cobranza(
         data=data
     )
 
-@router.delete("/{id_expediente}", status_code=204)
-def eliminar_expediente(
+
+@router.post("/{id_expediente}/gestiones/{dia}/pdf")
+def generar_pdf_gestion(
     id_expediente: int,
+    dia: int,
     session: Session = Depends(get_session),
-    usuario_actual: Usuario = Depends(requiere_rol("Administrador")),
+    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Cobranza")),
 ):
-    servicio = ExpedienteService(session)
-    servicio.eliminar(id_expediente)
+    servicio = PDFCobranzaService(session)
+
+    ruta = servicio.generar(id_expediente, dia)
+
+    return FileResponse(
+        path=ruta,
+        media_type="application/pdf",
+        filename=ruta.name,
+    )

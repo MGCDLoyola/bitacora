@@ -37,6 +37,19 @@ def carpeta_gestion(
         / f"Intento {intento}"
     )
 
+def carpeta_gestion_dia(
+    cliente: Cliente,
+    expediente: Expediente,
+    fecha_gestion: date
+) -> Path:
+    fecha_str = fecha_gestion.strftime("%d-%m-%Y")
+
+    return (
+        carpeta_expediente(cliente, expediente)
+        / "3. Gestiones"
+        / fecha_str
+    )
+
 def carpeta_cierre(cliente: Cliente, expediente: Expediente) -> Path:
     return carpeta_expediente(cliente, expediente) / "2. Cierre"
 
@@ -63,6 +76,13 @@ def crear_carpeta_gestion(
     intento: int
 ) -> None:
     carpeta_gestion(cliente, expediente, fecha_gestion, intento).mkdir(parents=True, exist_ok=True)
+
+def crear_carpeta_gestion_dia(
+    cliente: Cliente,
+    expediente: Expediente,
+    fecha_gestion: date
+) -> None:
+    carpeta_gestion_dia(cliente, expediente, fecha_gestion).mkdir(parents=True, exist_ok=True)
 
 def crear_carpeta_cierre(cliente: Cliente, expediente: Expediente) -> None:
     carpeta_cierre(cliente, expediente).mkdir(parents=True, exist_ok=True)

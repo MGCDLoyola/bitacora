@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: Letter;
+        margin: 0;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Calibri, "Segoe UI", Arial, sans-serif;
+        color: #26282B;
+        font-size: 11px;
+        margin: 0;
+        padding: 36px 40px;
+    }
+
+    /* ---------- Encabezado ---------- */
+
+    .encabezado {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 16px;
+    }
+
+    .encabezado img {
+        height: 34px;
+    }
+
+    .encabezado .empresa {
+        text-align: right;
+    }
+
+    .encabezado .empresa .razon {
+        font-weight: bold;
+        color: #1F3864;
+        font-size: 11px;
+        letter-spacing: 0.3px;
+    }
+
+    .encabezado .empresa .area {
+        color: #8A8F98;
+        font-size: 9.5px;
+    }
+
+    .linea-acento {
+        height: 3px;
+        border-radius: 3px;
+        background: linear-gradient(90deg, #1F3864 0%, #9C7A2E 100%);
+        margin-bottom: 26px;
+    }
+
+    /* ---------- Título ---------- */
+
+    .titulo-bloque {
+        margin-bottom: 22px;
+    }
+
+    h1 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1F3864;
+        margin: 0 0 6px 0;
+        letter-spacing: -0.2px;
+    }
+
+    .badge-dia {
+        display: inline-block;
+        background: #FBF6EC;
+        color: #9C7A2E;
+        border: 1px solid #EAD9AF;
+        border-radius: 20px;
+        padding: 3px 12px;
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    /* ---------- Datos generales ---------- */
+
+    .seccion-label {
+        font-size: 9.5px;
+        font-weight: bold;
+        color: #8A8F98;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        margin: 0 0 8px 0;
+    }
+
+    .grid-datos {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 24px;
+    }
+
+    .grid-datos .full {
+        grid-column: 1 / -1;
+    }
+
+    .dato-card {
+        background: #F7F8FA;
+        border-radius: 8px;
+        padding: 9px 14px;
+    }
+
+    .dato-card .etiqueta {
+        font-size: 9px;
+        color: #8A8F98;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 2px;
+    }
+
+    .dato-card .valor {
+        font-size: 12px;
+        color: #1F2733;
+        font-weight: 600;
+    }
+
+    /* ---------- Intentos ---------- */
+
+    .intento-card {
+        border: 1px solid #E7E9EC;
+        border-left: 4px solid #1F3864;
+        border-radius: 10px;
+        margin-bottom: 14px;
+        overflow: hidden;
+    }
+
+    .intento-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        background: #F7F8FA;
+    }
+
+    .intento-header .titulo {
+        font-weight: bold;
+        color: #1F3864;
+        font-size: 11.5px;
+    }
+
+    .intento-header .horario {
+        color: #8A8F98;
+        font-size: 9.5px;
+    }
+
+    .intento-body {
+        padding: 14px 16px 4px 16px;
+    }
+
+    .intento-fila {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 12px;
+    }
+
+    .campo .etiqueta {
+        font-size: 9px;
+        color: #8A8F98;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 3px;
+    }
+
+    .campo .valor {
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #1F2733;
+    }
+
+    .pill {
+        display: inline-block;
+        border-radius: 20px;
+        padding: 2px 11px;
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    .pill.si {
+        background: #E7F6EC;
+        color: #1E8E4B;
+    }
+
+    .pill.no {
+        background: #FBEAEA;
+        color: #C23B3B;
+    }
+
+    .comentario-intento {
+        border-top: 1px solid #EFF1F3;
+        padding: 10px 0 12px 0;
+    }
+
+    .comentario-intento .etiqueta {
+        font-size: 9px;
+        color: #8A8F98;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-bottom: 4px;
+    }
+
+    .comentario-intento .texto {
+        font-size: 10.5px;
+        color: #444B54;
+        font-style: italic;
+        line-height: 1.4;
+    }
+
+    /* ---------- Comentarios generales ---------- */
+
+    .card-comentarios {
+        background: #F7F8FA;
+        border-radius: 10px;
+        padding: 14px 16px;
+        margin-top: 22px;
+        margin-bottom: 20px;
+    }
+
+    .card-comentarios .texto {
+        font-size: 10.5px;
+        color: #444B54;
+        font-style: italic;
+        line-height: 1.5;
+    }
+
+    /* ---------- Firma ---------- */
+
+    .pie {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-top: 30px;
+        padding-top: 14px;
+        border-top: 1px solid #EFF1F3;
+    }
+
+    .elabora {
+        font-size: 10.5px;
+        color: #444B54;
+    }
+
+    .elabora b {
+        color: #1F3864;
+    }
+
+    .firma-bloque {
+        text-align: center;
+        width: 200px;
+    }
+
+    .firma-bloque img {
+        max-width: 180px;
+        max-height: 64px;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .firma-linea {
+        border-top: 1px solid #C7CBD1;
+        margin-top: 4px;
+        padding-top: 3px;
+        font-size: 9.5px;
+        color: #8A8F98;
+    }
+</style>
+</head>
+<body>
+
+    <div class="encabezado">
+        <img src="{{ logo_base64 }}" alt="MGC">
+        <div class="empresa">
+            <div class="razon">MGC MÉXICO</div>
+            <div class="area">Supervisión de Cobranza Extrajudicial</div>
+        </div>
+    </div>
+    <div class="linea-acento"></div>
+
+    <div class="titulo-bloque">
+        <h1>Registro de Intentos de Llamada</h1>
+        <span class="badge-dia">Día {{ dia }} de seguimiento &nbsp;&middot;&nbsp; {{ fecha_dia }}</span>
+    </div>
+
+    <div class="seccion-label">Datos generales</div>
+    <div class="grid-datos">
+        <div class="dato-card full">
+            <div class="etiqueta">Cliente</div>
+            <div class="valor">{{ cliente.nombre }} ({{ cliente.interlocutor }})</div>
+        </div>
+        <div class="dato-card">
+            <div class="etiqueta">Monto vencido total</div>
+            <div class="valor">{{ monto_vencido or "N/D" }}</div>
+        </div>
+        <div class="dato-card">
+            <div class="etiqueta">Fecha de registro</div>
+            <div class="valor">{{ fecha_registro }}</div>
+        </div>
+        <div class="dato-card">
+            <div class="etiqueta">Responsable de cobranza</div>
+            <div class="valor">{{ responsable.nombre }}</div>
+        </div>
+    </div>
+
+    <div class="seccion-label">Intentos de contacto</div>
+
+    {% for intento in intentos %}
+    <div class="intento-card">
+        <div class="intento-header">
+            <span class="titulo">Intento de llamada {{ intento.orden }}</span>
+            <span class="horario">Horario programado: a partir de las {{ intento.horario_programado }} hrs.</span>
+        </div>
+        <div class="intento-body">
+            <div class="intento-fila">
+                <div class="campo">
+                    <div class="etiqueta">Hora real de contacto</div>
+                    <div class="valor">{{ intento.hora }} hrs.</div>
+                </div>
+                <div class="campo">
+                    <div class="etiqueta">Medio utilizado</div>
+                    <div class="valor">{{ intento.medio or "N/D" }}</div>
+                </div>
+                <div class="campo">
+                    <div class="etiqueta">¿Contactó al cliente?</div>
+                    <span class="pill {{ 'si' if intento.contacto else 'no' }}">
+                        {{ "Sí" if intento.contacto else "No" }}
+                    </span>
+                </div>
+            </div>
+            <div class="comentario-intento">
+                <div class="etiqueta">Comentarios / próximos pasos</div>
+                <div class="texto">{{ intento.comentarios or "Sin comentarios registrados." }}</div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="seccion-label">Comentarios generales del expediente</div>
+    <div class="card-comentarios">
+        <div class="texto">{{ comentarios_expediente or "Sin comentarios registrados." }}</div>
+    </div>
+
+    <div class="pie">
+        <div class="elabora">
+            Elabora: <b>{{ responsable.nombre }}</b><br>
+            Analista de Cobranza Extrajudicial
+        </div>
+        {% if firma_base64 %}
+        <div class="firma-bloque">
+            <img src="{{ firma_base64 }}" alt="Firma">
+            <div class="firma-linea">Firma de {{ responsable.nombre }}</div>
+        </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>
