@@ -64,6 +64,7 @@ class CobranzaService(BaseService):
             dia=dia,
             orden=orden,
             fecha=data.fecha,
+            contacto=data.contacto,
             medio=data.medio,
             comentarios=data.comentarios
         )

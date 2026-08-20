@@ -1,11 +1,14 @@
 from datetime import date
 
+from mdb import PostgreSQL
+
 from fastapi import APIRouter, Depends
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from src.core.database import get_session
 from src.core.deps import requiere_rol, usuario_actual
+from src.core.pg import get_pg
 from src.models.usuario import Usuario
 from src.schemas.cobranza import CobranzaCreate, CobranzaRead
 from src.schemas.expediente import ExpedienteRead, ExpedienteUpdate
@@ -132,9 +135,10 @@ def generar_pdf_cobranza(
     id_expediente: int,
     dia: int,
     session: Session = Depends(get_session),
+    pg: PostgreSQL = Depends(get_pg),
     usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Cobranza")),
 ):
-    servicio = PDFCobranzaService(session)
+    servicio = PDFCobranzaService(session, pg)
 
     ruta = servicio.generar(id_expediente, dia)
 

@@ -1,10 +1,13 @@
 from pathlib import Path
+from datetime import timedelta
+
+from mdb import PostgreSQL
 
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import select
 
 from src.core.almacenamiento import carpeta_gestion_dia, crear_carpeta_gestion_dia
-from src.core.config import HORARIOS_GESTION
+from src.core.config import HORARIOS_GESTION, TABLA_V
 from src.core.exceptions import ConflictoNegocio, NoEncontrado
 from src.core.pdf import imagen_base64, renderizar_pdf
 
@@ -12,6 +15,8 @@ from src.models.cobranza import Cobranza
 
 from src.services.base import BaseService
 from src.services.expediente import ExpedienteService
+
+from src.utils.money import money
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 LOGO_PATH = TEMPLATES_DIR / "assets" / "mgc_logo.png"
@@ -23,9 +28,53 @@ class PDFCobranzaService(BaseService):
 
     NOMBRE_ARCHIVO = "Gestion.pdf"
 
+    def __init__(
+        self,
+        session,
+        pg: PostgreSQL,
+    ):
+        super().__init__(session)
+        self.pg = pg
+
     def generar(self, id_expediente: int, dia: int) -> Path:
 
         expediente = ExpedienteService(self.session).obtener(id_expediente)
+
+        fecha_objetivo = (
+            expediente.fecha_creacion
+            + timedelta(days=dia - 1)
+        ).date()
+
+        filas = self.pg.consultar(
+            query=f'''
+                SELECT "Monto vencimiento" AS monto_vencimiento
+                FROM "{TABLA_V}"
+                WHERE "Interlocutor" = :interlocutor
+                AND "Fecha" <= :fecha_objetivo
+                ORDER BY "Fecha" DESC
+                LIMIT 1
+            ''',
+            params={
+                "interlocutor": expediente.interlocutor,
+                "fecha_objetivo": fecha_objetivo,
+            },
+            output="dict",
+        )
+
+        if not filas:
+            raise ConflictoNegocio(
+                f"No se encontró un vencimiento para el interlocutor "
+                f"'{expediente.interlocutor}' hasta la fecha "
+                f"{fecha_objetivo:%d/%m/%Y}."
+            )
+
+        monto_vencido = filas[0]["monto_vencimiento"]
+
+        if monto_vencido is None:
+            raise ConflictoNegocio(
+                f"El vencimiento del interlocutor "
+                f"'{expediente.interlocutor}' no tiene monto registrado."
+            )
 
         cliente = expediente.cliente
 
@@ -71,7 +120,7 @@ class PDFCobranzaService(BaseService):
             "fecha_registro": expediente.fecha_creacion.strftime("%d/%m/%Y"),
             "cliente": cliente,
             "responsable": responsable,
-            "monto_vencido": None,
+            "monto_vencido": money(monto_vencido),
             "comentarios_expediente": expediente.comentarios,
             "firma_base64": firma_base64,
             "logo_base64": imagen_base64(LOGO_PATH),

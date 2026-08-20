@@ -20,6 +20,7 @@ class BaseService:
 
     def _guardar(self, instancia: DeclarativeBase) -> None:
 
+        self.session.add(instancia)
         self._commit()
         self.session.refresh(instancia)
 

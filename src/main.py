@@ -3,6 +3,8 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
+from contextlib import asynccontextmanager
+
 from src.core.exceptions import (BitacoraError, 
                                  NoEncontrado, 
                                  ConflictoNegocio, 
@@ -12,6 +14,7 @@ from src.core.exceptions import (BitacoraError,
                                  PermisoDenegado,
                                  ErrorEnvioCredenciales)
 from src.core.logging import configurar_logging
+from src.core.pg import pg
 from src.routers.auth import router as auth_router
 from src.routers.roles import router as roles_router
 from src.routers.usuarios import router as usuarios_router
@@ -22,7 +25,16 @@ configurar_logging()
 
 logger = logging.getLogger("bitacora")
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    pg.conectar()
+
+    try:
+        yield
+    finally:
+        pg.desconectar()
+
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(auth_router)
 app.include_router(roles_router)
