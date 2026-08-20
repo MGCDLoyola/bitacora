@@ -19,6 +19,7 @@ from src.routers.auth import router as auth_router
 from src.routers.roles import router as roles_router
 from src.routers.usuarios import router as usuarios_router
 from src.routers.expedientes import router as expedientes_router
+from src.routers.evidencias import router as evidencias_router
 from src.routers.cobranzas import router as cobranzas_router
 
 configurar_logging()
@@ -40,6 +41,7 @@ app.include_router(auth_router)
 app.include_router(roles_router)
 app.include_router(usuarios_router)
 app.include_router(expedientes_router)
+app.include_router(evidencias_router)
 app.include_router(cobranzas_router)
 
 

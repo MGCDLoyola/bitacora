@@ -139,6 +139,10 @@ class PDFCobranzaService(BaseService):
                     "medio": intento.medio,
                     "contacto": intento.contacto,
                     "comentarios": intento.comentarios,
+                    "evidencias": [
+                        evidencia.nombre_original
+                        for evidencia in intento.evidencias
+                    ],
                 }
                 for intento in intentos
             ],
@@ -150,10 +154,6 @@ class PDFCobranzaService(BaseService):
 
         pdf_bytes = renderizar_pdf(html)
 
-        # ---------------------------------------------------------
-        # Guardar bitácora en 2. Cierre
-        # ---------------------------------------------------------
-
         crear_carpeta_cierre(cliente, expediente)
 
         carpeta = carpeta_cierre(cliente, expediente)
@@ -162,10 +162,6 @@ class PDFCobranzaService(BaseService):
         ruta = carpeta / nombre_documento
 
         ruta.write_bytes(pdf_bytes)
-
-        # ---------------------------------------------------------
-        # Registrar documento en la base de datos
-        # ---------------------------------------------------------
 
         tipo_documento = self.session.scalar(
             select(TipoDocumento)
