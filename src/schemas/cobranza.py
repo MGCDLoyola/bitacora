@@ -17,7 +17,7 @@ class CobranzaCreate(CobranzaBase):
 class CobranzaUpdate(SchemaBase):
 
     fecha       : datetime | None = None
-    contacto    : bool     | None = None
+    contacto    : bool     = None
     medio       : str      | None = None
     comentarios : str      | None = None
 

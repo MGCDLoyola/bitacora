@@ -86,6 +86,12 @@ class CobranzaService(BaseService):
         cambios = data.model_dump(exclude_unset=True)
 
         for campo, valor in cambios.items():
+
+            if valor is None and campo in ("fecha", "contacto"):
+                raise OperacionInvalida(
+                    f"El campo '{campo}' no puede ser nulo."
+                )
+
             setattr(cobranza, campo, valor)
 
         self._guardar(cobranza)
