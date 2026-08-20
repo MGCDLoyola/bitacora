@@ -99,7 +99,7 @@ class UsuarioService(BaseService):
         for campo, valor in cambios.items():
             setattr(usuario, campo, valor)
 
-        self._commit()
+        self._guardar(usuario)
 
         return usuario
 
