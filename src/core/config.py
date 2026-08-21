@@ -6,6 +6,8 @@ load_dotenv()
 
 DATABASE_URL = os.environ["DATABASE_URL"]
 
+PG_DUMP_PATH = os.getenv("PG_DUMP_PATH")
+
 PSQL_DATA_HOST = os.getenv("PSQL_DATA_HOST")
 PSQL_DATA_DB = os.getenv("PSQL_DATA_DB")
 PSQL_DATA_USR = os.getenv("PSQL_DATA_USR")
