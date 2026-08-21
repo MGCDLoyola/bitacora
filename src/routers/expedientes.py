@@ -12,6 +12,7 @@ from src.schemas.expediente import ExpedienteRead, ExpedienteUpdate
 from src.services.cobranza import CobranzaService
 from src.services.expediente import ExpedienteService
 from src.services.pdf_cobranza import PDFCobranzaService
+from src.services.pdf_consolidacion import PDFConsolidacionService
 
 
 router = APIRouter(prefix="/expedientes", tags=["Expedientes"])
@@ -137,6 +138,23 @@ def generar_pdf_cobranza(
     servicio = PDFCobranzaService(session)
 
     ruta = servicio.generar(id_expediente, dia)
+
+    return FileResponse(
+        path=ruta,
+        media_type="application/pdf",
+        filename=ruta.name,
+    )
+
+
+@router.post("/{id_expediente}/consolidacion/pdf")
+def generar_pdf_consolidacion(
+    id_expediente: int,
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor", "Cobranza")),
+):
+    servicio = PDFConsolidacionService(session)
+
+    ruta = servicio.generar(id_expediente)
 
     return FileResponse(
         path=ruta,
