@@ -10,7 +10,7 @@ from src.core.almacenamiento import (
 )
 from src.core.config import HORARIOS_GESTION
 from src.core.exceptions import ConflictoNegocio
-from src.core.monto import obtener_montos_vencido
+from src.core.monto import obtener_monto_vencido
 from src.core.pdf import imagen_base64, renderizar_pdf
 
 from src.models.documento import Documento
@@ -42,12 +42,6 @@ class PDFConsolidacionService(BaseService):
         cobranzas = preconsolidacion["cobranzas"]
         documentos_edc = preconsolidacion["documentos_edc"]
 
-        filas_monto = obtener_montos_vencido(
-            interlocutor=expediente.interlocutor,
-            fecha_creacion=expediente.fecha_creacion.date(),
-            cantidad=4,
-        )
-
         cliente = expediente.cliente
         responsable = expediente.usuario
 
@@ -77,15 +71,25 @@ class PDFConsolidacionService(BaseService):
             )
 
             if not intentos_dia:
-                raise ConflictoNegocio(
-                    f"El expediente '{id_expediente}' no tiene intentos registrados "
-                    f"para el día {dia}."
-                )
+                dias.append({
+                    "dia": dia,
+                    "fecha_dia": "N/D",
+                    "monto_vencido": "",
+                    "intentos": [],
+                })
+                continue
+
+            fecha_dia = intentos_dia[0].fecha.date()
+
+            monto_vencido = obtener_monto_vencido(
+                interlocutor=expediente.interlocutor,
+                fecha_ancla=fecha_dia,
+            )
 
             dias.append({
                 "dia": dia,
-                "fecha_dia": intentos_dia[0].fecha.date().strftime("%d/%m/%Y"),
-                "monto_vencido": money(filas_monto[dia - 1]["monto_vencimiento"]),
+                "fecha_dia": fecha_dia.strftime("%d/%m/%Y"),
+                "monto_vencido": money(monto_vencido),
                 "intentos": [
                     {
                         "orden": intento.orden,

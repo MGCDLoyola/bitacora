@@ -5,41 +5,33 @@ from src.core.exceptions import ConflictoNegocio
 from src.core.pg import pg
 
 
-def obtener_montos_vencido(interlocutor: str, fecha_creacion: date, cantidad: int) -> list[dict]:
+def obtener_monto_vencido(interlocutor: str, fecha_ancla: date) -> float | None:
 
     filas = pg.consultar(
         query=f'''
-            SELECT "Fecha" AS fecha, "Monto vencimiento" AS monto_vencimiento
+            SELECT "Monto vencimiento" AS monto_vencimiento
             FROM "{TABLA_V}"
             WHERE "Interlocutor" = :interlocutor
-            AND "Fecha" >= :fecha_creacion
-            ORDER BY "Fecha" ASC
-            LIMIT :cantidad
+            AND "Fecha" <= :fecha_ancla
+            ORDER BY "Fecha" DESC
+            LIMIT 1
         ''',
         params={
             "interlocutor": interlocutor,
-            "fecha_creacion": fecha_creacion,
-            "cantidad": cantidad,
+            "fecha_ancla": fecha_ancla,
         },
         output="dict",
     )
 
-    if len(filas) < cantidad:
+    if not filas:
+        return None
+
+    monto_vencimiento = filas[0]["monto_vencimiento"]
+
+    if monto_vencimiento is None:
         raise ConflictoNegocio(
-            f"No se encontraron suficientes registros de vencimiento para el "
-            f"interlocutor '{interlocutor}'. Se esperaban al menos {cantidad}, "
-            f"se encontraron {len(filas)}."
+            f"El vencimiento del interlocutor '{interlocutor}' con ancla "
+            f"{fecha_ancla:%d/%m/%Y} no tiene monto registrado."
         )
 
-    monto_faltante = next(
-        (fila for fila in filas if fila["monto_vencimiento"] is None),
-        None
-    )
-
-    if monto_faltante is not None:
-        raise ConflictoNegocio(
-            f"El vencimiento del interlocutor '{interlocutor}' con fecha "
-            f"{monto_faltante['fecha']:%d/%m/%Y} no tiene monto registrado."
-        )
-
-    return filas
+    return monto_vencimiento

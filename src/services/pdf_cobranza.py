@@ -10,7 +10,7 @@ from src.core.almacenamiento import (
 )
 from src.core.config import HORARIOS_GESTION
 from src.core.exceptions import ConflictoNegocio, NoEncontrado
-from src.core.monto import obtener_montos_vencido
+from src.core.monto import obtener_monto_vencido
 from src.core.pdf import imagen_base64, renderizar_pdf
 
 from src.models.cobranza import Cobranza
@@ -37,14 +37,6 @@ class PDFCobranzaService(BaseService):
 
         expediente = ExpedienteService(self.session).obtener(id_expediente)
 
-        filas = obtener_montos_vencido(
-            interlocutor=expediente.interlocutor,
-            fecha_creacion=expediente.fecha_creacion.date(),
-            cantidad=dia,
-        )
-
-        monto_vencido = filas[-1]["monto_vencimiento"]
-
         cliente = expediente.cliente
 
         intentos = (
@@ -64,6 +56,11 @@ class PDFCobranzaService(BaseService):
             )
 
         fecha_dia = intentos[0].fecha.date()
+
+        monto_vencido = obtener_monto_vencido(
+            interlocutor=expediente.interlocutor,
+            fecha_ancla=fecha_dia,
+        )
 
         responsable = expediente.usuario
 
