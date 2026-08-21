@@ -35,6 +35,10 @@ class Expediente(AuditoriaMixin, Base):
             Date
         )
 
+    fecha_desfase: Mapped[date | None] = mapped_column(
+        Date
+    )
+
     id_usuario: Mapped[int | None] = mapped_column(
         ForeignKey("usuarios.id_usuario", onupdate="CASCADE", ondelete="RESTRICT"),
         nullable=True
