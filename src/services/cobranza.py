@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import Path
 
 from sqlalchemy import select
@@ -46,10 +46,30 @@ class CobranzaService(BaseService):
         self,
         id_expediente: int,
         id_usuario: int,
+        dia: int,
         data: CobranzaCreate
     ) -> Cobranza:
 
-        dia = self._dia(id_expediente)
+        expediente = self.session.get(
+            Expediente,
+            id_expediente
+        )
+
+        if expediente is None:
+            raise NoEncontrado(
+                f"No existe un expediente con id '{id_expediente}'."
+            )
+
+        if not expediente.estado:
+            raise ConflictoNegocio(
+                "No se puede registrar una cobranza "
+                "en un expediente cerrado."
+            )
+
+        if not 1 <= dia <= MAX_DIAS:
+            raise OperacionInvalida(
+                f"El día de gestión debe estar entre 1 y {MAX_DIAS}."
+            )
 
         orden = self._orden(
             id_expediente=id_expediente,
@@ -70,8 +90,6 @@ class CobranzaService(BaseService):
         )
 
         self._guardar(cobranza)
-
-        self._cierre(cobranza)
 
         return cobranza
 
@@ -111,34 +129,6 @@ class CobranzaService(BaseService):
         for ruta in rutas:
             if ruta.exists():
                 ruta.unlink()
-
-    def _dia(self, id_expediente: int) -> int:
-
-        ultima = (
-            self.session.scalars(
-                select(Cobranza)
-                .where(Cobranza.id_expediente == id_expediente)
-                .order_by(
-                    Cobranza.dia.desc(),
-                    Cobranza.orden.desc()
-                )
-                .limit(1)
-            )
-            .first()
-        )
-
-        if ultima is None:
-            return 1
-
-        if ultima.fecha_creacion.date() == date.today():
-            return ultima.dia
-
-        if ultima.dia >= MAX_DIAS:
-            raise ConflictoNegocio(
-                "El expediente ya concluyó su periodo de seguimiento."
-            )
-
-        return ultima.dia + 1
 
     def _orden(
         self,
@@ -190,18 +180,3 @@ class CobranzaService(BaseService):
                 f"La hora capturada no corresponde al intento {orden}; "
                 f"debe ser a partir de las {inicio}:00 horas."
             )
-
-    def _cierre(
-        self,
-        cobranza: Cobranza
-    ) -> None:
-
-        if (
-            cobranza.dia == MAX_DIAS
-            and cobranza.orden == MAX_GESTIONES_DIA
-        ):
-            expediente = self.session.get(Expediente, cobranza.id_expediente)
-
-            expediente.fecha_consolidacion = date.today()
-
-            self._guardar(expediente)

@@ -111,18 +111,18 @@ def listar_cobranzas(
     return CobranzaService(session).listar_por_expediente(id_expediente)
 
 
-@router.post("/{id_expediente}/cobranzas", response_model=CobranzaRead)
+@router.post("/{id_expediente}/cobranzas/{dia}", response_model=CobranzaRead)
 def crear_cobranza(
     id_expediente: int,
+    dia: int,
     data: CobranzaCreate,
     session: Session = Depends(get_session),
     usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor", "Cobranza")),
 ):
-    ExpedienteService(session).obtener(id_expediente)
-
     return CobranzaService(session).crear(
         id_expediente=id_expediente,
         id_usuario=usuario_actual.id,
+        dia=dia,
         data=data
     )
 
