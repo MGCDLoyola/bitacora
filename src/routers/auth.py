@@ -1,11 +1,22 @@
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
-from src.core.config import COOKIE_SECURE, NOMBRE_COOKIE_SESION, SESION_DURACION_HORAS
+from mgc_graph import Mail, Mailbox
+
+from src.core.config import (
+    COOKIE_SECURE,
+    NOMBRE_COOKIE_SESION,
+    SESION_DURACION_HORAS,
+)
 from src.core.database import get_session
-from src.core.deps import sesion_actual
+from src.core.deps import mail, mailbox, sesion_actual
 from src.models.sesion import Sesion
-from src.schemas.auth import CambiarPasswordRequest, LoginRequest
+from src.schemas.auth import (
+    CambiarPasswordRequest,
+    ConfirmarRecuperacionRequest,
+    LoginRequest,
+    RecuperarPasswordRequest,
+)
 from src.schemas.usuario import UsuarioRead
 from src.services.auth import AuthService
 
@@ -49,6 +60,36 @@ def cambiar_password(
     )
 
     response.delete_cookie(NOMBRE_COOKIE_SESION)
+
+
+@router.post("/recuperar-pw", status_code=204)
+def recuperar_password(
+    data: RecuperarPasswordRequest,
+    session: Session = Depends(get_session),
+    mail: Mail = Depends(mail),
+    mailbox: Mailbox = Depends(mailbox),
+):
+    servicio = AuthService(session)
+
+    servicio.recuperar_password(
+        correo=data.correo,
+        mail=mail,
+        mailbox=mailbox,
+    )
+
+
+@router.post("/recuperar-pw/confirmar", status_code=204)
+def confirmar_recuperacion(
+    data: ConfirmarRecuperacionRequest,
+    session: Session = Depends(get_session),
+):
+    servicio = AuthService(session)
+
+    servicio.confirmar_recuperacion(
+        correo=data.correo,
+        codigo=data.codigo,
+        password_nueva=data.password_nueva,
+    )
 
 
 @router.post("/logout", status_code=204)

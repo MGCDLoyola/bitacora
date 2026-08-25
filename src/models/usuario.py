@@ -64,6 +64,14 @@ class Usuario(AuditoriaMixin, Base):
         server_default="false"
     )
 
+    codigo_recuperacion_hash: Mapped[str | None] = mapped_column(
+        String(255)
+    )
+
+    codigo_recuperacion_expira: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
+
     rol: Mapped["Rol"] = relationship(
         "Rol",
         back_populates="usuarios"
@@ -103,3 +111,20 @@ class Usuario(AuditoriaMixin, Base):
 
     def check_password(self, password: str) -> bool:
         return check_password_hash(self.password_hash, password)
+
+    def set_codigo_recuperacion(self, codigo: str, expira: datetime) -> None:
+        self.codigo_recuperacion_hash = generate_password_hash(codigo)
+        self.codigo_recuperacion_expira = expira
+
+    def check_codigo_recuperacion(self, codigo: str) -> bool:
+        if self.codigo_recuperacion_hash is None:
+            return False
+        if self.codigo_recuperacion_expira is None:
+            return False
+        if self.codigo_recuperacion_expira < datetime.now(self.codigo_recuperacion_expira.tzinfo):
+            return False
+        return check_password_hash(self.codigo_recuperacion_hash, codigo)
+
+    def limpiar_codigo_recuperacion(self) -> None:
+        self.codigo_recuperacion_hash = None
+        self.codigo_recuperacion_expira = None
