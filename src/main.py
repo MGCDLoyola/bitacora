@@ -1,9 +1,14 @@
 import logging
+import mimetypes
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from contextlib import asynccontextmanager
+
+mimetypes.add_type("text/css", ".css")
+mimetypes.add_type("application/javascript", ".js")
 
 from src.core.exceptions import (BitacoraError, 
                                  NoEncontrado, 
@@ -37,6 +42,18 @@ async def lifespan(app: FastAPI):
         pg.desconectar()
 
 app = FastAPI(lifespan=lifespan)
+
+app.mount(
+    "/static",
+    StaticFiles(directory="frontend"),
+    name="static"
+)
+
+
+@app.get("/login")
+def pagina_login():
+    return FileResponse("frontend/login.html")
+
 
 app.include_router(auth_router)
 app.include_router(roles_router)
