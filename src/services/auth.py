@@ -59,16 +59,22 @@ class AuthService(BaseService):
         self,
         usuario: Usuario,
         sesion_actual: Sesion,
-        password_actual: str,
+        password_actual: str | None,
         password_nueva: str
     ) -> None:
 
-        if not usuario.check_password(password_actual):
-            raise NoAutorizado(
-                "La contraseña actual es incorrecta."
-            )
+        if not usuario.requiere_cambio_password:
+            if not password_actual:
+                raise OperacionInvalida(
+                    "Debes proporcionar la contraseña actual."
+                )
 
-        if password_actual == password_nueva:
+            if not usuario.check_password(password_actual):
+                raise NoAutorizado(
+                    "La contraseña actual es incorrecta."
+                )
+
+        if usuario.check_password(password_nueva):
             raise OperacionInvalida(
                 "La nueva contraseña debe ser diferente a la actual."
             )

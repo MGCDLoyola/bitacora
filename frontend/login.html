@@ -4,33 +4,68 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark">
+
 <title>Bitácora · Acceso</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link
+    href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+>
+
 <link rel="stylesheet" href="/static/css/tokens.css">
+<link rel="stylesheet" href="/static/css/utilidades.css">
+<link rel="stylesheet" href="/static/css/componentes.css">
 <link rel="stylesheet" href="/static/css/login.css">
+
 <script defer src="/static/js/login.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+<script
+    defer
+    src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"
+></script>
 </head>
+
 <body>
 
 <div class="escena" x-data="loginApp()">
 
-    <div class="pestana">Supervisión de Cobranza Extrajudicial</div>
+    <div class="pestana">
+        Supervisión de Cobranza Extrajudicial
+    </div>
 
-    <div class="ficha">
+    <main class="ficha">
 
         <div class="marca">
-            <h1 class="marca__nombre">Bitácora</h1>
+            <h1 class="marca__nombre u-titulo u-texto-primario">
+                Bitácora
+            </h1>
         </div>
 
-        <p class="subtitulo" x-text="subtitulos[vista]"></p>
+        <p
+            class="subtitulo u-subtitulo u-texto-terciario"
+            x-text="subtitulos[vista]"
+        ></p>
 
-        <form x-show="vista === 'login'" x-cloak @submit.prevent="enviarLogin" novalidate>
+
+        <!-- LOGIN -->
+
+        <form
+            x-show="vista === 'login'"
+            x-cloak
+            @submit.prevent="enviarLogin"
+            novalidate
+        >
 
             <div class="campo">
-                <label for="correo">Correo</label>
+
+                <label
+                    for="correo"
+                    class="u-etiqueta u-texto-terciario"
+                >
+                    Correo
+                </label>
+
                 <input
                     id="correo"
                     type="email"
@@ -41,11 +76,21 @@
                     autofocus
                     required
                 >
+
             </div>
 
+
             <div class="campo">
-                <label for="password">Contraseña</label>
+
+                <label
+                    for="password"
+                    class="u-etiqueta u-texto-terciario"
+                >
+                    Contraseña
+                </label>
+
                 <div class="campo__envoltura">
+
                     <input
                         id="password"
                         :type="mostrarPassword ? 'text' : 'password'"
@@ -55,47 +100,126 @@
                         :disabled="cargando"
                         required
                     >
+
                     <button
                         type="button"
                         class="campo__alternar"
                         tabindex="-1"
                         @click="mostrarPassword = !mostrarPassword"
-                        :aria-label="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                        :aria-label="
+                            mostrarPassword
+                                ? 'Ocultar contraseña'
+                                : 'Mostrar contraseña'
+                        "
                     >
-                        <svg x-show="!mostrarPassword" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+
+                        <svg
+                            x-show="!mostrarPassword"
+                            width="17"
+                            height="17"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                        >
                             <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
                             <circle cx="12" cy="12" r="3"/>
                         </svg>
-                        <svg x-show="mostrarPassword" x-cloak width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+
+                        <svg
+                            x-show="mostrarPassword"
+                            x-cloak
+                            width="17"
+                            height="17"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                        >
                             <path d="M3 3l18 18"/>
                             <path d="M10.6 5.2A11.6 11.6 0 0 1 12 5c7 0 11 7 11 7a13.6 13.6 0 0 1-3.4 4M6.3 6.3C3.4 8.1 1 12 1 12s4 7 11 7a10.8 10.8 0 0 0 4.2-.8"/>
                             <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>
                         </svg>
+
                     </button>
+
                 </div>
+
                 <div class="campo__enlace">
-                    <button type="button" class="enlace" @click="irASolicitarCodigo">
+
+                    <button
+                        type="button"
+                        class="enlace"
+                        @click="irASolicitarCodigo"
+                    >
                         ¿Olvidaste tu contraseña?
                     </button>
+
                 </div>
+
             </div>
 
-            <button class="boton" type="submit" :disabled="cargando">
-                <span class="boton__spinner" x-show="cargando" x-cloak></span>
-                <span x-text="cargando ? 'Verificando' : 'Iniciar sesión'"></span>
+
+            <button
+                class="boton u-boton-texto"
+                type="submit"
+                :disabled="cargando"
+            >
+
+                <span
+                    class="boton__spinner"
+                    x-show="cargando"
+                    x-cloak
+                ></span>
+
+                <span
+                    x-text="
+                        cargando
+                            ? 'Verificando'
+                            : 'Iniciar sesión'
+                    "
+                ></span>
+
             </button>
 
-            <div class="mensaje-error" role="alert" aria-live="polite" x-show="error" x-cloak>
-                <span class="mensaje-error__sello">Rechazado</span>
+
+            <div
+                class="mensaje-error"
+                role="alert"
+                aria-live="polite"
+                x-show="error"
+                x-cloak
+            >
+
+                <span class="mensaje-error__sello">
+                    Rechazado
+                </span>
+
                 <span x-text="error"></span>
+
             </div>
 
         </form>
 
-        <form x-show="vista === 'solicitar'" x-cloak @submit.prevent="solicitarCodigo" novalidate>
+
+        <!-- SOLICITAR CÓDIGO -->
+
+        <form
+            x-show="vista === 'solicitar'"
+            x-cloak
+            @submit.prevent="solicitarCodigo"
+            novalidate
+        >
 
             <div class="campo">
-                <label for="correo-recuperacion">Correo</label>
+
+                <label
+                    for="correo-recuperacion"
+                    class="u-etiqueta u-texto-terciario"
+                >
+                    Correo
+                </label>
+
                 <input
                     id="correo-recuperacion"
                     type="email"
@@ -106,32 +230,94 @@
                     autofocus
                     required
                 >
+
             </div>
 
-            <button class="boton" type="submit" :disabled="cargando">
-                <span class="boton__spinner" x-show="cargando" x-cloak></span>
-                <span x-text="cargando ? 'Enviando' : 'Enviar código'"></span>
+
+            <button
+                class="boton u-boton-texto"
+                type="submit"
+                :disabled="cargando"
+            >
+
+                <span
+                    class="boton__spinner"
+                    x-show="cargando"
+                    x-cloak
+                ></span>
+
+                <span
+                    x-text="
+                        cargando
+                            ? 'Enviando'
+                            : 'Enviar código'
+                    "
+                ></span>
+
             </button>
 
-            <div class="mensaje-error" role="alert" aria-live="polite" x-show="error" x-cloak>
-                <span class="mensaje-error__sello">Rechazado</span>
+
+            <div
+                class="mensaje-error"
+                role="alert"
+                aria-live="polite"
+                x-show="error"
+                x-cloak
+            >
+
+                <span class="mensaje-error__sello">
+                    Rechazado
+                </span>
+
                 <span x-text="error"></span>
+
             </div>
 
+
             <div class="campo__enlace campo__enlace--centrado">
-                <button type="button" class="enlace" @click="irALogin">Volver a iniciar sesión</button>
+
+                <button
+                    type="button"
+                    class="enlace"
+                    @click="irALogin"
+                >
+                    Volver a iniciar sesión
+                </button>
+
             </div>
 
         </form>
 
-        <form x-show="vista === 'confirmar'" x-cloak @submit.prevent="confirmarRecuperacion" novalidate>
 
-            <p class="nota-envio">
-                Enviamos un código a <strong x-text="correo"></strong>.
+        <!-- CONFIRMAR RECUPERACIÓN -->
+
+        <form
+            x-show="vista === 'confirmar'"
+            x-cloak
+            @submit.prevent="confirmarRecuperacion"
+            novalidate
+        >
+
+            <p class="nota-envio u-cuerpo u-texto-secundario">
+
+                Enviamos un código a
+                <strong
+                    class="u-texto-primario"
+                    x-text="correo"
+                ></strong>.
+
             </p>
 
+
             <div class="campo">
-                <label for="codigo">Código de 6 dígitos</label>
+
+                <label
+                    for="codigo"
+                    class="u-etiqueta u-texto-terciario"
+                >
+                    Código de 6 dígitos
+                </label>
+
                 <input
                     id="codigo"
                     type="text"
@@ -145,64 +331,239 @@
                     autofocus
                     required
                 >
+
             </div>
+
 
             <div class="campo">
-                <label for="password-nueva">Contraseña nueva</label>
-                <input
-                    id="password-nueva"
-                    type="password"
-                    x-model="passwordNueva"
-                    placeholder="Mínimo 8 caracteres"
-                    autocomplete="new-password"
-                    :disabled="cargando"
-                    minlength="8"
-                    required
+
+                <label
+                    for="password-nueva"
+                    class="u-etiqueta u-texto-terciario"
                 >
+                    Contraseña nueva
+                </label>
+
+                <div class="campo__envoltura">
+
+                    <input
+                        id="password-nueva"
+                        :type="mostrarPasswordNueva ? 'text' : 'password'"
+                        x-model="passwordNueva"
+                        placeholder="Mínimo 8 caracteres"
+                        autocomplete="new-password"
+                        :disabled="cargando"
+                        minlength="8"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="campo__alternar"
+                        tabindex="-1"
+                        @click="mostrarPasswordNueva = !mostrarPasswordNueva"
+                        :aria-label="
+                            mostrarPasswordNueva
+                                ? 'Ocultar contraseña'
+                                : 'Mostrar contraseña'
+                        "
+                    >
+                        <svg
+                            x-show="!mostrarPasswordNueva"
+                            width="17"
+                            height="17"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                        >
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+
+                        <svg
+                            x-show="mostrarPasswordNueva"
+                            x-cloak
+                            width="17"
+                            height="17"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                        >
+                            <path d="M3 3l18 18"/>
+                            <path d="M10.6 5.2A11.6 11.6 0 0 1 12 5c7 0 11 7 11 7a13.6 13.6 0 0 1-3.4 4M6.3 6.3C3.4 8.1 1 12 1 12s4 7 11 7a10.8 10.8 0 0 0 4.2-.8"/>
+                            <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>
+                        </svg>
+                    </button>
+
+                </div>
+
             </div>
+
 
             <div class="campo">
-                <label for="password-confirmar">Confirmar contraseña</label>
-                <input
-                    id="password-confirmar"
-                    type="password"
-                    x-model="passwordConfirmar"
-                    placeholder="Repite la contraseña"
-                    autocomplete="new-password"
-                    :disabled="cargando"
-                    minlength="8"
-                    required
+
+                <label
+                    for="password-confirmar"
+                    class="u-etiqueta u-texto-terciario"
                 >
+                    Confirmar contraseña
+                </label>
+
+                <div class="campo__envoltura">
+
+                    <input
+                        id="password-confirmar"
+                        :type="mostrarPasswordConfirmar ? 'text' : 'password'"
+                        x-model="passwordConfirmar"
+                        placeholder="Repite la contraseña"
+                        autocomplete="new-password"
+                        :disabled="cargando"
+                        minlength="8"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="campo__alternar"
+                        tabindex="-1"
+                        @click="mostrarPasswordConfirmar = !mostrarPasswordConfirmar"
+                        :aria-label="
+                            mostrarPasswordConfirmar
+                                ? 'Ocultar contraseña'
+                                : 'Mostrar contraseña'
+                        "
+                    >
+                        <svg
+                            x-show="!mostrarPasswordConfirmar"
+                            width="17"
+                            height="17"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                        >
+                            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+
+                        <svg
+                            x-show="mostrarPasswordConfirmar"
+                            x-cloak
+                            width="17"
+                            height="17"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.6"
+                        >
+                            <path d="M3 3l18 18"/>
+                            <path d="M10.6 5.2A11.6 11.6 0 0 1 12 5c7 0 11 7 11 7a13.6 13.6 0 0 0-3.4 4M6.3 6.3C3.4 8.1 1 12 1 12s4 7 11 7a10.8 10.8 0 0 0 4.2-.8"/>
+                            <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>
+                        </svg>
+                    </button>
+
+                </div>
+
             </div>
 
-            <button class="boton" type="submit" :disabled="cargando">
-                <span class="boton__spinner" x-show="cargando" x-cloak></span>
-                <span x-text="cargando ? 'Restableciendo' : 'Restablecer contraseña'"></span>
+
+            <button
+                class="boton u-boton-texto"
+                type="submit"
+                :disabled="cargando"
+            >
+
+                <span
+                    class="boton__spinner"
+                    x-show="cargando"
+                    x-cloak
+                ></span>
+
+                <span
+                    x-text="
+                        cargando
+                            ? 'Restableciendo'
+                            : 'Restablecer contraseña'
+                    "
+                ></span>
+
             </button>
 
-            <div class="mensaje-error" role="alert" aria-live="polite" x-show="error" x-cloak>
-                <span class="mensaje-error__sello">Rechazado</span>
+
+            <div
+                class="mensaje-error"
+                role="alert"
+                aria-live="polite"
+                x-show="error"
+                x-cloak
+            >
+
+                <span class="mensaje-error__sello">
+                    Rechazado
+                </span>
+
                 <span x-text="error"></span>
+
             </div>
 
+
             <div class="campo__enlace campo__enlace--centrado">
-                <button type="button" class="enlace" @click="irASolicitarCodigo">Reenviar código</button>
-                <button type="button" class="enlace" @click="irALogin">Volver a iniciar sesión</button>
+
+                <button
+                    type="button"
+                    class="enlace"
+                    @click="irASolicitarCodigo"
+                >
+                    Reenviar código
+                </button>
+
+                <button
+                    type="button"
+                    class="enlace"
+                    @click="irALogin"
+                >
+                    Volver a iniciar sesión
+                </button>
+
             </div>
 
         </form>
 
-        <div x-show="vista === 'exito'" x-cloak class="bloque-exito">
-            <p>Tu contraseña fue restablecida.</p>
-            <button type="button" class="boton" @click="irALogin">Iniciar sesión</button>
+
+        <!-- ÉXITO -->
+
+        <div
+            x-show="vista === 'exito'"
+            x-cloak
+            class="bloque-exito"
+        >
+
+            <p class="u-cuerpo u-texto-primario">
+                Tu contraseña fue restablecida.
+            </p>
+
+            <button
+                type="button"
+                class="boton u-boton-texto"
+                @click="irALogin"
+            >
+                Iniciar sesión
+            </button>
+
         </div>
 
-        <div class="pie">
+
+        <div class="pie u-mono-sm u-texto-terciario">
+
             <span>MGC México</span>
+
             <span x-text="fecha"></span>
+
         </div>
 
-    </div>
+    </main>
 
 </div>
 

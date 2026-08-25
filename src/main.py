@@ -54,6 +54,9 @@ app.mount(
 def pagina_login():
     return FileResponse("frontend/login.html")
 
+@app.get("/cambiar-password")
+def pagina_cambiar_password():
+    return FileResponse("frontend/cambiar-password.html")
 
 app.include_router(auth_router)
 app.include_router(roles_router)

@@ -11,7 +11,7 @@ class LoginRequest(SchemaBase):
 
 class CambiarPasswordRequest(SchemaBase):
 
-    password_actual: str
+    password_actual: str | None = None
     password_nueva: str = Field(min_length=8)
 
 

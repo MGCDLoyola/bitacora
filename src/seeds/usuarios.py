@@ -3,10 +3,10 @@ from src.schemas.usuario import UsuarioCreate
 from src.services.usuario import UsuarioService
 from src.core.exceptions import OperacionInvalida
 
-ID_ROL_COBRANZA = 3
+ID_ROL_COBRANZA = 1
 
 USUARIOS_PRUEBA = [
-    {"nombre": "Diego Loyola", "correo": "diego.loyola@m.com.mx"}
+    {"nombre": "Diego Loyola", "correo": "diego.loyola@mgcmexico.com.mx"}
 ]
 
 

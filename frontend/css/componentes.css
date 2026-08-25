@@ -1,0 +1,206 @@
+.campo {
+    margin-bottom: 22px;
+}
+
+.campo input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--ink-700);
+    color: var(--text-100);
+    font-family: var(--font-sans);
+    font-size: 16.5px;
+    padding: 6px 2px 10px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.campo input::placeholder {
+    color: var(--text-500);
+    opacity: 0.55;
+}
+
+.campo input:focus {
+    border-bottom-color: var(--gold-500);
+    box-shadow: 0 1px 0 0 var(--gold-500);
+}
+
+.campo input:focus-visible {
+    outline: none;
+}
+
+.campo input:disabled {
+    opacity: 0.5;
+}
+
+input::-ms-reveal,
+input::-ms-clear,
+::-ms-reveal {
+    display: none;
+}
+
+.campo__envoltura {
+    position: relative;
+}
+
+.campo__envoltura input {
+    padding-right: 30px;
+}
+
+.campo__alternar {
+    position: absolute;
+    right: 0;
+    bottom: 6px;
+    background: none;
+    border: none;
+    padding: 4px;
+    color: var(--text-500);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s ease;
+}
+
+.campo__alternar:hover {
+    color: var(--text-100);
+}
+
+.campo__alternar:focus-visible {
+    outline: 2px solid var(--gold-300);
+    outline-offset: 2px;
+}
+
+.campo__enlace {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+    margin-bottom: 6px;
+}
+
+.campo__enlace--centrado {
+    justify-content: center;
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.campo__codigo {
+    letter-spacing: 0.4em;
+    font-family: var(--font-mono) !important;
+    text-align: center;
+    font-size: 20px !important;
+}
+
+.enlace {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 400;
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text-500);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer;
+    transition: color 0.15s ease;
+}
+
+.enlace:hover {
+    color: var(--gold-300);
+}
+
+.enlace:focus-visible {
+    outline: 2px solid var(--gold-300);
+    outline-offset: 2px;
+}
+
+.boton {
+    width: 100%;
+    background: var(--gold-500);
+    color: var(--ink-950);
+    border: none;
+    border-radius: var(--radius-tab);
+    padding: 13px 16px;
+    margin-top: 26px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.boton:hover:not(:disabled) {
+    background: var(--gold-300);
+}
+
+.boton:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.boton:disabled {
+    opacity: 0.65;
+    cursor: default;
+}
+
+.boton:focus-visible {
+    outline: 2px solid var(--gold-300);
+    outline-offset: 3px;
+}
+
+.boton__spinner {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    border: 2px solid rgba(10, 15, 28, 0.35);
+    border-top-color: var(--ink-950);
+    animation: girar 0.6s linear infinite;
+}
+
+@keyframes girar {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.mensaje-error {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    background: rgba(178, 76, 76, 0.1);
+    border: 1px solid var(--rose-700);
+    color: #E8B4B4;
+    font-size: 13.5px;
+    padding: 10px 12px;
+    border-radius: var(--radius-tab);
+    margin-top: 18px;
+}
+
+.mensaje-error__sello {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--rose-500);
+    flex-shrink: 0;
+}
+
+.ayuda-password {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--text-300);
+    background: rgba(201, 162, 39, 0.08);
+    border: 1px solid var(--ink-700);
+    padding: 9px 11px;
+    border-radius: var(--radius-tab);
+    margin: 8px 0 0;
+}
+
+.pie {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding-top: 18px;
+    border-top: 1px dashed var(--ink-700);
+    font-size: 12.5px;
+}
