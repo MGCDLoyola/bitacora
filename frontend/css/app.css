@@ -18,6 +18,7 @@ body {
     color: var(--text-100);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    overflow: hidden;
 }
 
 button,
@@ -28,19 +29,30 @@ textarea {
 }
 
 .app {
-    min-height: 100vh;
+    width: 100%;
+    height: 100vh;
     display: grid;
     grid-template-columns: 250px minmax(0, 1fr);
+    overflow: hidden;
     background: var(--ink-950);
 }
 
+
+/* ─────────────────────────────────────────────
+   BARRA LATERAL
+   ───────────────────────────────────────────── */
+
 .barra-lateral {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    height: 100vh;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
     background: var(--ink-900);
     border-right: 1px solid var(--ink-700);
 }
+
+
+/* Marca */
 
 .barra-lateral__marca {
     padding: 26px 22px 24px;
@@ -64,6 +76,9 @@ textarea {
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
+
+
+/* Usuario */
 
 .barra-lateral__usuario {
     padding: 18px 22px;
@@ -90,10 +105,38 @@ textarea {
     letter-spacing: 0.06em;
 }
 
+
+/* Navegación */
+
 .navegacion {
-    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
     padding: 18px 12px;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink-700) transparent;
 }
+
+.navegacion::-webkit-scrollbar {
+    width: 5px;
+}
+
+.navegacion::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.navegacion::-webkit-scrollbar-thumb {
+    background: var(--ink-700);
+    border-radius: 10px;
+}
+
+.navegacion::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-800);
+}
+
+
+/* Elementos de navegación */
 
 .navegacion__item {
     width: 100%;
@@ -129,56 +172,70 @@ textarea {
     color: var(--text-500);
 }
 
+.navegacion__item--accion:hover {
+    color: var(--text-100);
+}
+
 .navegacion__texto {
     font-family: var(--font-sans);
     font-size: 14px;
 }
+
+
+/* Cerrar sesión */
 
 .barra-lateral__pie {
     padding: 12px;
     border-top: 1px solid var(--ink-700);
 }
 
+
+/* ─────────────────────────────────────────────
+   CONTENIDO
+   ───────────────────────────────────────────── */
+
 .contenido {
     min-width: 0;
-    min-height: 100vh;
+    min-height: 0;
+    height: 100vh;
     display: flex;
     flex-direction: column;
-}
-
-.encabezado {
-    min-height: 76px;
-    display: flex;
-    align-items: center;
-    padding: 16px 30px;
-    border-bottom: 1px solid var(--ink-700);
-    background: var(--ink-950);
-}
-
-.encabezado__titulo {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.encabezado__nombre {
-    font-family: var(--font-display);
-    font-size: 25px;
-    font-weight: 600;
-    color: var(--text-100);
-}
-
-.encabezado__descripcion {
-    color: var(--text-500);
-    font-size: 13px;
+    overflow: hidden;
 }
 
 .contenido__principal {
     flex: 1;
     min-width: 0;
+    min-height: 0;
+    overflow: auto;
     padding: 30px;
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink-700) transparent;
 }
+
+.contenido__principal::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+.contenido__principal::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.contenido__principal::-webkit-scrollbar-thumb {
+    background: var(--ink-700);
+    border-radius: 10px;
+}
+
+.contenido__principal::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-800);
+}
+
+
+/* ─────────────────────────────────────────────
+   ESTADOS GLOBALES
+   ───────────────────────────────────────────── */
 
 .estado-carga {
     position: fixed;
@@ -204,14 +261,15 @@ textarea {
     box-shadow: var(--shadow-card);
 }
 
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────── */
+
 @media (max-width: 900px) {
+
     .app {
         grid-template-columns: 210px minmax(0, 1fr);
-    }
-
-    .encabezado {
-        padding-left: 22px;
-        padding-right: 22px;
     }
 
     .contenido__principal {
@@ -219,13 +277,24 @@ textarea {
     }
 }
 
+
 @media (max-width: 720px) {
+
+    body {
+        overflow: auto;
+    }
+
     .app {
+        min-height: 100vh;
+        height: auto;
         display: block;
+        overflow: visible;
     }
 
     .barra-lateral {
-        min-height: auto;
+        height: auto;
+        min-height: 0;
+        display: flex;
         border-right: none;
         border-bottom: 1px solid var(--ink-700);
     }
@@ -245,7 +314,10 @@ textarea {
     .navegacion {
         display: flex;
         gap: 6px;
+        min-height: auto;
+        max-height: 120px;
         overflow-x: auto;
+        overflow-y: hidden;
         padding: 10px 12px;
     }
 
@@ -258,17 +330,29 @@ textarea {
         display: none;
     }
 
-    .encabezado {
-        min-height: 68px;
-    }
-}
-
-@media (max-width: 520px) {
-    .encabezado {
-        padding: 14px 18px;
+    .contenido {
+        height: auto;
+        min-height: calc(100vh - 1px);
+        overflow: visible;
     }
 
     .contenido__principal {
+        overflow: visible;
+        padding: 22px;
+    }
+}
+
+
+@media (max-width: 520px) {
+
+    .contenido__principal {
         padding: 18px;
+    }
+
+    .mensaje-aplicacion {
+        right: 14px;
+        bottom: 14px;
+        left: 14px;
+        max-width: none;
     }
 }

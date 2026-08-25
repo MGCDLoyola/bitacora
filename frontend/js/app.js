@@ -2,8 +2,6 @@ const app = document.getElementById("app");
 const estadoCarga = document.getElementById("estado-carga");
 
 const navegacion = document.getElementById("navegacion");
-const tituloVista = document.getElementById("titulo-vista");
-const subtituloVista = document.getElementById("subtitulo-vista");
 
 const usuarioNombre = document.getElementById("usuario-nombre");
 const usuarioRol = document.getElementById("usuario-rol");
@@ -37,10 +35,7 @@ const navegacionPorRol = {
 
 
 const vistas = {
-    usuarios: {
-        titulo: "Usuarios",
-        subtitulo: "Administración de usuarios del sistema"
-    }
+    usuarios: {}
 };
 
 
@@ -160,9 +155,6 @@ async function navegar(idVista) {
     }
 
     vistaActual = idVista;
-
-    tituloVista.textContent = vista.titulo;
-    subtituloVista.textContent = vista.subtitulo;
 
     actualizarNavegacionActiva(idVista);
 

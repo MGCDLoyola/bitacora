@@ -109,7 +109,7 @@ def actualizar_usuario(
 def actualizar_estado_usuario(
     id_usuario: int,
     data: UsuarioUpdateSupervisor,
-    usuario_actual: Usuario = Depends(requiere_rol("Supervisor")),
+    usuario_actual: Usuario = Depends(requiere_rol("Supervisor", "Administrador")),
     session: Session = Depends(get_session),
 ):
     return UsuarioService(session).actualizar_supervisor(

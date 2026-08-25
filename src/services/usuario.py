@@ -126,7 +126,7 @@ class UsuarioService(BaseService):
 
         if usuario.rol.nombre == "Administrador":
             raise OperacionInvalida(
-                "Un Supervisor no puede modificar a un Administrador."
+                f"Un {usuario.rol.nombre} no puede modificar a un Administrador."
             )
 
         cambios = data.model_dump(exclude_unset=True)

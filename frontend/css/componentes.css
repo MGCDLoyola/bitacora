@@ -163,7 +163,6 @@ input::-ms-clear,
 }
 
 .mensaje-error {
-    display: flex;
     align-items: baseline;
     gap: 8px;
     background: rgba(178, 76, 76, 0.1);

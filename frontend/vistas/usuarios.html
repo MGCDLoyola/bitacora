@@ -1,0 +1,347 @@
+<section class="vista-usuarios">
+
+    <div class="vista-usuarios__encabezado">
+
+        <div>
+            <h2 class="vista-usuarios__titulo u-titulo">
+                Usuarios
+            </h2>
+
+            <p class="vista-usuarios__descripcion u-subtitulo u-texto-terciario">
+                Usuarios registrados en Bitácora.
+            </p>
+        </div>
+
+        <button
+            id="boton-nuevo-usuario"
+            type="button"
+            class="boton u-boton-texto vista-usuarios__boton-nuevo"
+        >
+            Nuevo usuario
+        </button>
+
+    </div>
+
+
+    <div class="vista-usuarios__filtros">
+
+        <div class="campo-filtro campo-filtro--busqueda">
+
+            <label
+                for="filtro-usuarios"
+                class="u-etiqueta u-texto-terciario"
+            >
+                Buscar
+            </label>
+
+            <input
+                id="filtro-usuarios"
+                type="search"
+                class="campo-filtro__input"
+                placeholder="Nombre o correo"
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <div class="campo-filtro">
+
+            <label
+                for="filtro-rol"
+                class="u-etiqueta u-texto-terciario"
+            >
+                Rol
+            </label>
+
+            <select
+                id="filtro-rol"
+                class="campo-filtro__input"
+            >
+                <option value="">Todos</option>
+            </select>
+
+        </div>
+
+
+        <div class="campo-filtro">
+
+            <label
+                for="filtro-estado"
+                class="u-etiqueta u-texto-terciario"
+            >
+                Estado
+            </label>
+
+            <select
+                id="filtro-estado"
+                class="campo-filtro__input"
+            >
+                <option value="">Todos</option>
+                <option value="activo">Activos</option>
+                <option value="inactivo">Inactivos</option>
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <div class="tabla-contenedor">
+
+        <div
+            id="tabla-usuarios"
+            class="tabla-scroll"
+        ></div>
+
+    </div>
+
+
+    <div
+        id="estado-usuarios"
+        class="estado-vista u-texto-terciario"
+        hidden
+    >
+        Cargando usuarios...
+    </div>
+
+
+    <div
+        id="mensaje-usuarios"
+        class="mensaje-error"
+        role="alert"
+        aria-live="polite"
+        hidden
+    >
+        <span class="mensaje-error__sello">
+            Error
+        </span>
+
+        <span id="texto-mensaje-usuarios"></span>
+    </div>
+
+
+    <!-- MODAL: NUEVO USUARIO -->
+
+    <div
+        id="modal-nuevo-usuario"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-nuevo-usuario-titulo"
+        hidden
+    >
+
+        <div class="modal__fondo" data-cerrar-nuevo-usuario></div>
+
+        <div class="modal__contenido">
+
+            <div class="modal__encabezado">
+
+                <h3
+                    id="modal-nuevo-usuario-titulo"
+                    class="modal__titulo u-titulo"
+                >
+                    Nuevo usuario
+                </h3>
+
+            </div>
+
+
+            <form
+                id="form-nuevo-usuario"
+                novalidate
+            >
+
+                <div class="modal__cuerpo">
+
+                    <div class="campo">
+
+                        <label
+                            for="nuevo-usuario-nombre"
+                            class="u-etiqueta u-texto-terciario"
+                        >
+                            Nombre completo
+                        </label>
+
+                        <input
+                            id="nuevo-usuario-nombre"
+                            type="text"
+                            name="nombre"
+                            autocomplete="name"
+                            placeholder="Nombre y apellidos"
+                            maxlength="100"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label
+                            for="nuevo-usuario-correo"
+                            class="u-etiqueta u-texto-terciario"
+                        >
+                            Correo
+                        </label>
+
+                        <input
+                            id="nuevo-usuario-correo"
+                            type="email"
+                            name="correo"
+                            autocomplete="email"
+                            placeholder="nombre@mgc.com.mx"
+                            maxlength="255"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="campo">
+
+                        <label
+                            for="nuevo-usuario-rol"
+                            class="u-etiqueta u-texto-terciario"
+                        >
+                            Rol
+                        </label>
+
+                        <select
+                            id="nuevo-usuario-rol"
+                            name="id_rol"
+                            required
+                        >
+                            <option value="">
+                                Selecciona un rol
+                            </option>
+                        </select>
+
+                    </div>
+
+
+                    <div
+                        id="mensaje-nuevo-usuario"
+                        class="mensaje-error modal__error"
+                        role="alert"
+                        aria-live="polite"
+                        hidden
+                    >
+                        <span class="mensaje-error__sello">
+                            Error
+                        </span>
+
+                        <span id="texto-mensaje-nuevo-usuario"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="modal__acciones">
+
+                    <button
+                        id="boton-cancelar-nuevo-usuario"
+                        type="button"
+                        class="boton boton--secundario u-boton-texto"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        id="boton-guardar-nuevo-usuario"
+                        type="submit"
+                        class="boton u-boton-texto"
+                    >
+                        Crear usuario
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- MODAL: CAMBIO DE ESTADO -->
+
+    <div
+        id="modal-estado-usuario"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-estado-titulo"
+        hidden
+    >
+
+        <div
+            class="modal__fondo"
+            data-cerrar-modal
+        ></div>
+
+        <div class="modal__contenido">
+
+            <div class="modal__encabezado">
+
+                <h3
+                    id="modal-estado-titulo"
+                    class="modal__titulo u-titulo"
+                >
+                    Cambiar estado
+                </h3>
+
+            </div>
+
+
+            <div class="modal__cuerpo">
+
+                <p
+                    id="modal-estado-mensaje"
+                    class="u-cuerpo u-texto-secundario"
+                ></p>
+
+
+                <div
+                    id="modal-estado-error"
+                    class="mensaje-error modal__error"
+                    role="alert"
+                    aria-live="polite"
+                    hidden
+                >
+                    <span class="mensaje-error__sello">
+                        Error
+                    </span>
+
+                    <span id="texto-modal-estado-error"></span>
+                </div>
+
+            </div>
+
+
+            <div class="modal__acciones">
+
+                <button
+                    id="boton-cancelar-estado"
+                    type="button"
+                    class="boton boton--secundario u-boton-texto"
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    id="boton-confirmar-estado"
+                    type="button"
+                    class="boton u-boton-texto"
+                >
+                    Confirmar
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>

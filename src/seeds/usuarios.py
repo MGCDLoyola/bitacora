@@ -6,7 +6,7 @@ from src.core.exceptions import OperacionInvalida
 ID_ROL_COBRANZA = 1
 
 USUARIOS_PRUEBA = [
-    {"nombre": "Diego Loyola", "correo": "diego.loyola@mgcmexico.com.mx"}
+    {"nombre": "Administrador", "correo": "admin@admin.com"}
 ]
 
 
