@@ -9,7 +9,7 @@ from src.core.config import (
     SESION_DURACION_HORAS,
 )
 from src.core.database import get_session
-from src.core.deps import mail, mailbox, sesion_actual
+from src.core.deps import mail, mailbox, sesion_actual, usuario_actual
 from src.models.sesion import Sesion
 from src.schemas.auth import (
     CambiarPasswordRequest,
@@ -19,6 +19,7 @@ from src.schemas.auth import (
 )
 from src.schemas.usuario import UsuarioRead
 from src.services.auth import AuthService
+from src.models.usuario import Usuario
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -90,6 +91,13 @@ def confirmar_recuperacion(
         codigo=data.codigo,
         password_nueva=data.password_nueva,
     )
+
+
+@router.get("/me", response_model=UsuarioRead)
+def obtener_usuario_actual(
+    usuario: Usuario = Depends(usuario_actual),
+):
+    return usuario
 
 
 @router.post("/logout", status_code=204)

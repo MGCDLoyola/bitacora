@@ -1,7 +1,7 @@
 import logging
 import mimetypes
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
@@ -20,6 +20,8 @@ from src.core.exceptions import (BitacoraError,
                                  ErrorEnvioCredenciales)
 from src.core.logging import configurar_logging
 from src.core.pg import pg
+from src.core.deps import usuario_actual
+from src.models.usuario import Usuario
 from src.routers.auth import router as auth_router
 from src.routers.roles import router as roles_router
 from src.routers.usuarios import router as usuarios_router
@@ -49,6 +51,11 @@ app.mount(
     name="static"
 )
 
+@app.get("/")
+def pagina_inicio(
+    usuario: Usuario = Depends(usuario_actual),
+):
+    return FileResponse("frontend/app.html")
 
 @app.get("/login")
 def pagina_login():
