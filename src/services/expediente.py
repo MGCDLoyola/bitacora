@@ -47,13 +47,15 @@ class ExpedienteService(BaseService):
         self,
         interlocutor: str,
         fecha_incumplimiento: date | None = None,
-        id_usuario: int | None = None
+        id_usuario: int | None = None,
+        monto_vencido: float | None = None
     ) -> Expediente:
 
         expediente = Expediente(
             interlocutor=interlocutor,
             fecha_incumplimiento=fecha_incumplimiento,
-            id_usuario=id_usuario
+            id_usuario=id_usuario,
+            monto_vencido=monto_vencido
         )
 
         self.session.add(expediente)

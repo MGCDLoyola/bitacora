@@ -1,5 +1,7 @@
 import logging
+
 from datetime import date, datetime
+from decimal import Decimal
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session, load_only
@@ -26,12 +28,13 @@ logger = logging.getLogger(__name__)
 
 def obtener_vencimientos(
     pg: PostgreSQL
-) -> dict[date, set[str]]:
+) -> dict[date, dict[str, Decimal]]:
 
     query = f'''
         SELECT
             "Interlocutor" AS interlocutor,
-            "Fecha" AS fecha
+            "Fecha" AS fecha,
+            "Monto vencimiento" AS monto_vencimiento
         FROM "{TABLA_V}"
         WHERE "Fecha" IN (
             SELECT DISTINCT "Fecha"
@@ -50,9 +53,10 @@ def obtener_vencimientos(
         parse_dates="fecha"
     )
 
-    vencimientos: dict[date, set[str]] = {}
+    vencimientos: dict[date, dict[str, Decimal]] = {}
 
     for fila in filas or []:
+
         fecha = fila["fecha"]
 
         if isinstance(fecha, datetime):
@@ -62,9 +66,19 @@ def obtener_vencimientos(
                 f"Fecha de vencimiento inválida: {fecha!r}"
             )
 
-        vencimientos.setdefault(fecha, set()).add(
-            fila["interlocutor"]
-        )
+        interlocutor = fila["interlocutor"]
+        monto = fila["monto_vencimiento"]
+
+        if monto is None:
+            raise ConflictoNegocio(
+                f"El vencimiento del interlocutor '{interlocutor}' "
+                f"con fecha {fecha:%d/%m/%Y} no tiene monto registrado."
+            )
+
+        vencimientos.setdefault(
+            fecha,
+            {}
+        )[interlocutor] = monto
 
     return dict(
         sorted(
@@ -90,6 +104,7 @@ def obtener_expedientes_activos(
                 Expediente.fecha_creacion,
                 Expediente.fecha_consolidacion,
                 Expediente.fecha_desfase,
+                Expediente.monto_vencido,
             )
         )
     )
@@ -102,7 +117,7 @@ def obtener_expedientes_activos(
 
 
 def obtener_interlocutores_consolidados(
-    vencimientos: dict[date, set[str]],
+    vencimientos: dict[date, dict[str, Decimal]],
     hoy: date
 ) -> tuple[set[str], date | None]:
 
@@ -115,7 +130,7 @@ def obtener_interlocutores_consolidados(
         return set(), None
 
     interlocutores = set.intersection(
-        *(vencimientos[fecha] for fecha in ultimos_bloques)
+        *(set(vencimientos[fecha]) for fecha in ultimos_bloques)
     )
 
     fecha_bloque_mas_antiguo = ultimos_bloques[-1]
@@ -134,7 +149,9 @@ def obtener_interlocutores_con_documento_consolidacion(
     tipo_consolidacion = (
         session.execute(
             select(TipoDocumento.id)
-            .where(TipoDocumento.nombre == "Consolidación")
+            .where(
+                TipoDocumento.nombre == "Consolidación"
+            )
         )
         .scalar_one_or_none()
     )
@@ -144,7 +161,10 @@ def obtener_interlocutores_con_documento_consolidacion(
             "No existe el tipo de documento 'Consolidación'."
         )
 
-    expediente_ids = [expediente.id for expediente in expedientes]
+    expediente_ids = [
+        expediente.id
+        for expediente in expedientes
+    ]
 
     stmt = (
         select(Documento.id_expediente)
@@ -190,6 +210,7 @@ def procesar_expedientes_en_consolidacion(
     )
 
     for expediente in por_cerrar:
+
         if expediente.id not in expedientes_con_documento:
             continue
 
@@ -204,17 +225,33 @@ def procesar_expedientes_en_consolidacion(
 
 
 def procesar_expedientes_en_revision(
-    vencimientos: dict[date, set[str]],
-    vencimientos_hoy: set[str],
+    vencimientos: dict[date, dict[str, Decimal]],
     expedientes: list[Expediente],
     hoy: date
 ) -> None:
 
+    vencimientos_hoy = vencimientos.get(
+        hoy,
+        {}
+    )
+
     interlocutores_consolidados, fecha_bloque_mas_antiguo = (
-        obtener_interlocutores_consolidados(vencimientos, hoy)
+        obtener_interlocutores_consolidados(
+            vencimientos,
+            hoy
+        )
     )
 
     for expediente in expedientes:
+
+        if expediente.interlocutor in vencimientos_hoy:
+
+            expediente.monto_vencido = (
+                vencimientos_hoy[
+                    expediente.interlocutor
+                ]
+            )
+
         if (
             expediente.fecha_consolidacion is not None
             or expediente.fecha_desfase is not None
@@ -234,10 +271,12 @@ def procesar_expedientes_en_revision(
                 expediente.id,
                 expediente.interlocutor
             )
+
             continue
 
         if expediente.interlocutor not in vencimientos_hoy:
-            expediente.fecha_desfase = date.today()
+
+            expediente.fecha_desfase = hoy
 
             logger.info(
                 "Expediente %s entra en desfase: "
@@ -269,28 +308,37 @@ def sincronizar_clientes(
     clientes_existentes = set(
         session.execute(
             select(Cliente.interlocutor)
-            .where(Cliente.interlocutor.in_(vencimientos_hoy))
+            .where(
+                Cliente.interlocutor.in_(vencimientos_hoy)
+            )
         )
         .scalars()
         .all()
     )
 
-    nuevos_clientes = vencimientos_hoy - clientes_existentes
+    nuevos_clientes = (
+        vencimientos_hoy - clientes_existentes
+    )
 
     if not nuevos_clientes:
         return
 
     contactos = {
         contacto["interlocutor"]: contacto
-        for contacto in obtener_contactos(pg, nuevos_clientes)
+        for contacto in obtener_contactos(
+            pg,
+            nuevos_clientes
+        )
     }
 
     cliente_service = ClienteService(session)
 
     for interlocutor in nuevos_clientes:
+
         datos = contactos.get(interlocutor)
 
         if datos is None:
+
             logger.warning(
                 "Interlocutor nuevo '%s' sin datos de contacto. "
                 "Se crea con datos por confirmar.",
@@ -308,7 +356,9 @@ def sincronizar_clientes(
                 correo=None,
                 contrato=None
             )
+
         else:
+
             cliente = cliente_service.crear(
                 interlocutor=interlocutor,
                 central=datos["central"],
@@ -322,16 +372,19 @@ def sincronizar_clientes(
 
 def crear_expedientes_nuevos(
     session: Session,
-    vencimientos_hoy: set[str],
+    vencimientos_hoy: dict[str, Decimal],
     expedientes: list[Expediente]
 ) -> None:
 
     expedientes_por_interlocutor = (
-        obtener_expedientes_por_interlocutor(expedientes)
+        obtener_expedientes_por_interlocutor(
+            expedientes
+        )
     )
 
     nuevos_expedientes = (
-        vencimientos_hoy - expedientes_por_interlocutor.keys()
+        set(vencimientos_hoy)
+        - expedientes_por_interlocutor.keys()
     )
 
     if not nuevos_expedientes:
@@ -341,23 +394,33 @@ def crear_expedientes_nuevos(
     hoy = date.today()
 
     for interlocutor in nuevos_expedientes:
-        cliente = session.get(Cliente, interlocutor)
+
+        cliente = session.get(
+            Cliente,
+            interlocutor
+        )
 
         if cliente is None:
+
             logger.error(
                 "No se encontró Cliente para interlocutor '%s' "
                 "al crear expediente.",
                 interlocutor
             )
+
             continue
 
         expediente = expediente_service.crear(
             interlocutor=interlocutor,
             fecha_incumplimiento=hoy,
-            id_usuario=None
+            id_usuario=None,
+            monto_vencido=vencimientos_hoy[interlocutor],
         )
 
-        crear_carpeta_expediente(cliente, expediente)
+        crear_carpeta_expediente(
+            cliente,
+            expediente
+        )
 
         logger.info(
             "Nuevo expediente %s creado para interlocutor '%s'.",
@@ -375,12 +438,15 @@ def procesar_vencimientos(
     hoy = date.today()
 
     if hoy in vencimientos:
+
         logger.info(
             "Se encontró el bloque de vencimientos de hoy (%s): %d interlocutores.",
             hoy,
             len(vencimientos[hoy])
         )
+
     else:
+
         logger.warning(
             "No se encontró el bloque de vencimientos de hoy (%s). "
             "Se interpreta como cero vencimientos para hoy.",
@@ -394,15 +460,24 @@ def procesar_vencimientos(
         respaldo
     )
 
-    vencimientos_hoy = vencimientos.get(hoy, set())
+    vencimientos_hoy = vencimientos.get(
+        hoy,
+        {}
+    )
+
+    interlocutores_hoy = set(
+        vencimientos_hoy
+    )
 
     sincronizar_clientes(
         pg=pg,
         session=session,
-        vencimientos_hoy=vencimientos_hoy
+        vencimientos_hoy=interlocutores_hoy
     )
 
-    expedientes = obtener_expedientes_activos(session)
+    expedientes = obtener_expedientes_activos(
+        session
+    )
 
     logger.info(
         "Se encontraron %d expedientes activos.",
@@ -411,13 +486,12 @@ def procesar_vencimientos(
 
     procesar_expedientes_en_consolidacion(
         session=session,
-        vencimientos_hoy=vencimientos_hoy,
+        vencimientos_hoy=interlocutores_hoy,
         expedientes=expedientes
     )
 
     procesar_expedientes_en_revision(
         vencimientos=vencimientos,
-        vencimientos_hoy=vencimientos_hoy,
         expedientes=expedientes,
         hoy=hoy
     )
