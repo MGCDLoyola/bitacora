@@ -123,6 +123,22 @@ def listar_gestiones_activos(
     return servicio.listar_gestiones_activas()
 
 
+@router.get(
+    "/gestiones/resumen",
+)
+def obtener_resumen_gestiones(
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(
+        requiere_rol("Administrador", "Supervisor", "Cobranza")
+    ),
+):
+    servicio = ExpedienteService(session)
+
+    return servicio.contar_gestiones(
+        usuario_actual.id
+    )
+
+
 @router.get("/{id_expediente}", response_model=ExpedienteRead)
 def obtener_expediente(
     id_expediente: int,

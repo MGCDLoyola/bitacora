@@ -1,0 +1,162 @@
+<section class="vista-gestiones">
+
+    <div class="vista-gestiones__encabezado">
+
+        <div>
+            <h2 class="vista-gestiones__titulo u-titulo">
+                Gestiones
+            </h2>
+
+            <p class="vista-gestiones__descripcion u-subtitulo u-texto-terciario">
+                Seguimiento de la cobranza extrajudicial.
+            </p>
+        </div>
+
+    </div>
+
+
+    <nav
+        class="vista-gestiones__navegacion"
+        aria-label="Secciones de gestiones"
+    >
+
+        <button
+            type="button"
+            class="vista-gestiones__tab vista-gestiones__tab--activo"
+            data-seccion="del-dia"
+        >
+            <span>Del día</span>
+            <span
+                class="vista-gestiones__contador"
+                data-contador="del-dia"
+            >
+                0
+            </span>
+        </button>
+
+        <button
+            type="button"
+            class="vista-gestiones__tab"
+            data-seccion="desfasados"
+        >
+            <span>Desfasados</span>
+            <span
+                class="vista-gestiones__contador"
+                data-contador="desfasados"
+            >
+                0
+            </span>
+        </button>
+
+        <button
+            type="button"
+            class="vista-gestiones__tab"
+            data-seccion="consolidacion"
+        >
+            <span>Consolidación</span>
+            <span
+                class="vista-gestiones__contador"
+                data-contador="consolidacion"
+            >
+                0
+            </span>
+        </button>
+
+        <button
+            type="button"
+            class="vista-gestiones__tab"
+            data-seccion="activos"
+        >
+            <span>Activos</span>
+            <span
+                class="vista-gestiones__contador"
+                data-contador="activos"
+            >
+                0
+            </span>
+        </button>
+
+    </nav>
+
+
+    <div
+        id="estado-gestiones"
+        class="estado-vista u-texto-terciario"
+        hidden
+    >
+        Cargando gestiones...
+    </div>
+
+
+    <div
+        id="mensaje-gestiones"
+        class="mensaje-error"
+        role="alert"
+        aria-live="polite"
+        hidden
+    >
+        <span class="mensaje-error__sello">
+            Error
+        </span>
+
+        <span id="texto-mensaje-gestiones"></span>
+    </div>
+
+
+    <!-- DEL DÍA -->
+    <section
+        id="seccion-del-dia"
+        class="seccion-gestiones"
+        data-seccion-contenido="del-dia"
+    >
+        <div
+            id="gestiones-del-dia"
+            class="gestiones-tarjetas"
+        ></div>
+    </section>
+
+
+    <!-- DESFASADOS -->
+    <section
+        id="seccion-desfasados"
+        class="seccion-gestiones"
+        data-seccion-contenido="desfasados"
+        hidden
+    >
+        <div
+            id="gestiones-desfasados"
+            class="gestiones-tarjetas"
+        ></div>
+    </section>
+
+
+    <!-- CONSOLIDACIÓN -->
+    <section
+        id="seccion-consolidacion"
+        class="seccion-gestiones"
+        data-seccion-contenido="consolidacion"
+        hidden
+    >
+        <div
+            id="gestiones-consolidacion"
+            class="gestiones-tarjetas"
+        ></div>
+    </section>
+
+
+    <!-- ACTIVOS -->
+    <section
+        id="seccion-activos"
+        class="seccion-gestiones"
+        data-seccion-contenido="activos"
+        hidden
+    >
+        <div class="tabla-contenedor">
+            <div
+                id="gestiones-activos"
+                class="tabla-scroll"
+            ></div>
+        </div>
+    </section>
+
+</section>

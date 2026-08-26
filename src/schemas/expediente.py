@@ -32,3 +32,10 @@ class ExpedienteGestionRead(SchemaBase):
     contrato: str | None = None
     monto_vencido: Decimal | None = None
     usuario: str | None = None
+
+class GestionesResumenRead(SchemaBase):
+
+    del_dia: int
+    desfasados: int
+    consolidacion: int
+    activos: int

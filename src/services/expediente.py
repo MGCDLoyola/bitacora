@@ -1,7 +1,7 @@
 from datetime import date
 import shutil
 
-from sqlalchemy import exists, select
+from sqlalchemy import exists, select, func
 from sqlalchemy.orm import joinedload
 
 from src.models.expediente import Expediente
@@ -214,6 +214,68 @@ class ExpedienteService(BaseService):
         return self._listar_gestiones(
             Expediente.fecha_consolidacion.is_(None)
         )
+
+    def contar_gestiones(
+        self,
+        id_usuario: int
+    ) -> dict[str, int]:
+
+        tiene_documento_consolidacion = exists(
+            select(Documento.id)
+            .join(
+                TipoDocumento,
+                Documento.id_tipo_documento == TipoDocumento.id
+            )
+            .where(
+                Documento.id_expediente == Expediente.id,
+                TipoDocumento.nombre == "Consolidación"
+            )
+        )
+
+        del_dia = (
+            select(func.count(Expediente.id))
+            .where(
+                Expediente.estado.is_(True),
+                Expediente.id_usuario == id_usuario,
+                Expediente.fecha_desfase.is_(None),
+                Expediente.fecha_consolidacion.is_(None)
+            )
+        )
+
+        desfasados = (
+            select(func.count(Expediente.id))
+            .where(
+                Expediente.estado.is_(True),
+                Expediente.id_usuario == id_usuario,
+                Expediente.fecha_desfase.is_not(None),
+                Expediente.fecha_consolidacion.is_(None)
+            )
+        )
+
+        consolidacion = (
+            select(func.count(Expediente.id))
+            .where(
+                Expediente.estado.is_(True),
+                Expediente.id_usuario == id_usuario,
+                Expediente.fecha_consolidacion.is_not(None),
+                ~tiene_documento_consolidacion
+            )
+        )
+
+        activos = (
+            select(func.count(Expediente.id))
+            .where(
+                Expediente.estado.is_(True),
+                Expediente.fecha_consolidacion.is_(None)
+            )
+        )
+
+        return {
+            "del-dia": self.session.execute(del_dia).scalar_one(),
+            "desfasados": self.session.execute(desfasados).scalar_one(),
+            "consolidacion": self.session.execute(consolidacion).scalar_one(),
+            "activos": self.session.execute(activos).scalar_one(),
+        }
 
     def _listar_gestiones(
         self,

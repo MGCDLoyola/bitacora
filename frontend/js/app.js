@@ -18,6 +18,10 @@ const textoMensajeAplicacion = document.getElementById(
 const navegacionPorRol = {
     Administrador: [
         {
+            id: "gestiones",
+            texto: "Gestiones"
+        },
+        {
             id: "usuarios",
             texto: "Usuarios"
         }
@@ -25,16 +29,26 @@ const navegacionPorRol = {
 
     Supervisor: [
         {
+            id: "gestiones",
+            texto: "Gestiones"
+        },
+        {
             id: "usuarios",
             texto: "Usuarios"
         }
     ],
 
-    Cobranza: []
+    Cobranza: [
+        {
+            id: "gestiones",
+            texto: "Gestiones"
+        }
+    ]
 };
 
 
 const vistas = {
+    gestiones: {},
     usuarios: {}
 };
 
@@ -214,6 +228,11 @@ async function cargarVista(idVista) {
 
 async function obtenerModuloVista(idVista) {
     switch (idVista) {
+
+        case "gestiones":
+            return await import(
+                "./gestiones.js"
+            );
 
         case "usuarios":
             return await import(

@@ -1,0 +1,458 @@
+/* ─────────────────────────────────────────────
+   VISTA
+   ───────────────────────────────────────────── */
+
+.vista-gestiones {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.vista-gestiones__encabezado {
+    flex-shrink: 0;
+    margin-bottom: 22px;
+}
+
+.vista-gestiones__titulo {
+    margin: 0;
+}
+
+.vista-gestiones__descripcion {
+    margin: 6px 0 0;
+}
+
+
+/* ─────────────────────────────────────────────
+   NAVEGACIÓN
+   Orden visual:
+   Del día → Desfasados → Consolidación → Activos
+   ───────────────────────────────────────────── */
+
+.vista-gestiones__navegacion {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--ink-700);
+}
+
+/*
+ * El HTML actualmente tiene:
+ * Del día → Activos → Desfasados → Consolidación
+ *
+ * Se conserva el HTML y únicamente se modifica
+ * el orden visual mediante flex-order.
+ */
+
+.vista-gestiones__tab {
+    order: 1;
+    position: relative;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 11px 18px 12px;
+
+    color: var(--text-500);
+
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+
+    cursor: pointer;
+
+    transition:
+        color 0.15s ease,
+        border-color 0.15s ease;
+}
+
+/* Del día */
+.vista-gestiones__tab[data-seccion="del-dia"] {
+    order: 1;
+}
+
+/* Desfasados */
+.vista-gestiones__tab[data-seccion="desfasados"] {
+    order: 2;
+}
+
+/* Consolidación */
+.vista-gestiones__tab[data-seccion="consolidacion"] {
+    order: 3;
+}
+
+/* Activos */
+.vista-gestiones__tab[data-seccion="activos"] {
+    order: 4;
+}
+
+.vista-gestiones__tab:hover {
+    color: var(--text-100);
+}
+
+.vista-gestiones__tab--activo {
+    color: var(--gold-300);
+    border-bottom-color: var(--gold-500);
+}
+
+.vista-gestiones__tab:focus-visible {
+    outline: 2px solid var(--gold-300);
+    outline-offset: -2px;
+}
+
+.vista-gestiones__contador {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 24px;
+    height: 24px;
+    margin-left: 8px;
+    padding: 0 5px;
+
+    background: var(--ink-850);
+    border: 1px solid var(--ink-700);
+    border-radius: 3px;
+
+    color: var(--text-300);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.vista-gestiones__tab--activo .vista-gestiones__contador {
+    background: var(--gold-500);
+    border-color: var(--gold-500);
+    color: var(--ink-950);
+}
+
+
+.seccion-gestiones {
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+}
+
+
+.vista-gestiones > .seccion-gestiones[data-seccion-contenido="del-dia"] {
+    order: 1;
+}
+
+.vista-gestiones > .seccion-gestiones[data-seccion-contenido="desfasados"] {
+    order: 2;
+}
+
+.vista-gestiones > .seccion-gestiones[data-seccion-contenido="consolidacion"] {
+    order: 3;
+}
+
+.vista-gestiones > .seccion-gestiones[data-seccion-contenido="activos"] {
+    order: 4;
+}
+
+
+.gestiones-tarjetas {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    display: grid;
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(340px, 1fr)
+        );
+
+    align-content: start;
+    gap: 14px;
+
+    overflow-y: auto;
+    padding-right: 4px;
+
+    scrollbar-width: thin;
+    scrollbar-color:
+        var(--ink-700)
+        transparent;
+}
+
+.gestiones-tarjetas::-webkit-scrollbar {
+    width: 7px;
+}
+
+.gestiones-tarjetas::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.gestiones-tarjetas::-webkit-scrollbar-thumb {
+    background: var(--ink-700);
+    border-radius: 10px;
+}
+
+.gestiones-tarjetas::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-800);
+}
+
+.gestion-card {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+
+    background: var(--ink-900);
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-card);
+
+    box-shadow: var(--shadow-card);
+
+    overflow: hidden;
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
+}
+
+.gestion-card:hover {
+    border-color: var(--ink-800);
+    background: var(--ink-850);
+}
+
+
+.gestion-card__encabezado {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid var(--ink-700);
+}
+
+
+.gestion-card__interlocutor {
+    display: block;
+    margin-bottom: 5px;
+
+    color: var(--gold-500);
+}
+
+
+.gestion-card__cliente {
+    margin: 0;
+
+    color: var(--text-100);
+
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+
+.gestion-card__id {
+    flex-shrink: 0;
+    color: var(--text-500);
+}
+
+
+.gestion-card__datos {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 1px;
+
+    background: var(--ink-700);
+}
+
+
+.gestion-card__dato {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    min-width: 0;
+
+    padding: 15px 16px;
+
+    background: var(--ink-900);
+}
+
+
+.gestion-card__dato .u-cuerpo {
+    overflow: hidden;
+
+    color: var(--text-300);
+
+    font-size: 14px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
+.gestion-card__acciones {
+    display: flex;
+    justify-content: flex-end;
+
+    padding: 13px 16px;
+
+    border-top: 1px solid var(--ink-700);
+}
+
+
+.gestion-card__boton {
+    width: auto;
+    min-width: 0;
+    margin-top: 0;
+}
+
+
+.gestiones-vacio {
+    width: 100%;
+
+    padding: 52px 24px;
+
+    text-align: center;
+
+    background: var(--ink-900);
+    border: 1px dashed var(--ink-700);
+    border-radius: var(--radius-card);
+}
+
+.gestiones-vacio p {
+    margin: 0;
+}
+
+
+.seccion-gestiones[data-seccion-contenido="activos"] {
+    min-height: 0;
+}
+
+.seccion-gestiones[data-seccion-contenido="activos"] .tabla-contenedor {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    background: var(--ink-900);
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-card);
+
+    overflow: hidden;
+}
+
+.seccion-gestiones[data-seccion-contenido="activos"] .tabla-scroll {
+    width: 100%;
+    height: 100%;
+
+    overflow: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color:
+        var(--ink-700)
+        transparent;
+}
+
+.seccion-gestiones[data-seccion-contenido="activos"] .tabla-scroll::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+.seccion-gestiones[data-seccion-contenido="activos"] .tabla-scroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.seccion-gestiones[data-seccion-contenido="activos"] .tabla-scroll::-webkit-scrollbar-thumb {
+    background: var(--ink-700);
+    border-radius: 10px;
+}
+
+.seccion-gestiones[data-seccion-contenido="activos"] .tabla-scroll::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-800);
+}
+
+
+@media (max-width: 900px) {
+
+    .gestiones-tarjetas {
+        grid-template-columns:
+            repeat(
+                auto-fill,
+                minmax(300px, 1fr)
+            );
+    }
+
+    .gestion-card__datos {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .gestion-card__dato:last-child {
+        grid-column: 1 / -1;
+    }
+}
+
+
+@media (max-width: 720px) {
+
+    .vista-gestiones__navegacion {
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .vista-gestiones__navegacion::-webkit-scrollbar {
+        display: none;
+    }
+
+    .vista-gestiones__tab {
+        flex-shrink: 0;
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .gestiones-tarjetas {
+        grid-template-columns: 1fr;
+    }
+
+    .gestion-card__datos {
+        grid-template-columns: 1fr;
+    }
+
+    .gestion-card__dato:last-child {
+        grid-column: auto;
+    }
+}
+
+
+@media (max-width: 520px) {
+
+    .gestion-card__encabezado {
+        padding: 16px;
+    }
+
+    .gestion-card__cliente {
+        font-size: 18px;
+    }
+
+    .gestion-card__datos {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+    }
+
+    .gestion-card__dato {
+        padding: 13px 16px;
+    }
+
+    .gestion-card__acciones {
+        padding: 12px 16px;
+    }
+
+    .gestion-card__boton {
+        width: 100%;
+    }
+}
