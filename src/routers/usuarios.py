@@ -95,6 +95,17 @@ def listar_usuarios(
         excluir_id=usuario_actual.id
     )
 
+@router.get("/asignables", response_model=list[UsuarioRead])
+def listar_usuarios_asignables(
+    usuario_actual: Usuario = Depends(
+        requiere_rol("Administrador", "Supervisor")
+    ),
+    session: Session = Depends(get_session),
+):
+    return UsuarioService(session).listar_asignables(
+        usuario_actual
+    )
+
 @router.patch("/rol-masivo", response_model=list[UsuarioRead])
 def actualizar_rol_masivo(
     data: UsuarioRolMasivo,
