@@ -128,14 +128,13 @@ def listar_gestiones_activos(
 )
 def obtener_resumen_gestiones(
     session: Session = Depends(get_session),
-    usuario_actual: Usuario = Depends(
-        requiere_rol("Administrador", "Supervisor", "Cobranza")
-    ),
+    usuario_actual: Usuario = Depends(usuario_actual),
 ):
     servicio = ExpedienteService(session)
 
     return servicio.contar_gestiones(
-        usuario_actual.id
+        usuario_actual.id,
+        usuario_actual.rol.nombre
     )
 
 

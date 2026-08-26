@@ -1,6 +1,6 @@
 let usuarioSesion = null;
 
-let seccionActual = "del-dia";
+let seccionActual = null;
 
 let estadoGestiones = null;
 let mensajeGestiones = null;
@@ -64,13 +64,88 @@ export async function iniciar({ usuario, contenedor }) {
     );
 
 
+    configurarVistaPorRol(contenedor);
+
     configurarNavegacion(contenedor);
 
     configurarFiltro();
 
     await cargarResumen();
 
-    await cargarSeccion("del-dia");
+    await cargarSeccion(seccionActual);
+}
+
+
+function configurarVistaPorRol(contenedor) {
+    const rol =
+        usuarioSesion?.rol?.nombre;
+
+    const configuracion = {
+        "Administrador": [
+            "activos",
+            "del-dia",
+            "desfasados",
+            "consolidacion"
+        ],
+
+        "Supervisor": [
+            "activos",
+            "del-dia",
+            "desfasados",
+            "consolidacion"
+        ],
+
+        "Cobranza": [
+            "del-dia",
+            "desfasados",
+            "consolidacion",
+            "activos"
+        ],
+
+        "Visualizador": [
+            "activos"
+        ]
+    };
+
+    const seccionesPermitidas =
+        configuracion[rol] ?? [];
+
+    seccionActual =
+        seccionesPermitidas[0] ?? null;
+
+    const navegacion =
+        contenedor.querySelector(
+            ".vista-gestiones__navegacion"
+        );
+
+    const botones =
+        [...navegacion.querySelectorAll(
+            "[data-seccion]"
+        )];
+
+    botones.forEach((boton) => {
+        const seccion =
+            boton.dataset.seccion;
+
+        boton.hidden =
+            !seccionesPermitidas.includes(seccion);
+    });
+
+    seccionesPermitidas.forEach((seccion) => {
+        const boton =
+            botones.find(
+                (elemento) =>
+                    elemento.dataset.seccion === seccion
+            );
+
+        if (boton) {
+            navegacion.appendChild(boton);
+        }
+    });
+
+    actualizarPestanas();
+    actualizarContenedores();
+    actualizarFiltro();
 }
 
 
@@ -211,6 +286,42 @@ function actualizarContadores(resumen) {
 
 
 async function cambiarSeccion(seccion) {
+    const rol =
+        usuarioSesion?.rol?.nombre;
+
+    const seccionesPermitidas = {
+        "Administrador": [
+            "activos",
+            "del-dia",
+            "desfasados",
+            "consolidacion"
+        ],
+
+        "Supervisor": [
+            "activos",
+            "del-dia",
+            "desfasados",
+            "consolidacion"
+        ],
+
+        "Cobranza": [
+            "del-dia",
+            "desfasados",
+            "consolidacion",
+            "activos"
+        ],
+
+        "Visualizador": [
+            "activos"
+        ]
+    };
+
+    if (
+        !seccionesPermitidas[rol]?.includes(seccion)
+    ) {
+        return;
+    }
+
     seccionActual = seccion;
 
     actualizarPestanas();

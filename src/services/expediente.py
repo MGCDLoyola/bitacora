@@ -218,8 +218,24 @@ class ExpedienteService(BaseService):
 
     def contar_gestiones(
         self,
-        id_usuario: int
+        id_usuario: int,
+        rol: str
     ) -> dict[str, int]:
+
+        if rol == "Visualizador":
+            activos = (
+                select(func.count(Expediente.id))
+                .where(
+                    Expediente.estado.is_(True),
+                    Expediente.fecha_consolidacion.is_(None)
+                )
+            )
+
+            return {
+                "activos": self.session.execute(
+                    activos
+                ).scalar_one()
+            }
 
         tiene_documento_consolidacion = exists(
             select(Documento.id)
@@ -272,10 +288,21 @@ class ExpedienteService(BaseService):
         )
 
         return {
-            "del-dia": self.session.execute(del_dia).scalar_one(),
-            "desfasados": self.session.execute(desfasados).scalar_one(),
-            "consolidacion": self.session.execute(consolidacion).scalar_one(),
-            "activos": self.session.execute(activos).scalar_one(),
+            "del-dia": self.session.execute(
+                del_dia
+            ).scalar_one(),
+
+            "desfasados": self.session.execute(
+                desfasados
+            ).scalar_one(),
+
+            "consolidacion": self.session.execute(
+                consolidacion
+            ).scalar_one(),
+
+            "activos": self.session.execute(
+                activos
+            ).scalar_one(),
         }
 
     def _listar_gestiones(

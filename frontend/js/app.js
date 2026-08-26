@@ -43,6 +43,13 @@ const navegacionPorRol = {
             id: "gestiones",
             texto: "Gestiones"
         }
+    ],
+
+    Visualizador: [
+        {
+            id: "gestiones",
+            texto: "Gestiones"
+        }
     ]
 };
 
