@@ -167,10 +167,10 @@ def obtener_resumen_gestiones(
 
 
 @router.patch(
-    "/asignar-masivo",
+    "/asignar",
     response_model=list[ExpedienteRead],
 )
-def asignar_expedientes_masivo(
+def asignar_expedientes(
     data: ExpedienteAsignacionMasiva,
     session: Session = Depends(get_session),
     usuario_actual: Usuario = Depends(
@@ -182,7 +182,7 @@ def asignar_expedientes_masivo(
 ):
     servicio = ExpedienteService(session)
 
-    return servicio.asignar_masivo(
+    return servicio.asignar(
         ids=data.ids,
         id_usuario=data.id_usuario,
         usuario_actual=usuario_actual,
@@ -224,30 +224,6 @@ def actualizar_expediente(
     return servicio.actualizar(
         id_expediente,
         data,
-    )
-
-
-@router.patch(
-    "/{id_expediente}/asignar",
-    response_model=ExpedienteRead,
-)
-def asignar_expediente(
-    id_expediente: int,
-    id_usuario: int | None = None,
-    session: Session = Depends(get_session),
-    usuario_actual: Usuario = Depends(
-        requiere_rol(
-            "Administrador",
-            "Supervisor",
-        )
-    ),
-):
-    servicio = ExpedienteService(session)
-
-    return servicio.asignar(
-        id_expediente,
-        id_usuario,
-        usuario_actual,
     )
 
 

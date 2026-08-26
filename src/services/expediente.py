@@ -125,37 +125,6 @@ class ExpedienteService(BaseService):
 
     def asignar(
         self,
-        id_expediente: int,
-        id_usuario: int | None,
-        usuario_actual: Usuario
-    ) -> Expediente:
-
-        expediente = self.obtener(id_expediente)
-
-        if id_usuario is not None:
-
-            usuario_destino = UsuarioService(
-                self.session
-            ).obtener(
-                id_usuario
-            )
-
-            if not UsuarioService(self.session).puede_asignar(
-                usuario_actual,
-                usuario_destino
-            ):
-                raise OperacionInvalida(
-                    "No tienes permisos para asignar el expediente a este usuario."
-                )
-
-        expediente.id_usuario = id_usuario
-
-        self._guardar(expediente)
-
-        return expediente
-
-    def asignar_masivo(
-        self,
         ids: list[int],
         id_usuario: int | None,
         usuario_actual: Usuario
