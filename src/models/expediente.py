@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import Boolean, Date, ForeignKey, String, Text
+from sqlalchemy import Boolean, Date, ForeignKey, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.base import Base
@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from .cobranza import Cobranza
     from .usuario import Usuario
 
+
 class Expediente(AuditoriaMixin, Base):
     __tablename__ = "expedientes"
 
@@ -23,7 +24,11 @@ class Expediente(AuditoriaMixin, Base):
     )
 
     interlocutor: Mapped[str] = mapped_column(
-        ForeignKey("clientes.interlocutor", onupdate="CASCADE", ondelete="RESTRICT"),
+        ForeignKey(
+            "clientes.interlocutor",
+            onupdate="CASCADE",
+            ondelete="RESTRICT"
+        ),
         nullable=False
     )
 
@@ -31,16 +36,25 @@ class Expediente(AuditoriaMixin, Base):
         Date
     )
 
+    monto_vencido: Mapped[float | None] = mapped_column(
+        Numeric(14, 2),
+        nullable=True
+    )
+
     fecha_consolidacion: Mapped[date | None] = mapped_column(
-            Date
-        )
+        Date
+    )
 
     fecha_desfase: Mapped[date | None] = mapped_column(
         Date
     )
 
     id_usuario: Mapped[int | None] = mapped_column(
-        ForeignKey("usuarios.id_usuario", onupdate="CASCADE", ondelete="RESTRICT"),
+        ForeignKey(
+            "usuarios.id_usuario",
+            onupdate="CASCADE",
+            ondelete="RESTRICT"
+        ),
         nullable=True
     )
 
