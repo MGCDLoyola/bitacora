@@ -4,6 +4,8 @@ from sqlalchemy import select
 from pathlib import Path
 
 from src.models.usuario import Usuario
+from src.models.rol import Rol
+
 from src.schemas.usuario import UsuarioCreate, UsuarioUpdate, UsuarioUpdateSupervisor
 from src.core.exceptions import NoEncontrado, OperacionInvalida
 from src.core.almacenamiento import crear_carpeta_firmas, carpeta_firmas
@@ -32,6 +34,68 @@ class UsuarioService(BaseService):
         stmt = stmt.order_by(Usuario.id)
 
         return self.session.execute(stmt).scalars().all()
+
+    def puede_asignar(
+        self,
+        usuario_actual: Usuario,
+        usuario_destino: Usuario
+    ) -> bool:
+
+        if not usuario_destino.activo:
+            return False
+
+        if usuario_actual.rol.nombre == "Administrador":
+            return (
+                usuario_destino.id == usuario_actual.id
+                or usuario_destino.rol.nombre in ("Supervisor", "Cobranza")
+            )
+
+        if usuario_actual.rol.nombre == "Supervisor":
+            return (
+                usuario_destino.id == usuario_actual.id
+                or usuario_destino.rol.nombre == "Cobranza"
+            )
+
+        return False
+
+    def listar_asignables(
+        self,
+        usuario_actual: Usuario
+    ) -> Sequence[Usuario]:
+
+        if usuario_actual.rol.nombre == "Administrador":
+            roles_permitidos = ["Supervisor", "Cobranza"]
+
+        elif usuario_actual.rol.nombre == "Supervisor":
+            roles_permitidos = ["Cobranza"]
+
+        else:
+            return []
+
+        stmt = (
+            select(Usuario)
+            .where(
+                Usuario.activo.is_(True),
+                (
+                    Usuario.id == usuario_actual.id
+                )
+                | (
+                    Usuario.id_rol.in_(
+                        select(Rol.id).where(
+                            Rol.nombre.in_(roles_permitidos)
+                        )
+                    )
+                )
+            )
+            .order_by(Usuario.nombre)
+        )
+
+        return (
+            self.session
+            .execute(stmt)
+            .scalars()
+            .all()
+        )
 
     def obtener(self, id_usuario: int, activos: bool = False, cobranza: bool = False) -> Usuario:
         usuario = self.session.get(Usuario, id_usuario)

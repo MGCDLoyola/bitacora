@@ -42,3 +42,7 @@ class GestionesResumenRead(SchemaBase):
     desfasados: int
     consolidacion: int
     activos: int
+
+class ExpedienteAsignacionMasiva(SchemaBase):
+    ids: list[int]
+    id_usuario: int | None = None

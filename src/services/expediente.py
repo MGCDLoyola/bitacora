@@ -8,9 +8,10 @@ from src.models.expediente import Expediente
 from src.models.documento import Documento
 from src.models.tipo_documento import TipoDocumento
 from src.models.cobranza import Cobranza
+from src.models.usuario import Usuario
 
 from src.core.almacenamiento import carpeta_expediente
-from src.core.exceptions import NoEncontrado
+from src.core.exceptions import NoEncontrado, OperacionInvalida
 
 from src.schemas.expediente import (
     ExpedienteUpdate,
@@ -124,24 +125,66 @@ class ExpedienteService(BaseService):
     def asignar(
         self,
         id_expediente: int,
-        id_usuario: int | None
+        id_usuario: int | None,
+        usuario_actual: Usuario
     ) -> Expediente:
 
         expediente = self.obtener(id_expediente)
 
         if id_usuario is not None:
 
-            UsuarioService(self.session).obtener(
-                id_usuario,
-                activos=True,
-                cobranza=True
+            usuario_destino = UsuarioService(
+                self.session
+            ).obtener(
+                id_usuario
             )
+
+            if not UsuarioService(self.session).puede_asignar(
+                usuario_actual,
+                usuario_destino
+            ):
+                raise OperacionInvalida(
+                    "No tienes permisos para asignar el expediente a este usuario."
+                )
 
         expediente.id_usuario = id_usuario
 
         self._guardar(expediente)
 
         return expediente
+
+    def asignar_masivo(
+        self,
+        ids: list[int],
+        id_usuario: int | None,
+        usuario_actual: Usuario
+    ) -> Sequence[Expediente]:
+
+        expedientes = [
+            self.obtener(id_expediente)
+            for id_expediente in ids
+        ]
+
+        if id_usuario is not None:
+
+            usuario_destino = UsuarioService(
+                self.session
+            ).obtener(id_usuario)
+
+            if not UsuarioService(self.session).puede_asignar(
+                usuario_actual,
+                usuario_destino
+            ):
+                raise OperacionInvalida(
+                    "No tienes permisos para asignar los expedientes a este usuario."
+                )
+
+        for expediente in expedientes:
+            expediente.id_usuario = id_usuario
+
+        self._commit()
+
+        return expedientes
 
     def listar_por_asignado(
         self,
