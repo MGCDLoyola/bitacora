@@ -6,6 +6,7 @@
     width: 100%;
     height: 100%;
     min-height: 0;
+
     display: flex;
     flex-direction: column;
 }
@@ -26,33 +27,30 @@
 
 /* ─────────────────────────────────────────────
    NAVEGACIÓN
-   Orden visual:
-   Del día → Desfasados → Consolidación → Activos
    ───────────────────────────────────────────── */
 
 .vista-gestiones__navegacion {
     flex-shrink: 0;
+
     display: flex;
     align-items: center;
     gap: 0;
+
     margin-bottom: 18px;
+
     border-bottom: 1px solid var(--ink-700);
 }
 
-/*
- * El HTML actualmente tiene:
- * Del día → Activos → Desfasados → Consolidación
- *
- * Se conserva el HTML y únicamente se modifica
- * el orden visual mediante flex-order.
- */
-
 .vista-gestiones__tab {
-    order: 1;
     position: relative;
+
+    display: inline-flex;
+    align-items: center;
+
     background: none;
     border: none;
     border-bottom: 2px solid transparent;
+
     margin-bottom: -1px;
     padding: 11px 18px 12px;
 
@@ -61,6 +59,7 @@
     font-family: var(--font-mono);
     font-size: 11.5px;
     font-weight: 500;
+
     text-transform: uppercase;
     letter-spacing: 0.07em;
 
@@ -69,26 +68,6 @@
     transition:
         color 0.15s ease,
         border-color 0.15s ease;
-}
-
-/* Del día */
-.vista-gestiones__tab[data-seccion="del-dia"] {
-    order: 1;
-}
-
-/* Desfasados */
-.vista-gestiones__tab[data-seccion="desfasados"] {
-    order: 2;
-}
-
-/* Consolidación */
-.vista-gestiones__tab[data-seccion="consolidacion"] {
-    order: 3;
-}
-
-/* Activos */
-.vista-gestiones__tab[data-seccion="activos"] {
-    order: 4;
 }
 
 .vista-gestiones__tab:hover {
@@ -105,6 +84,11 @@
     outline-offset: -2px;
 }
 
+
+/* ─────────────────────────────────────────────
+   CONTADORES
+   ───────────────────────────────────────────── */
+
 .vista-gestiones__contador {
     display: inline-flex;
     align-items: center;
@@ -112,6 +96,7 @@
 
     min-width: 24px;
     height: 24px;
+
     margin-left: 8px;
     padding: 0 5px;
 
@@ -120,6 +105,7 @@
     border-radius: 3px;
 
     color: var(--text-300);
+
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 500;
@@ -133,47 +119,52 @@
 }
 
 
+/* ─────────────────────────────────────────────
+   SECCIONES
+   ───────────────────────────────────────────── */
+
 .seccion-gestiones {
     flex: 1;
-    min-height: 0;
+
     width: 100%;
+    min-height: 0;
 }
 
 
-.vista-gestiones > .seccion-gestiones[data-seccion-contenido="del-dia"] {
-    order: 1;
+/* ─────────────────────────────────────────────
+   BOX DE GESTIONES
+   ───────────────────────────────────────────── */
+
+.gestiones-box {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    background: var(--ink-900);
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-card);
+
+    overflow: hidden;
 }
 
-.vista-gestiones > .seccion-gestiones[data-seccion-contenido="desfasados"] {
-    order: 2;
-}
 
-.vista-gestiones > .seccion-gestiones[data-seccion-contenido="consolidacion"] {
-    order: 3;
-}
-
-.vista-gestiones > .seccion-gestiones[data-seccion-contenido="activos"] {
-    order: 4;
-}
-
+/* ─────────────────────────────────────────────
+   CONTENEDOR DE TARJETAS
+   ───────────────────────────────────────────── */
 
 .gestiones-tarjetas {
     width: 100%;
     height: 100%;
     min-height: 0;
 
-    display: grid;
-    grid-template-columns:
-        repeat(
-            auto-fill,
-            minmax(340px, 1fr)
-        );
-
-    align-content: start;
+    display: flex;
+    flex-direction: column;
     gap: 14px;
 
+    padding: 18px;
+
     overflow-y: auto;
-    padding-right: 4px;
+    overflow-x: hidden;
 
     scrollbar-width: thin;
     scrollbar-color:
@@ -197,6 +188,11 @@
 .gestiones-tarjetas::-webkit-scrollbar-thumb:hover {
     background: var(--ink-800);
 }
+
+
+/* ─────────────────────────────────────────────
+   TARJETA DE GESTIÓN
+   ───────────────────────────────────────────── */
 
 .gestion-card {
     display: flex;
@@ -223,25 +219,24 @@
 }
 
 
-.gestion-card__encabezado {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
+/* ─────────────────────────────────────────────
+   ENCABEZADO
+   ───────────────────────────────────────────── */
 
-    padding: 18px 20px;
+.gestion-card__encabezado {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 20px;
+
+    padding: 14px 18px;
 
     border-bottom: 1px solid var(--ink-700);
 }
 
 
-.gestion-card__interlocutor {
-    display: block;
-    margin-bottom: 5px;
-
-    color: var(--gold-500);
-}
-
+/* ─────────────────────────────────────────────
+   INFORMACIÓN DEL CLIENTE
+   ───────────────────────────────────────────── */
 
 .gestion-card__cliente {
     margin: 0;
@@ -252,19 +247,72 @@
     font-size: 20px;
     font-weight: 600;
     line-height: 1.25;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 
+.gestion-card__interlocutor {
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--gold-500);
+
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+}
+
+
+/* ─────────────────────────────────────────────
+   FOLIO + BOTÓN
+   ───────────────────────────────────────────── */
+
 .gestion-card__id {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 7px;
+
     flex-shrink: 0;
+
     color: var(--text-500);
 }
 
 
+.gestion-card__acciones {
+    display: flex;
+    justify-content: flex-end;
+
+    padding: 0;
+
+    border: none;
+}
+
+
+.gestion-card__boton {
+    width: auto;
+    min-width: 0;
+    margin-top: 0;
+
+    padding: 6px 15px;
+    font-size: 13px;
+}
+
+
+/* ─────────────────────────────────────────────
+   DATOS DE TARJETA
+   ───────────────────────────────────────────── */
+
 .gestion-card__datos {
     display: grid;
+
     grid-template-columns:
-        repeat(3, minmax(0, 1fr));
+        repeat(4, minmax(0, 1fr));
 
     gap: 1px;
 
@@ -275,11 +323,13 @@
 .gestion-card__dato {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    justify-content: center;
+
+    gap: 4px;
 
     min-width: 0;
 
-    padding: 15px 16px;
+    padding: 10px 14px;
 
     background: var(--ink-900);
 }
@@ -290,28 +340,15 @@
 
     color: var(--text-300);
 
-    font-size: 14px;
+    font-size: 13px;
+
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-
-.gestion-card__acciones {
-    display: flex;
-    justify-content: flex-end;
-
-    padding: 13px 16px;
-
-    border-top: 1px solid var(--ink-700);
-}
-
-
-.gestion-card__boton {
-    width: auto;
-    min-width: 0;
-    margin-top: 0;
-}
-
+/* ─────────────────────────────────────────────
+   ESTADO VACÍO
+   ───────────────────────────────────────────── */
 
 .gestiones-vacio {
     width: 100%;
@@ -329,6 +366,10 @@
     margin: 0;
 }
 
+
+/* ─────────────────────────────────────────────
+   ACTIVOS
+   ───────────────────────────────────────────── */
 
 .seccion-gestiones[data-seccion-contenido="activos"] {
     min-height: 0;
@@ -377,15 +418,11 @@
 }
 
 
-@media (max-width: 900px) {
+/* ─────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────── */
 
-    .gestiones-tarjetas {
-        grid-template-columns:
-            repeat(
-                auto-fill,
-                minmax(300px, 1fr)
-            );
-    }
+@media (max-width: 900px) {
 
     .gestion-card__datos {
         grid-template-columns: 1fr 1fr;
@@ -410,12 +447,9 @@
 
     .vista-gestiones__tab {
         flex-shrink: 0;
+
         padding-left: 14px;
         padding-right: 14px;
-    }
-
-    .gestiones-tarjetas {
-        grid-template-columns: 1fr;
     }
 
     .gestion-card__datos {
@@ -446,10 +480,6 @@
 
     .gestion-card__dato {
         padding: 13px 16px;
-    }
-
-    .gestion-card__acciones {
-        padding: 12px 16px;
     }
 
     .gestion-card__boton {

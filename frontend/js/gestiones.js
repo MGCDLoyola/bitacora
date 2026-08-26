@@ -293,10 +293,6 @@ function crearTarjetaGestion(gestion) {
         ? escaparHtml(gestion.contrato)
         : "Sin contrato";
 
-    const usuario = gestion.usuario
-        ? escaparHtml(gestion.usuario)
-        : "Sin asignar";
-
     return `
         <article
             class="gestion-card"
@@ -306,18 +302,38 @@ function crearTarjetaGestion(gestion) {
             <div class="gestion-card__encabezado">
 
                 <div>
-                    <span class="gestion-card__interlocutor u-mono-sm">
-                        ${escaparHtml(gestion.interlocutor)}
-                    </span>
 
                     <h3 class="gestion-card__cliente">
                         ${escaparHtml(gestion.nombre_cliente)}
                     </h3>
+
+                    <span class="gestion-card__interlocutor u-mono-sm">
+                        ${escaparHtml(gestion.interlocutor)}
+                    </span>
+
                 </div>
 
-                <span class="gestion-card__id u-mono-sm">
-                    #${gestion.id}
-                </span>
+
+                <div class="gestion-card__id">
+
+                    <span class="u-mono-sm">
+                        #${gestion.id}
+                    </span>
+
+                    <div class="gestion-card__acciones">
+
+                        <button
+                            type="button"
+                            class="boton u-boton-texto gestion-card__boton"
+                            data-accion="abrir"
+                            data-id="${gestion.id}"
+                        >
+                            Abrir expediente
+                        </button>
+
+                    </div>
+
+                </div>
 
             </div>
 
@@ -353,28 +369,27 @@ function crearTarjetaGestion(gestion) {
                 <div class="gestion-card__dato">
 
                     <span class="u-etiqueta u-texto-terciario">
-                        Responsable
+                        Día
                     </span>
 
                     <span class="u-cuerpo">
-                        ${usuario}
+                        —
                     </span>
 
                 </div>
 
-            </div>
 
+                <div class="gestion-card__dato">
 
-            <div class="gestion-card__acciones">
+                    <span class="u-etiqueta u-texto-terciario">
+                        Intentos
+                    </span>
 
-                <button
-                    type="button"
-                    class="boton u-boton-texto gestion-card__boton"
-                    data-accion="abrir"
-                    data-id="${gestion.id}"
-                >
-                    Abrir expediente
-                </button>
+                    <span class="u-cuerpo">
+                        —
+                    </span>
+
+                </div>
 
             </div>
 
