@@ -32,6 +32,9 @@ class ExpedienteGestionRead(SchemaBase):
     contrato: str | None = None
     monto_vencido: Decimal | None = None
     usuario: str | None = None
+    dia: int | None = None
+    intentos: int | None = None
+
 
 class GestionesResumenRead(SchemaBase):
 

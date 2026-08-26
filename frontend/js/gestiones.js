@@ -473,7 +473,7 @@ function crearTarjetaGestion(gestion) {
                     </span>
 
                     <span class="u-cuerpo">
-                        —
+                        ${gestion.dia ?? "—"}
                     </span>
 
                 </div>
@@ -486,7 +486,7 @@ function crearTarjetaGestion(gestion) {
                     </span>
 
                     <span class="u-cuerpo">
-                        —
+                        ${gestion.intentos ?? "—"}
                     </span>
 
                 </div>

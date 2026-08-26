@@ -7,6 +7,7 @@ from sqlalchemy.orm import joinedload
 from src.models.expediente import Expediente
 from src.models.documento import Documento
 from src.models.tipo_documento import TipoDocumento
+from src.models.cobranza import Cobranza
 
 from src.core.almacenamiento import carpeta_expediente
 from src.core.exceptions import NoEncontrado
@@ -282,8 +283,38 @@ class ExpedienteService(BaseService):
         *filtros
     ) -> Sequence[ExpedienteGestionRead]:
 
+        ultima_cobranza_dia = (
+            select(Cobranza.dia)
+            .where(
+                Cobranza.id_expediente == Expediente.id
+            )
+            .order_by(
+                Cobranza.fecha.desc(),
+                Cobranza.id.desc()
+            )
+            .limit(1)
+            .scalar_subquery()
+        )
+
+        ultima_cobranza_intentos = (
+            select(Cobranza.orden)
+            .where(
+                Cobranza.id_expediente == Expediente.id
+            )
+            .order_by(
+                Cobranza.fecha.desc(),
+                Cobranza.id.desc()
+            )
+            .limit(1)
+            .scalar_subquery()
+        )
+
         stmt = (
-            select(Expediente)
+            select(
+                Expediente,
+                ultima_cobranza_dia.label("dia"),
+                ultima_cobranza_intentos.label("intentos")
+            )
             .options(
                 joinedload(Expediente.cliente),
                 joinedload(Expediente.usuario)
@@ -295,10 +326,9 @@ class ExpedienteService(BaseService):
             .order_by(Expediente.id)
         )
 
-        expedientes = (
+        resultados = (
             self.session
             .execute(stmt)
-            .scalars()
             .unique()
             .all()
         )
@@ -314,9 +344,11 @@ class ExpedienteService(BaseService):
                     expediente.usuario.nombre
                     if expediente.usuario is not None
                     else None
-                )
+                ),
+                dia=dia,
+                intentos=intentos
             )
-            for expediente in expedientes
+            for expediente, dia, intentos in resultados
         ]
 
     def eliminar(
