@@ -137,16 +137,16 @@ class ExpedienteService(BaseService):
 
         if id_usuario is not None:
 
-            usuario_destino = UsuarioService(
-                self.session
-            ).obtener(id_usuario)
+            usuario_service = UsuarioService(self.session)
 
-            if not UsuarioService(self.session).puede_asignar(
+            usuario_destino = usuario_service.obtener(id_usuario)
+
+            if not usuario_service.puede_asignar(
                 usuario_actual,
                 usuario_destino
             ):
                 raise OperacionInvalida(
-                    "No tienes permisos para asignar los expedientes a este usuario."
+                    "No tienes permisos para asignar el expediente a este usuario."
                 )
 
         for expediente in expedientes:
