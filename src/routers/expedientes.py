@@ -8,7 +8,11 @@ from src.core.database import get_session
 from src.core.deps import requiere_rol, usuario_actual
 from src.models.usuario import Usuario
 from src.schemas.cobranza import CobranzaCreate, CobranzaRead
-from src.schemas.expediente import ExpedienteRead, ExpedienteUpdate
+from src.schemas.expediente import (
+    ExpedienteRead,
+    ExpedienteUpdate,
+    ExpedienteGestionRead,
+)
 from src.services.cobranza import CobranzaService
 from src.services.expediente import ExpedienteService
 from src.services.pdf_cobranza import PDFCobranzaService
@@ -53,6 +57,70 @@ def buscar_expedientes(
         fecha_desde=fecha_desde,
         fecha_hasta=fecha_hasta
     )
+
+
+@router.get(
+    "/gestiones/del-dia",
+    response_model=list[ExpedienteGestionRead]
+)
+def listar_gestiones_del_dia(
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(
+        requiere_rol("Administrador", "Supervisor", "Cobranza")
+    ),
+):
+    servicio = ExpedienteService(session)
+
+    return servicio.listar_gestiones_del_dia(
+        usuario_actual.id
+    )
+
+
+@router.get(
+    "/gestiones/desfasados",
+    response_model=list[ExpedienteGestionRead]
+)
+def listar_gestiones_desfasados(
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(
+        requiere_rol("Administrador", "Supervisor", "Cobranza")
+    ),
+):
+    servicio = ExpedienteService(session)
+
+    return servicio.listar_gestiones_desfasadas(
+        usuario_actual.id
+    )
+
+
+@router.get(
+    "/gestiones/consolidacion",
+    response_model=list[ExpedienteGestionRead]
+)
+def listar_gestiones_consolidacion(
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(
+        requiere_rol("Administrador", "Supervisor", "Cobranza")
+    ),
+):
+    servicio = ExpedienteService(session)
+
+    return servicio.listar_gestiones_consolidacion(
+        usuario_actual.id
+    )
+
+
+@router.get(
+    "/gestiones/activos",
+    response_model=list[ExpedienteGestionRead]
+)
+def listar_gestiones_activos(
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(usuario_actual),
+):
+    servicio = ExpedienteService(session)
+
+    return servicio.listar_gestiones_activas()
 
 
 @router.get("/{id_expediente}", response_model=ExpedienteRead)

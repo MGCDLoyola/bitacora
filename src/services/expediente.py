@@ -1,14 +1,20 @@
 from datetime import date
 import shutil
 
-from sqlalchemy import select
+from sqlalchemy import exists, select
+from sqlalchemy.orm import joinedload
 
 from src.models.expediente import Expediente
+from src.models.documento import Documento
+from src.models.tipo_documento import TipoDocumento
 
 from src.core.almacenamiento import carpeta_expediente
 from src.core.exceptions import NoEncontrado
 
-from src.schemas.expediente import ExpedienteUpdate
+from src.schemas.expediente import (
+    ExpedienteUpdate,
+    ExpedienteGestionRead,
+)
 
 from src.services.usuario import UsuarioService
 from src.services.base import BaseService
@@ -74,13 +80,19 @@ class ExpedienteService(BaseService):
         stmt = select(Expediente)
 
         if interlocutor is not None:
-            stmt = stmt.where(Expediente.interlocutor == interlocutor)
+            stmt = stmt.where(
+                Expediente.interlocutor == interlocutor
+            )
 
         if fecha_desde is not None:
-            stmt = stmt.where(Expediente.fecha_incumplimiento >= fecha_desde)
+            stmt = stmt.where(
+                Expediente.fecha_incumplimiento >= fecha_desde
+            )
 
         if fecha_hasta is not None:
-            stmt = stmt.where(Expediente.fecha_incumplimiento <= fecha_hasta)
+            stmt = stmt.where(
+                Expediente.fecha_incumplimiento <= fecha_hasta
+            )
 
         stmt = stmt.order_by(Expediente.id)
 
@@ -108,13 +120,21 @@ class ExpedienteService(BaseService):
 
         return expediente
 
-    def asignar(self, id_expediente: int, id_usuario: int | None) -> Expediente:
+    def asignar(
+        self,
+        id_expediente: int,
+        id_usuario: int | None
+    ) -> Expediente:
 
         expediente = self.obtener(id_expediente)
 
         if id_usuario is not None:
 
-            UsuarioService(self.session).obtener(id_usuario, activos = True, cobranza = True)
+            UsuarioService(self.session).obtener(
+                id_usuario,
+                activos=True,
+                cobranza=True
+            )
 
         expediente.id_usuario = id_usuario
 
@@ -122,11 +142,16 @@ class ExpedienteService(BaseService):
 
         return expediente
 
-    def listar_por_asignado(self, id_usuario: int) -> Sequence[Expediente]:
+    def listar_por_asignado(
+        self,
+        id_usuario: int
+    ) -> Sequence[Expediente]:
 
         stmt = (
             select(Expediente)
-            .where(Expediente.id_usuario == id_usuario)
+            .where(
+                Expediente.id_usuario == id_usuario
+            )
             .order_by(Expediente.id)
         )
 
@@ -137,13 +162,114 @@ class ExpedienteService(BaseService):
             .all()
         )
 
-    def eliminar(self, id_expediente: int) -> None:
+    def listar_gestiones_del_dia(
+        self,
+        id_usuario: int
+    ) -> Sequence[ExpedienteGestionRead]:
+
+        return self._listar_gestiones(
+            Expediente.id_usuario == id_usuario,
+            Expediente.fecha_desfase.is_(None),
+            Expediente.fecha_consolidacion.is_(None)
+        )
+
+    def listar_gestiones_desfasadas(
+        self,
+        id_usuario: int
+    ) -> Sequence[ExpedienteGestionRead]:
+
+        return self._listar_gestiones(
+            Expediente.id_usuario == id_usuario,
+            Expediente.fecha_desfase.is_not(None),
+            Expediente.fecha_consolidacion.is_(None)
+        )
+
+    def listar_gestiones_consolidacion(
+        self,
+        id_usuario: int
+    ) -> Sequence[ExpedienteGestionRead]:
+
+        tiene_documento_consolidacion = exists(
+            select(Documento.id)
+            .join(
+                TipoDocumento,
+                Documento.id_tipo_documento == TipoDocumento.id
+            )
+            .where(
+                Documento.id_expediente == Expediente.id,
+                TipoDocumento.nombre == "Consolidación"
+            )
+        )
+
+        return self._listar_gestiones(
+            Expediente.id_usuario == id_usuario,
+            Expediente.fecha_consolidacion.is_not(None),
+            ~tiene_documento_consolidacion
+        )
+
+    def listar_gestiones_activas(
+        self
+    ) -> Sequence[ExpedienteGestionRead]:
+
+        return self._listar_gestiones(
+            Expediente.fecha_consolidacion.is_(None)
+        )
+
+    def _listar_gestiones(
+        self,
+        *filtros
+    ) -> Sequence[ExpedienteGestionRead]:
+
+        stmt = (
+            select(Expediente)
+            .options(
+                joinedload(Expediente.cliente),
+                joinedload(Expediente.usuario)
+            )
+            .where(
+                Expediente.estado.is_(True),
+                *filtros
+            )
+            .order_by(Expediente.id)
+        )
+
+        expedientes = (
+            self.session
+            .execute(stmt)
+            .scalars()
+            .unique()
+            .all()
+        )
+
+        return [
+            ExpedienteGestionRead(
+                id=expediente.id,
+                interlocutor=expediente.interlocutor,
+                nombre_cliente=expediente.cliente.nombre,
+                contrato=expediente.cliente.contrato,
+                monto_vencido=expediente.monto_vencido,
+                usuario=(
+                    expediente.usuario.nombre
+                    if expediente.usuario is not None
+                    else None
+                )
+            )
+            for expediente in expedientes
+        ]
+
+    def eliminar(
+        self,
+        id_expediente: int
+    ) -> None:
 
         expediente = self.obtener(id_expediente)
 
         cliente = expediente.cliente
 
-        carpeta = carpeta_expediente(cliente, expediente)
+        carpeta = carpeta_expediente(
+            cliente,
+            expediente
+        )
 
         self.session.delete(expediente)
 
