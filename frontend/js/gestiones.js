@@ -11,11 +11,20 @@ let contenedorActivos = null;
 let contenedorDesfasados = null;
 let contenedorConsolidacion = null;
 
+let filtroGestiones = null;
+
 let datosGestiones = {
     "del-dia": [],
     "activos": [],
     "desfasados": [],
     "consolidacion": []
+};
+
+let filtrosGestiones = {
+    "del-dia": "",
+    "desfasados": "",
+    "consolidacion": "",
+    "activos": ""
 };
 
 
@@ -50,8 +59,14 @@ export async function iniciar({ usuario, contenedor }) {
         "#gestiones-consolidacion"
     );
 
+    filtroGestiones = contenedor.querySelector(
+        "#filtro-gestiones"
+    );
+
 
     configurarNavegacion(contenedor);
+
+    configurarFiltro();
 
     await cargarResumen();
 
@@ -74,6 +89,78 @@ function configurarNavegacion(contenedor) {
                 }
             );
         });
+}
+
+
+function configurarFiltro() {
+    filtroGestiones.addEventListener(
+        "input",
+        () => {
+
+            filtrosGestiones[seccionActual] =
+                filtroGestiones.value;
+
+            filtrarSeccionActual();
+        }
+    );
+}
+
+
+function filtrarSeccionActual() {
+    const texto = filtrosGestiones[seccionActual]
+        .trim()
+        .toLowerCase();
+
+    const datos = datosGestiones[seccionActual];
+
+    if (!texto) {
+        renderizarSeccion(
+            seccionActual,
+            datos
+        );
+
+        return;
+    }
+
+    const filtrados = datos.filter(
+        (gestion) => {
+
+            const nombre =
+                String(
+                    gestion.nombre_cliente ?? ""
+                ).toLowerCase();
+
+            const interlocutor =
+                String(
+                    gestion.interlocutor ?? ""
+                ).toLowerCase();
+
+            const contrato =
+                String(
+                    gestion.contrato ?? ""
+                ).toLowerCase();
+
+            const responsable =
+                String(
+                    gestion.usuario ?? ""
+                ).toLowerCase();
+
+            return (
+                nombre.includes(texto) ||
+                interlocutor.includes(texto) ||
+                contrato.includes(texto) ||
+                (
+                    seccionActual === "activos" &&
+                    responsable.includes(texto)
+                )
+            );
+        }
+    );
+
+    renderizarSeccion(
+        seccionActual,
+        filtrados
+    );
 }
 
 
@@ -128,8 +215,21 @@ async function cambiarSeccion(seccion) {
 
     actualizarPestanas();
     actualizarContenedores();
+    actualizarFiltro();
 
     await cargarSeccion(seccion);
+}
+
+function actualizarFiltro() {
+    filtroGestiones.hidden = false;
+
+    filtroGestiones.value =
+        filtrosGestiones[seccionActual] ?? "";
+
+    filtroGestiones.placeholder =
+        seccionActual === "activos"
+            ? "Buscar por nombre, interlocutor, contrato o responsable..."
+            : "Buscar por nombre, interlocutor o contrato...";
 }
 
 

@@ -120,6 +120,63 @@
 
 
 /* ─────────────────────────────────────────────
+   FILTRO DE GESTIONES
+   ───────────────────────────────────────────── */
+
+.filtros-gestiones {
+    flex-shrink: 0;
+
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.filtro-gestiones {
+    width: 100%;
+}
+
+.filtro-gestiones__input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+
+    padding: 10px 13px;
+
+    background: var(--ink-900);
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-card);
+
+    color: var(--text-100);
+
+    font-family: var(--font-mono);
+    font-size: 12px;
+
+    outline: none;
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
+}
+
+.filtro-gestiones__input::placeholder {
+    color: var(--text-500);
+}
+
+.filtro-gestiones__input:hover {
+    border-color: var(--ink-800);
+}
+
+.filtro-gestiones__input:focus {
+    border-color: var(--gold-500);
+    background: var(--ink-850);
+}
+
+.filtro-gestiones__input:focus-visible {
+    outline: 2px solid var(--gold-300);
+    outline-offset: 1px;
+}
+
+
+/* ─────────────────────────────────────────────
    SECCIONES
    ───────────────────────────────────────────── */
 
