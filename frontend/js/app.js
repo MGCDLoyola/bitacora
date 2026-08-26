@@ -19,7 +19,7 @@ const navegacionPorRol = {
     Administrador: [
         {
             id: "gestiones",
-            texto: "Gestiones"
+            texto: "Gestión de expedientes"
         },
         {
             id: "usuarios",
@@ -30,7 +30,7 @@ const navegacionPorRol = {
     Supervisor: [
         {
             id: "gestiones",
-            texto: "Gestiones"
+            texto: "Gestión de expedientes"
         },
         {
             id: "usuarios",
@@ -41,14 +41,14 @@ const navegacionPorRol = {
     Cobranza: [
         {
             id: "gestiones",
-            texto: "Gestiones"
+            texto: "Gestión de expedientes"
         }
     ],
 
     Visualizador: [
         {
             id: "gestiones",
-            texto: "Gestiones"
+            texto: "Gestión de expedientes"
         }
     ]
 };

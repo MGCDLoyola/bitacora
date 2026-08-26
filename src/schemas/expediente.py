@@ -46,3 +46,9 @@ class GestionesResumenRead(SchemaBase):
 class ExpedienteAsignacionMasiva(SchemaBase):
     ids: list[int]
     id_usuario: int | None = None
+
+
+class ExpedienteResumenEliminacion(SchemaBase):
+
+    cobranzas: int
+    documentos: int

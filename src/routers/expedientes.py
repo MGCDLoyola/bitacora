@@ -12,6 +12,7 @@ from src.schemas.expediente import (
     ExpedienteAsignacionMasiva,
     ExpedienteGestionRead,
     ExpedienteRead,
+    ExpedienteResumenEliminacion,
     ExpedienteUpdate,
 )
 from src.services.cobranza import CobranzaService
@@ -248,6 +249,25 @@ def asignar_expediente(
         id_usuario,
         usuario_actual,
     )
+
+
+@router.get(
+    "/{id_expediente}/resumen-eliminacion",
+    response_model=ExpedienteResumenEliminacion,
+)
+def obtener_resumen_eliminacion(
+    id_expediente: int,
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(
+        requiere_rol(
+            "Administrador",
+            "Supervisor",
+        )
+    ),
+):
+    servicio = ExpedienteService(session)
+
+    return servicio.contar_contenido(id_expediente)
 
 
 @router.delete(

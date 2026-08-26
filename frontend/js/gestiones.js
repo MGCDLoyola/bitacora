@@ -2,25 +2,25 @@ let usuarioSesion = null;
 
 let seccionActual = null;
 
-let estadoGestiones = null;
-let mensajeGestiones = null;
-let textoMensajeGestiones = null;
+let estadoExpedientes = null;
+let mensajeExpedientes = null;
+let textoMensajeExpedientes = null;
 
 let contenedorDelDia = null;
 let contenedorActivos = null;
 let contenedorDesfasados = null;
 let contenedorConsolidacion = null;
 
-let filtroGestiones = null;
+let filtroExpedientes = null;
 
-let datosGestiones = {
+let datosExpedientes = {
     "del-dia": [],
     "activos": [],
     "desfasados": [],
     "consolidacion": []
 };
 
-let filtrosGestiones = {
+let filtrosExpedientes = {
     "del-dia": "",
     "desfasados": "",
     "consolidacion": "",
@@ -29,67 +29,78 @@ let filtrosGestiones = {
 
 
 /* ─────────────────────────────────────────────
-   SELECCIÓN DE ACTIVOS
+   SELECCIÓN DE EXPEDIENTES ACTIVOS
    ───────────────────────────────────────────── */
 
-let gestionesActivosFiltradasActuales = [];
-let gestionesActivosSeleccionadas = new Set();
+let expedientesActivosFiltradosActuales = [];
+let expedientesActivosSeleccionados = new Set();
 
 let checkboxTodosActivos = null;
 
-let barraSeleccionGestiones = null;
-let barraSeleccionGestionesTexto = null;
+let barraSeleccionExpedientes = null;
+let barraSeleccionExpedientesTexto = null;
 
-let botonReasignarGestiones = null;
-let botonEliminarGestiones = null;
-let botonCancelarSeleccionGestiones = null;
-
-
-/* ─────────────────────────────────────────────
-   MODAL REASIGNAR
-   ───────────────────────────────────────────── */
-
-let modalReasignarGestion = null;
-let modalReasignarMensaje = null;
-let modalReasignarError = null;
-let textoModalReasignarError = null;
-
-let selectReasignarGestion = null;
-
-let botonCancelarReasignar = null;
-let botonConfirmarReasignar = null;
-
-let idsReasignarPendientes = [];
+let botonReasignarExpedientes = null;
+let botonCancelarSeleccionExpedientes = null;
+let botonEliminarExpedientes = null;
 
 
 /* ─────────────────────────────────────────────
-   MODAL ELIMINAR
+   MODAL ASIGNAR
    ───────────────────────────────────────────── */
 
-let modalEliminarGestion = null;
-let modalEliminarMensaje = null;
-let modalEliminarError = null;
-let textoModalEliminarError = null;
+let modalAsignarExpedientes = null;
+let modalAsignarMensaje = null;
+let modalAsignarError = null;
+let textoModalAsignarError = null;
 
-let botonCancelarEliminar = null;
-let botonConfirmarEliminar = null;
+let selectAsignarExpediente = null;
 
-let idsEliminarPendientes = [];
+let botonCancelarAsignarExpedientes = null;
+let botonConfirmarAsignarExpedientes = null;
+
+let idsAsignarPendientes = [];
+
+
+/* ─────────────────────────────────────────────
+   MODAL ELIMINAR EXPEDIENTES
+   ───────────────────────────────────────────── */
+
+let modalEliminarExpedientes = null;
+let modalEliminarExpedientesMensaje = null;
+let modalEliminarExpedientesError = null;
+let textoModalEliminarExpedientesError = null;
+
+let botonCancelarEliminarExpedientes = null;
+let botonConfirmarEliminarExpedientes = null;
+
+let idsEliminarExpedientesPendientes = [];
 
 
 /* ─────────────────────────────────────────────
    ENDPOINTS
    ───────────────────────────────────────────── */
 
-const ENDPOINTS_GESTIONES = {
+const ENDPOINTS_EXPEDIENTES = {
 
-    reasignar:
+    asignar:
         "/expedientes/asignar-masivo",
 
-    eliminar:
-        "/expedientes/gestiones/eliminar-masivo"
-
 };
+
+function endpointResumenEliminacionExpediente(
+    idExpediente
+) {
+
+    return `/expedientes/${idExpediente}/resumen-eliminacion`;
+}
+
+function endpointEliminarExpediente(
+    idExpediente
+) {
+
+    return `/expedientes/${idExpediente}`;
+}
 
 
 /* ─────────────────────────────────────────────
@@ -100,15 +111,15 @@ export async function iniciar({ usuario, contenedor }) {
 
     usuarioSesion = usuario;
 
-    estadoGestiones = contenedor.querySelector(
+    estadoExpedientes = contenedor.querySelector(
         "#estado-gestiones"
     );
 
-    mensajeGestiones = contenedor.querySelector(
+    mensajeExpedientes = contenedor.querySelector(
         "#mensaje-gestiones"
     );
 
-    textoMensajeGestiones = contenedor.querySelector(
+    textoMensajeExpedientes = contenedor.querySelector(
         "#texto-mensaje-gestiones"
     );
 
@@ -128,7 +139,7 @@ export async function iniciar({ usuario, contenedor }) {
         "#gestiones-consolidacion"
     );
 
-    filtroGestiones = contenedor.querySelector(
+    filtroExpedientes = contenedor.querySelector(
         "#filtro-gestiones"
     );
 
@@ -212,7 +223,7 @@ function crearInterfazSeleccion() {
                     id="barra-seleccion-gestiones-texto"
                     class="barra-seleccion__texto u-etiqueta"
                 >
-                    0 gestiones seleccionadas
+                    0 expedientes seleccionados
                 </span>
 
             </div>
@@ -222,23 +233,23 @@ function crearInterfazSeleccion() {
 
                 <button
                     type="button"
-                    id="boton-reasignar-gestiones"
+                    id="boton-reasignar-expedientes"
                     class="barra-seleccion__accion"
                 >
-                    Reasignar
+                    Asignar
                 </button>
 
                 <button
                     type="button"
-                    id="boton-eliminar-gestiones"
+                    id="boton-eliminar-expedientes"
                     class="barra-seleccion__accion barra-seleccion__accion--desactivar"
                 >
-                    Eliminar
+                    Eliminar expedientes
                 </button>
 
                 <button
                     type="button"
-                    id="boton-cancelar-seleccion-gestiones"
+                    id="boton-cancelar-seleccion-expedientes"
                     class="barra-seleccion__cancelar"
                 >
                     Cancelar
@@ -257,29 +268,29 @@ function crearInterfazSeleccion() {
     }
 
 
-    barraSeleccionGestiones =
+    barraSeleccionExpedientes =
         document.querySelector(
             "#barra-seleccion-gestiones"
         );
 
-    barraSeleccionGestionesTexto =
+    barraSeleccionExpedientesTexto =
         document.querySelector(
             "#barra-seleccion-gestiones-texto"
         );
 
-    botonReasignarGestiones =
+    botonReasignarExpedientes =
         document.querySelector(
-            "#boton-reasignar-gestiones"
+            "#boton-reasignar-expedientes"
         );
 
-    botonEliminarGestiones =
+    botonEliminarExpedientes =
         document.querySelector(
-            "#boton-eliminar-gestiones"
+            "#boton-eliminar-expedientes"
         );
 
-    botonCancelarSeleccionGestiones =
+    botonCancelarSeleccionExpedientes =
         document.querySelector(
-            "#boton-cancelar-seleccion-gestiones"
+            "#boton-cancelar-seleccion-expedientes"
         );
 }
 
@@ -290,51 +301,55 @@ function crearInterfazSeleccion() {
 
 function crearModales() {
 
-    crearModalReasignar();
+    crearModalAsignar();
 
-    crearModalEliminar();
+    crearModalEliminarExpedientes();
 }
 
 
-function crearModalReasignar() {
+/* ─────────────────────────────────────────────
+   MODAL ASIGNAR EXPEDIENTES
+   ───────────────────────────────────────────── */
+
+function crearModalAsignar() {
 
     if (
         document.querySelector(
             "#modal-reasignar-gestion"
         )
     ) {
-        modalReasignarGestion =
+        modalAsignarExpedientes =
             document.querySelector(
                 "#modal-reasignar-gestion"
             );
 
-        modalReasignarMensaje =
-            modalReasignarGestion.querySelector(
+        modalAsignarMensaje =
+            modalAsignarExpedientes.querySelector(
                 "#modal-reasignar-mensaje"
             );
 
-        modalReasignarError =
-            modalReasignarGestion.querySelector(
+        modalAsignarError =
+            modalAsignarExpedientes.querySelector(
                 "#modal-reasignar-error"
             );
 
-        textoModalReasignarError =
-            modalReasignarGestion.querySelector(
+        textoModalAsignarError =
+            modalAsignarExpedientes.querySelector(
                 "#texto-modal-reasignar-error"
             );
 
-        selectReasignarGestion =
-            modalReasignarGestion.querySelector(
+        selectAsignarExpediente =
+            modalAsignarExpedientes.querySelector(
                 "#select-reasignar-gestion"
             );
 
-        botonCancelarReasignar =
-            modalReasignarGestion.querySelector(
+        botonCancelarAsignarExpedientes =
+            modalAsignarExpedientes.querySelector(
                 "#boton-cancelar-reasignar"
             );
 
-        botonConfirmarReasignar =
-            modalReasignarGestion.querySelector(
+        botonConfirmarAsignarExpedientes =
+            modalAsignarExpedientes.querySelector(
                 "#boton-confirmar-reasignar"
             );
 
@@ -355,23 +370,23 @@ function crearModalReasignar() {
     modal.innerHTML = `
         <div
             class="modal__fondo"
-            data-cerrar-reasignar
+            data-cerrar-asignar-expedientes
         ></div>
 
         <div
             class="modal__contenido"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="titulo-modal-reasignar"
+            aria-labelledby="titulo-modal-asignar-expedientes"
         >
 
             <div class="modal__encabezado">
 
                 <h3
-                    id="titulo-modal-reasignar"
+                    id="titulo-modal-asignar-expedientes"
                     class="modal__titulo u-titulo"
                 >
-                    Reasignar gestiones
+                    Asignar expedientes
                 </h3>
 
             </div>
@@ -438,7 +453,7 @@ function crearModalReasignar() {
                     id="boton-confirmar-reasignar"
                     class="boton u-boton-texto"
                 >
-                    Reasignar
+                    Asignar
                 </button>
 
             </div>
@@ -450,101 +465,105 @@ function crearModalReasignar() {
     document.body.appendChild(modal);
 
 
-    modalReasignarGestion = modal;
+    modalAsignarExpedientes = modal;
 
-    modalReasignarMensaje =
+    modalAsignarMensaje =
         modal.querySelector(
             "#modal-reasignar-mensaje"
         );
 
-    modalReasignarError =
+    modalAsignarError =
         modal.querySelector(
             "#modal-reasignar-error"
         );
 
-    textoModalReasignarError =
+    textoModalAsignarError =
         modal.querySelector(
             "#texto-modal-reasignar-error"
         );
 
-    selectReasignarGestion =
+    selectAsignarExpediente =
         modal.querySelector(
             "#select-reasignar-gestion"
         );
 
-    botonCancelarReasignar =
+    botonCancelarAsignarExpedientes =
         modal.querySelector(
             "#boton-cancelar-reasignar"
         );
 
-    botonConfirmarReasignar =
+    botonConfirmarAsignarExpedientes =
         modal.querySelector(
             "#boton-confirmar-reasignar"
         );
 
 
-    botonCancelarReasignar.addEventListener(
+    botonCancelarAsignarExpedientes.addEventListener(
         "click",
-        cerrarModalReasignar
+        cerrarModalAsignarExpedientes
     );
 
 
     modal
         .querySelectorAll(
-            "[data-cerrar-reasignar]"
+            "[data-cerrar-asignar-expedientes]"
         )
         .forEach((elemento) => {
 
             elemento.addEventListener(
                 "click",
-                cerrarModalReasignar
+                cerrarModalAsignarExpedientes
             );
 
         });
 
 
-    botonConfirmarReasignar.addEventListener(
+    botonConfirmarAsignarExpedientes.addEventListener(
         "click",
-        confirmarReasignacion
+        confirmarAsignacionExpedientes
     );
 }
 
 
-function crearModalEliminar() {
+/* ─────────────────────────────────────────────
+   MODAL ELIMINAR EXPEDIENTES
+   ───────────────────────────────────────────── */
+
+function crearModalEliminarExpedientes() {
 
     if (
         document.querySelector(
-            "#modal-eliminar-gestion"
+            "#modal-eliminar-expediente"
         )
     ) {
-        modalEliminarGestion =
+        modalEliminarExpedientes =
             document.querySelector(
-                "#modal-eliminar-gestion"
+                "#modal-eliminar-expediente"
             );
 
-        modalEliminarMensaje =
-            modalEliminarGestion.querySelector(
-                "#modal-eliminar-mensaje"
+        modalEliminarExpedientesMensaje =
+            modalEliminarExpedientes.querySelector(
+                "#modal-eliminar-expediente-mensaje"
             );
 
-        modalEliminarError =
-            modalEliminarGestion.querySelector(
-                "#modal-eliminar-error"
+        modalEliminarExpedientesError =
+            modalEliminarExpedientes.querySelector(
+                "#modal-eliminar-expediente-error"
             );
 
-        textoModalEliminarError =
-            modalEliminarGestion.querySelector(
-                "#texto-modal-eliminar-error"
+        textoModalEliminarExpedientesError =
+            modalEliminarExpedientes.querySelector(
+                "#texto-modal-eliminar-expediente-error"
             );
 
-        botonCancelarEliminar =
-            modalEliminarGestion.querySelector(
-                "#boton-cancelar-eliminar"
+        botonCancelarEliminarExpedientes =
+            modalEliminarExpedientes.querySelector(
+                "#boton-cancelar-eliminar-expediente"
             );
 
-        botonConfirmarEliminar =
-            modalEliminarGestion.querySelector(
-                "#boton-confirmar-eliminar"
+        botonConfirmarEliminarExpedientes =
+            modalEliminarExpedientes.querySelector(
+                "#boton-confirmar-eliminar-expediente"
             );
 
         return;
@@ -555,7 +574,7 @@ function crearModalEliminar() {
         document.createElement("div");
 
     modal.id =
-        "modal-eliminar-gestion";
+        "modal-eliminar-expediente";
 
     modal.className = "modal";
 
@@ -564,23 +583,23 @@ function crearModalEliminar() {
     modal.innerHTML = `
         <div
             class="modal__fondo"
-            data-cerrar-eliminar
+            data-cerrar-eliminar-expedientes
         ></div>
 
         <div
             class="modal__contenido"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="titulo-modal-eliminar"
+            aria-labelledby="titulo-modal-eliminar-expedientes"
         >
 
             <div class="modal__encabezado">
 
                 <h3
-                    id="titulo-modal-eliminar"
+                    id="titulo-modal-eliminar-expedientes"
                     class="modal__titulo u-titulo"
                 >
-                    Eliminar gestiones
+                    Eliminar expedientes
                 </h3>
 
             </div>
@@ -589,16 +608,14 @@ function crearModalEliminar() {
             <div class="modal__cuerpo">
 
                 <p
-                    id="modal-eliminar-mensaje"
+                    id="modal-eliminar-expediente-mensaje"
                     class="u-cuerpo u-texto-secundario"
                 >
-                    ¿Estás seguro de que deseas eliminar
-                    las gestiones seleccionadas?
                 </p>
 
 
                 <div
-                    id="modal-eliminar-error"
+                    id="modal-eliminar-expediente-error"
                     class="mensaje-error modal__error"
                     role="alert"
                     hidden
@@ -608,7 +625,7 @@ function crearModalEliminar() {
                     </span>
 
                     <span
-                        id="texto-modal-eliminar-error"
+                        id="texto-modal-eliminar-expediente-error"
                     ></span>
                 </div>
 
@@ -619,7 +636,7 @@ function crearModalEliminar() {
 
                 <button
                     type="button"
-                    id="boton-cancelar-eliminar"
+                    id="boton-cancelar-eliminar-expediente"
                     class="boton boton--secundario u-boton-texto"
                 >
                     Cancelar
@@ -627,7 +644,7 @@ function crearModalEliminar() {
 
                 <button
                     type="button"
-                    id="boton-confirmar-eliminar"
+                    id="boton-confirmar-eliminar-expediente"
                     class="boton u-boton-texto"
                 >
                     Eliminar
@@ -642,57 +659,57 @@ function crearModalEliminar() {
     document.body.appendChild(modal);
 
 
-    modalEliminarGestion = modal;
+    modalEliminarExpedientes = modal;
 
-    modalEliminarMensaje =
+    modalEliminarExpedientesMensaje =
         modal.querySelector(
-            "#modal-eliminar-mensaje"
+            "#modal-eliminar-expediente-mensaje"
         );
 
-    modalEliminarError =
+    modalEliminarExpedientesError =
         modal.querySelector(
-            "#modal-eliminar-error"
+            "#modal-eliminar-expediente-error"
         );
 
-    textoModalEliminarError =
+    textoModalEliminarExpedientesError =
         modal.querySelector(
-            "#texto-modal-eliminar-error"
+            "#texto-modal-eliminar-expediente-error"
         );
 
-    botonCancelarEliminar =
+    botonCancelarEliminarExpedientes =
         modal.querySelector(
-            "#boton-cancelar-eliminar"
+            "#boton-cancelar-eliminar-expediente"
         );
 
-    botonConfirmarEliminar =
+    botonConfirmarEliminarExpedientes =
         modal.querySelector(
-            "#boton-confirmar-eliminar"
+            "#boton-confirmar-eliminar-expediente"
         );
 
 
-    botonCancelarEliminar.addEventListener(
+    botonCancelarEliminarExpedientes.addEventListener(
         "click",
-        cerrarModalEliminar
+        cerrarModalEliminarExpedientes
     );
 
 
     modal
         .querySelectorAll(
-            "[data-cerrar-eliminar]"
+            "[data-cerrar-eliminar-expedientes]"
         )
         .forEach((elemento) => {
 
             elemento.addEventListener(
                 "click",
-                cerrarModalEliminar
+                cerrarModalEliminarExpedientes
             );
 
         });
 
 
-    botonConfirmarEliminar.addEventListener(
+    botonConfirmarEliminarExpedientes.addEventListener(
         "click",
-        confirmarEliminacion
+        confirmarEliminacionExpedientes
     );
 }
 
@@ -823,12 +840,12 @@ function configurarNavegacion(contenedor) {
 
 function configurarFiltro() {
 
-    filtroGestiones.addEventListener(
+    filtroExpedientes.addEventListener(
         "input",
         () => {
 
-            filtrosGestiones[seccionActual] =
-                filtroGestiones.value;
+            filtrosExpedientes[seccionActual] =
+                filtroExpedientes.value;
 
             filtrarSeccionActual();
 
@@ -839,15 +856,15 @@ function configurarFiltro() {
 
 function configurarAccionesSeleccion() {
 
-    if (botonReasignarGestiones) {
+    if (botonReasignarExpedientes) {
 
-        botonReasignarGestiones.addEventListener(
+        botonReasignarExpedientes.addEventListener(
             "click",
             () => {
 
-                abrirModalReasignar(
+                abrirModalAsignarExpedientes(
                     [
-                        ...gestionesActivosSeleccionadas
+                        ...expedientesActivosSeleccionados
                     ]
                 );
 
@@ -857,15 +874,15 @@ function configurarAccionesSeleccion() {
     }
 
 
-    if (botonEliminarGestiones) {
+    if (botonEliminarExpedientes) {
 
-        botonEliminarGestiones.addEventListener(
+        botonEliminarExpedientes.addEventListener(
             "click",
             () => {
 
-                abrirModalEliminar(
+                abrirModalEliminarExpedientes(
                     [
-                        ...gestionesActivosSeleccionadas
+                        ...expedientesActivosSeleccionados
                     ]
                 );
 
@@ -875,11 +892,11 @@ function configurarAccionesSeleccion() {
     }
 
 
-    if (botonCancelarSeleccionGestiones) {
+    if (botonCancelarSeleccionExpedientes) {
 
-        botonCancelarSeleccionGestiones.addEventListener(
+        botonCancelarSeleccionExpedientes.addEventListener(
             "click",
-            cancelarSeleccionGestiones
+            cancelarSeleccionExpedientes
         );
 
     }
@@ -896,13 +913,13 @@ function configurarAccionesSeleccion() {
 function filtrarSeccionActual() {
 
     const texto =
-        filtrosGestiones[seccionActual]
+        filtrosExpedientes[seccionActual]
             .trim()
             .toLowerCase();
 
 
     const datos =
-        datosGestiones[seccionActual];
+        datosExpedientes[seccionActual];
 
 
     if (!texto) {
@@ -918,29 +935,29 @@ function filtrarSeccionActual() {
 
     const filtrados =
         datos.filter(
-            (gestion) => {
+            (expediente) => {
 
                 const nombre =
                     String(
-                        gestion.nombre_cliente ?? ""
+                        expediente.nombre_cliente ?? ""
                     ).toLowerCase();
 
 
                 const interlocutor =
                     String(
-                        gestion.interlocutor ?? ""
+                        expediente.interlocutor ?? ""
                     ).toLowerCase();
 
 
                 const contrato =
                     String(
-                        gestion.contrato ?? ""
+                        expediente.contrato ?? ""
                     ).toLowerCase();
 
 
                 const responsable =
                     String(
-                        gestion.usuario ?? ""
+                        expediente.usuario ?? ""
                     ).toLowerCase();
 
 
@@ -1111,16 +1128,16 @@ async function cambiarSeccion(seccion) {
 
 function actualizarFiltro() {
 
-    filtroGestiones.hidden = false;
+    filtroExpedientes.hidden = false;
 
 
-    filtroGestiones.value =
-        filtrosGestiones[
+    filtroExpedientes.value =
+        filtrosExpedientes[
             seccionActual
         ] ?? "";
 
 
-    filtroGestiones.placeholder =
+    filtroExpedientes.placeholder =
         seccionActual === "activos"
             ? "Buscar por nombre, interlocutor, contrato o responsable..."
             : "Buscar por nombre, interlocutor o contrato...";
@@ -1176,12 +1193,12 @@ async function cargarSeccion(seccion) {
     try {
 
         const datos =
-            await obtenerGestiones(
+            await obtenerExpedientes(
                 seccion
             );
 
 
-        datosGestiones[seccion] =
+        datosExpedientes[seccion] =
             datos;
 
 
@@ -1190,16 +1207,16 @@ async function cargarSeccion(seccion) {
             const idsActuales =
                 new Set(
                     datos.map(
-                        (gestion) =>
-                            gestion.id
+                        (expediente) =>
+                            expediente.id
                     )
                 );
 
 
-            gestionesActivosSeleccionadas =
+            expedientesActivosSeleccionados =
                 new Set(
                     [
-                        ...gestionesActivosSeleccionadas
+                        ...expedientesActivosSeleccionados
                     ].filter(
                         (id) =>
                             idsActuales.has(id)
@@ -1219,7 +1236,7 @@ async function cargarSeccion(seccion) {
 
         mostrarError(
             error.message ||
-            "No se pudieron cargar las gestiones."
+            "No se pudieron cargar los expedientes."
         );
 
     } finally {
@@ -1230,7 +1247,7 @@ async function cargarSeccion(seccion) {
 }
 
 
-async function obtenerGestiones(seccion) {
+async function obtenerExpedientes(seccion) {
 
     const endpoints = {
 
@@ -1332,7 +1349,7 @@ function renderizarSeccion(
 
     if (seccion === "activos") {
 
-        gestionesActivosFiltradasActuales =
+        expedientesActivosFiltradosActuales =
             datos;
 
         renderizarActivos(
@@ -1370,29 +1387,29 @@ function renderizarTarjetas(
     contenedor.innerHTML =
         datos
             .map(
-                (gestion) =>
-                    crearTarjetaGestion(
-                        gestion
+                (expediente) =>
+                    crearTarjetaExpediente(
+                        expediente
                     )
             )
             .join("");
 }
 
 
-function crearTarjetaGestion(
-    gestion
+function crearTarjetaExpediente(
+    expediente
 ) {
 
     const monto =
         formatearMonto(
-            gestion.monto_vencido
+            expediente.monto_vencido
         );
 
 
     const contrato =
-        gestion.contrato
+        expediente.contrato
             ? escaparHtml(
-                gestion.contrato
+                expediente.contrato
             )
             : "Sin contrato";
 
@@ -1400,7 +1417,7 @@ function crearTarjetaGestion(
     return `
         <article
             class="gestion-card"
-            data-id="${gestion.id}"
+            data-id="${expediente.id}"
         >
 
             <div class="gestion-card__encabezado">
@@ -1409,13 +1426,13 @@ function crearTarjetaGestion(
 
                     <h3 class="gestion-card__cliente">
                         ${escaparHtml(
-                            gestion.nombre_cliente
+                            expediente.nombre_cliente
                         )}
                     </h3>
 
                     <span class="gestion-card__interlocutor u-mono-sm">
                         ${escaparHtml(
-                            gestion.interlocutor
+                            expediente.interlocutor
                         )}
                     </span>
 
@@ -1425,7 +1442,7 @@ function crearTarjetaGestion(
                 <div class="gestion-card__id">
 
                     <span class="u-mono-sm">
-                        #${gestion.id}
+                        #${expediente.id}
                     </span>
 
                     <div class="gestion-card__acciones">
@@ -1434,7 +1451,7 @@ function crearTarjetaGestion(
                             type="button"
                             class="boton u-boton-texto gestion-card__boton"
                             data-accion="abrir"
-                            data-id="${gestion.id}"
+                            data-id="${expediente.id}"
                         >
                             Abrir expediente
                         </button>
@@ -1481,7 +1498,7 @@ function crearTarjetaGestion(
                     </span>
 
                     <span class="u-cuerpo">
-                        ${gestion.dia ?? "—"}
+                        ${expediente.dia ?? "—"}
                     </span>
 
                 </div>
@@ -1494,7 +1511,7 @@ function crearTarjetaGestion(
                     </span>
 
                     <span class="u-cuerpo">
-                        ${gestion.intentos ?? "—"}
+                        ${expediente.intentos ?? "—"}
                     </span>
 
                 </div>
@@ -1512,7 +1529,7 @@ function crearTarjetaGestion(
 
 function renderizarActivos(datos) {
 
-    gestionesActivosFiltradasActuales =
+    expedientesActivosFiltradosActuales =
         datos;
 
 
@@ -1521,7 +1538,7 @@ function renderizarActivos(datos) {
         contenedorActivos.innerHTML = `
             <div class="tabla-vacia">
                 <p class="u-cuerpo u-texto-terciario">
-                    No hay gestiones activas.
+                    No hay expedientes activos.
                 </p>
             </div>
         `;
@@ -1529,7 +1546,7 @@ function renderizarActivos(datos) {
 
         checkboxTodosActivos = null;
 
-        actualizarBarraSeleccionGestiones();
+        actualizarBarraSeleccionExpedientes();
 
         return;
     }
@@ -1538,9 +1555,9 @@ function renderizarActivos(datos) {
     const filas =
         datos
             .map(
-                (gestion) =>
-                    crearFilaGestionActiva(
-                        gestion
+                (expediente) =>
+                    crearFilaExpedienteActivo(
+                        expediente
                     )
             )
             .join("");
@@ -1564,7 +1581,7 @@ function renderizarActivos(datos) {
                                 type="checkbox"
                                 id="checkbox-todos-activos"
                                 class="tabla__checkbox"
-                                aria-label="Seleccionar todas las gestiones visibles"
+                                aria-label="Seleccionar todos los expedientes visibles"
                             >
 
                         </th>
@@ -1592,17 +1609,17 @@ function renderizarActivos(datos) {
 
     configurarAccionesActivos();
 
-    actualizarBarraSeleccionGestiones();
+    actualizarBarraSeleccionExpedientes();
 }
 
 
-function crearFilaGestionActiva(
-    gestion
+function crearFilaExpedienteActivo(
+    expediente
 ) {
 
     const seleccionada =
-        gestionesActivosSeleccionadas.has(
-            gestion.id
+        expedientesActivosSeleccionados.has(
+            expediente.id
         );
 
     const permiteSeleccion =
@@ -1618,9 +1635,9 @@ function crearFilaGestionActiva(
                     <input
                         type="checkbox"
                         class="tabla__checkbox"
-                        data-checkbox-gestion
-                        data-id="${gestion.id}"
-                        aria-label="Seleccionar gestión ${gestion.id}"
+                        data-checkbox-expediente
+                        data-id="${expediente.id}"
+                        aria-label="Seleccionar expediente ${expediente.id}"
                         ${seleccionada ? "checked" : ""}
                     >
 
@@ -1632,7 +1649,7 @@ function crearFilaGestionActiva(
 
                 <span class="tabla__nombre">
                     ${escaparHtml(
-                        gestion.nombre_cliente
+                        expediente.nombre_cliente
                     )}
                 </span>
 
@@ -1641,7 +1658,7 @@ function crearFilaGestionActiva(
 
             <td>
                 ${escaparHtml(
-                    gestion.interlocutor
+                    expediente.interlocutor
                 )}
             </td>
 
@@ -1649,9 +1666,9 @@ function crearFilaGestionActiva(
             <td>
 
                 ${
-                    gestion.contrato
+                    expediente.contrato
                         ? escaparHtml(
-                            gestion.contrato
+                            expediente.contrato
                         )
                         : "Sin contrato"
                 }
@@ -1661,7 +1678,7 @@ function crearFilaGestionActiva(
 
             <td>
                 ${formatearMonto(
-                    gestion.monto_vencido
+                    expediente.monto_vencido
                 )}
             </td>
 
@@ -1669,9 +1686,9 @@ function crearFilaGestionActiva(
             <td>
 
                 ${
-                    gestion.usuario
+                    expediente.usuario
                         ? escaparHtml(
-                            gestion.usuario
+                            expediente.usuario
                         )
                         : "Sin asignar"
                 }
@@ -1685,7 +1702,7 @@ function crearFilaGestionActiva(
                     type="button"
                     class="tabla__accion"
                     data-accion="abrir"
-                    data-id="${gestion.id}"
+                    data-id="${expediente.id}"
                 >
                     Abrir expediente
                 </button>
@@ -1721,14 +1738,14 @@ function configurarAccionesActivos() {
 
     contenedorActivos
         .querySelectorAll(
-            "[data-checkbox-gestion]"
+            "[data-checkbox-expediente]"
         )
         .forEach(
             (checkbox) => {
 
                 checkbox.addEventListener(
                     "change",
-                    manejarCheckboxGestion
+                    manejarCheckboxExpediente
                 );
 
             }
@@ -1755,7 +1772,7 @@ function configurarAccionesActivos() {
 }
 
 
-function manejarCheckboxGestion(
+function manejarCheckboxExpediente(
     event
 ) {
 
@@ -1771,13 +1788,13 @@ function manejarCheckboxGestion(
 
     if (checkbox.checked) {
 
-        gestionesActivosSeleccionadas.add(
+        expedientesActivosSeleccionados.add(
             id
         );
 
     } else {
 
-        gestionesActivosSeleccionadas.delete(
+        expedientesActivosSeleccionados.delete(
             id
         );
 
@@ -1786,7 +1803,7 @@ function manejarCheckboxGestion(
 
     actualizarCheckboxTodosActivos();
 
-    actualizarBarraSeleccionGestiones();
+    actualizarBarraSeleccionExpedientes();
 }
 
 
@@ -1798,20 +1815,20 @@ function manejarCheckboxTodosActivos(
         event.currentTarget.checked;
 
 
-    gestionesActivosFiltradasActuales
+    expedientesActivosFiltradosActuales
         .forEach(
-            (gestion) => {
+            (expediente) => {
 
                 if (marcar) {
 
-                    gestionesActivosSeleccionadas.add(
-                        gestion.id
+                    expedientesActivosSeleccionados.add(
+                        expediente.id
                     );
 
                 } else {
 
-                    gestionesActivosSeleccionadas.delete(
-                        gestion.id
+                    expedientesActivosSeleccionados.delete(
+                        expediente.id
                     );
 
                 }
@@ -1821,7 +1838,7 @@ function manejarCheckboxTodosActivos(
 
 
     renderizarActivos(
-        gestionesActivosFiltradasActuales
+        expedientesActivosFiltradosActuales
     );
 }
 
@@ -1834,7 +1851,7 @@ function actualizarCheckboxTodosActivos() {
 
 
     const visibles =
-        gestionesActivosFiltradasActuales;
+        expedientesActivosFiltradosActuales;
 
 
     if (visibles.length === 0) {
@@ -1858,9 +1875,9 @@ function actualizarCheckboxTodosActivos() {
 
     const seleccionadasVisibles =
         visibles.filter(
-            (gestion) =>
-                gestionesActivosSeleccionadas.has(
-                    gestion.id
+            (expediente) =>
+                expedientesActivosSeleccionados.has(
+                    expediente.id
                 )
         );
 
@@ -1881,44 +1898,60 @@ function actualizarCheckboxTodosActivos() {
    BARRA DE SELECCIÓN
    ───────────────────────────────────────────── */
 
-function actualizarBarraSeleccionGestiones() {
+function actualizarBarraSeleccionExpedientes() {
 
-    if (!barraSeleccionGestiones) {
+    if (!barraSeleccionExpedientes) {
         return;
     }
 
 
     const cantidad =
-        gestionesActivosSeleccionadas.size;
+        expedientesActivosSeleccionados.size;
 
 
-    barraSeleccionGestiones.hidden =
+    barraSeleccionExpedientes.hidden =
         cantidad === 0;
 
 
     if (cantidad === 0) {
+
+        if (botonEliminarExpedientes) {
+
+            botonEliminarExpedientes.disabled =
+                true;
+
+        }
+
         return;
     }
 
 
-    barraSeleccionGestionesTexto.textContent =
+    barraSeleccionExpedientesTexto.textContent =
         cantidad === 1
-            ? "1 gestión seleccionada"
-            : `${cantidad} gestiones seleccionadas`;
+            ? "1 expediente seleccionado"
+            : `${cantidad} expedientes seleccionados`;
+
+
+    if (botonEliminarExpedientes) {
+
+        botonEliminarExpedientes.disabled =
+            false;
+
+    }
 }
 
 
-function cancelarSeleccionGestiones() {
+function cancelarSeleccionExpedientes() {
 
-    gestionesActivosSeleccionadas.clear();
+    expedientesActivosSeleccionados.clear();
 
 
     renderizarActivos(
-        gestionesActivosFiltradasActuales
+        expedientesActivosFiltradosActuales
     );
 
 
-    actualizarBarraSeleccionGestiones();
+    actualizarBarraSeleccionExpedientes();
 }
 
 
@@ -1960,10 +1993,10 @@ function abrirExpediente(
 
 
 /* ─────────────────────────────────────────────
-   REASIGNACIÓN
+   ASIGNACIÓN DE EXPEDIENTES
    ───────────────────────────────────────────── */
 
-async function abrirModalReasignar(
+async function abrirModalAsignarExpedientes(
     ids
 ) {
 
@@ -1972,35 +2005,35 @@ async function abrirModalReasignar(
     }
 
 
-    idsReasignarPendientes =
+    idsAsignarPendientes =
         ids;
 
 
-    ocultarErrorModalReasignar();
+    ocultarErrorModalAsignarExpedientes();
 
 
-    modalReasignarMensaje.textContent =
+    modalAsignarMensaje.textContent =
         ids.length === 1
-            ? "Selecciona el nuevo responsable para esta gestión."
-            : `Selecciona el nuevo responsable para las ${ids.length} gestiones seleccionadas.`;
+            ? "Selecciona el nuevo responsable para este expediente."
+            : `Selecciona el nuevo responsable para los ${ids.length} expedientes seleccionados.`;
 
 
-    selectReasignarGestion.innerHTML = `
+    selectAsignarExpediente.innerHTML = `
         <option value="">
             Cargando usuarios...
         </option>
     `;
 
 
-    selectReasignarGestion.disabled =
+    selectAsignarExpediente.disabled =
         true;
 
 
-    botonConfirmarReasignar.disabled =
+    botonConfirmarAsignarExpedientes.disabled =
         true;
 
 
-    modalReasignarGestion.hidden =
+    modalAsignarExpedientes.hidden =
         false;
 
 
@@ -2010,7 +2043,7 @@ async function abrirModalReasignar(
             await obtenerUsuariosAsignables();
 
 
-        selectReasignarGestion.innerHTML = `
+        selectAsignarExpediente.innerHTML = `
             <option value="">
                 Selecciona un responsable
             </option>
@@ -2027,20 +2060,20 @@ async function abrirModalReasignar(
         `;
 
 
-        selectReasignarGestion.disabled =
+        selectAsignarExpediente.disabled =
             false;
 
 
-        botonConfirmarReasignar.disabled =
+        botonConfirmarAsignarExpedientes.disabled =
             false;
 
 
-        selectReasignarGestion.focus();
+        selectAsignarExpediente.focus();
 
 
     } catch (error) {
 
-        mostrarErrorModalReasignar(
+        mostrarErrorModalAsignarExpedientes(
             error.message ||
             "No se pudieron cargar los usuarios."
         );
@@ -2050,54 +2083,60 @@ async function abrirModalReasignar(
 
 
 async function obtenerUsuariosAsignables() {
-    const respuesta = await fetch(
-        "/usuarios/asignables",
-        {
-            method: "GET",
-            credentials: "include"
-        }
-    );
+
+    const respuesta =
+        await fetch(
+            "/usuarios/asignables",
+            {
+                method: "GET",
+                credentials: "include"
+            }
+        );
+
 
     if (!respuesta.ok) {
+
         throw new Error(
             await mensajeDeError(respuesta)
         );
+
     }
+
 
     return await respuesta.json();
 }
 
 
-function cerrarModalReasignar() {
+function cerrarModalAsignarExpedientes() {
 
-    idsReasignarPendientes =
+    idsAsignarPendientes =
         [];
 
 
-    ocultarErrorModalReasignar();
+    ocultarErrorModalAsignarExpedientes();
 
 
-    modalReasignarGestion.hidden =
+    modalAsignarExpedientes.hidden =
         true;
 }
 
 
-async function confirmarReasignacion() {
+async function confirmarAsignacionExpedientes() {
 
     if (
-        idsReasignarPendientes.length === 0
+        idsAsignarPendientes.length === 0
     ) {
         return;
     }
 
 
     const idUsuario =
-        selectReasignarGestion.value;
+        selectAsignarExpediente.value;
 
 
     if (!idUsuario) {
 
-        mostrarErrorModalReasignar(
+        mostrarErrorModalAsignarExpedientes(
             "Selecciona un responsable."
         );
 
@@ -2105,13 +2144,13 @@ async function confirmarReasignacion() {
     }
 
 
-    ocultarErrorModalReasignar();
+    ocultarErrorModalAsignarExpedientes();
 
 
-    botonConfirmarReasignar.disabled =
+    botonConfirmarAsignarExpedientes.disabled =
         true;
 
-    botonCancelarReasignar.disabled =
+    botonCancelarAsignarExpedientes.disabled =
         true;
 
 
@@ -2119,7 +2158,7 @@ async function confirmarReasignacion() {
 
         const respuesta =
             await fetch(
-                ENDPOINTS_GESTIONES.reasignar,
+                ENDPOINTS_EXPEDIENTES.asignar,
                 {
                     method: "PATCH",
 
@@ -2132,7 +2171,7 @@ async function confirmarReasignacion() {
 
                     body: JSON.stringify({
                         ids:
-                            idsReasignarPendientes,
+                            idsAsignarPendientes,
 
                         id_usuario:
                             Number(idUsuario)
@@ -2143,7 +2182,7 @@ async function confirmarReasignacion() {
 
         if (!respuesta.ok) {
 
-            mostrarErrorModalReasignar(
+            mostrarErrorModalAsignarExpedientes(
                 await mensajeDeError(
                     respuesta
                 )
@@ -2153,10 +2192,10 @@ async function confirmarReasignacion() {
         }
 
 
-        gestionesActivosSeleccionadas.clear();
+        expedientesActivosSeleccionados.clear();
 
 
-        cerrarModalReasignar();
+        cerrarModalAsignarExpedientes();
 
 
         await cargarSeccion(
@@ -2169,49 +2208,60 @@ async function confirmarReasignacion() {
 
     } catch {
 
-        mostrarErrorModalReasignar(
+        mostrarErrorModalAsignarExpedientes(
             "No se pudo contactar al servidor. Intenta de nuevo."
         );
 
     } finally {
 
-        botonConfirmarReasignar.disabled =
+        botonConfirmarAsignarExpedientes.disabled =
             false;
 
-        botonCancelarReasignar.disabled =
+        botonCancelarAsignarExpedientes.disabled =
             false;
 
     }
 }
 
 
-function mostrarErrorModalReasignar(
+function mostrarErrorModalAsignarExpedientes(
     mensaje
 ) {
 
-    textoModalReasignarError.textContent =
+    textoModalAsignarError.textContent =
         mensaje;
 
-    modalReasignarError.hidden =
+    modalAsignarError.hidden =
         false;
 }
 
 
-function ocultarErrorModalReasignar() {
+function ocultarErrorModalAsignarExpedientes() {
 
-    textoModalReasignarError.textContent =
+    textoModalAsignarError.textContent =
         "";
 
-    modalReasignarError.hidden =
+    modalAsignarError.hidden =
         true;
 }
 
 
 /* ─────────────────────────────────────────────
-   ELIMINACIÓN
+   ELIMINACIÓN DE EXPEDIENTES
    ───────────────────────────────────────────── */
 
-function abrirModalEliminar(
+/*
+ * Este es el único punto de entrada para eliminar
+ * uno o varios expedientes.
+ *
+ * Individual:
+ *     abrirModalEliminarExpedientes([id])
+ *
+ * Masivo:
+ *     abrirModalEliminarExpedientes([id1, id2, id3])
+ */
+
+async function abrirModalEliminarExpedientes(
     ids
 ) {
 
@@ -2220,99 +2270,178 @@ function abrirModalEliminar(
     }
 
 
-    idsEliminarPendientes =
+    idsEliminarExpedientesPendientes =
         ids;
 
 
-    ocultarErrorModalEliminar();
+    ocultarErrorModalEliminarExpedientes();
 
 
-    modalEliminarMensaje.textContent =
-        ids.length === 1
-            ? "¿Estás seguro de que deseas eliminar esta gestión?"
-            : `¿Estás seguro de que deseas eliminar las ${ids.length} gestiones seleccionadas?`;
+    const cantidad =
+        ids.length;
 
 
-    modalEliminarGestion.hidden =
+    modalEliminarExpedientesMensaje.textContent =
+        cantidad === 1
+            ? "Consultando expediente..."
+            : `Consultando ${cantidad} expedientes...`;
+
+
+    botonConfirmarEliminarExpedientes.disabled =
+        true;
+
+
+    modalEliminarExpedientes.hidden =
         false;
 
 
-    botonConfirmarEliminar.focus();
+    try {
+
+        let totalCobranzas = 0;
+        let totalDocumentos = 0;
+
+
+        for (const idExpediente of ids) {
+
+            const respuesta =
+                await fetch(
+                    endpointResumenEliminacionExpediente(
+                        idExpediente
+                    ),
+                    {
+                        method: "GET",
+                        credentials: "include"
+                    }
+                );
+
+
+            if (!respuesta.ok) {
+
+                throw new Error(
+                    await mensajeDeError(
+                        respuesta
+                    )
+                );
+
+            }
+
+
+            const resumen =
+                await respuesta.json();
+
+
+            totalCobranzas +=
+                Number(
+                    resumen.cobranzas ?? 0
+                );
+
+
+            totalDocumentos +=
+                Number(
+                    resumen.documentos ?? 0
+                );
+
+        }
+
+
+        const tieneContenido =
+            totalCobranzas > 0 ||
+            totalDocumentos > 0;
+
+
+        if (cantidad === 1) {
+
+            modalEliminarExpedientesMensaje.textContent =
+                tieneContenido
+                    ? `Este expediente tiene ${totalCobranzas} gestión(es) y ${totalDocumentos} documento(s) asociados. Al eliminarlo se eliminará también todo eso, incluyendo sus evidencias. ¿Deseas continuar?`
+                    : "¿Estás seguro de que deseas eliminar este expediente?";
+
+        } else {
+
+            modalEliminarExpedientesMensaje.textContent =
+                tieneContenido
+                    ? `Los ${cantidad} expedientes seleccionados tienen en conjunto ${totalCobranzas} gestión(es) y ${totalDocumentos} documento(s) asociados. Al eliminarlos se eliminará también todo eso, incluyendo sus evidencias. ¿Deseas continuar?`
+                    : `¿Estás seguro de que deseas eliminar los ${cantidad} expedientes seleccionados?`;
+
+        }
+
+
+    } catch (error) {
+
+        mostrarErrorModalEliminarExpedientes(
+            error.message ||
+            "No se pudo consultar el resumen de los expedientes."
+        );
+
+        return;
+
+    } finally {
+
+        botonConfirmarEliminarExpedientes.disabled =
+            false;
+
+    }
+
+
+    botonConfirmarEliminarExpedientes.focus();
 }
 
 
-function cerrarModalEliminar() {
-
-    idsEliminarPendientes =
-        [];
-
-
-    ocultarErrorModalEliminar();
-
-
-    modalEliminarGestion.hidden =
-        true;
-}
-
-
-async function confirmarEliminacion() {
+async function confirmarEliminacionExpedientes() {
 
     if (
-        idsEliminarPendientes.length === 0
+        idsEliminarExpedientesPendientes.length === 0
     ) {
         return;
     }
 
 
-    ocultarErrorModalEliminar();
+    ocultarErrorModalEliminarExpedientes();
 
 
-    botonConfirmarEliminar.disabled =
+    botonConfirmarEliminarExpedientes.disabled =
         true;
 
-    botonCancelarEliminar.disabled =
+    botonCancelarEliminarExpedientes.disabled =
         true;
 
 
     try {
 
-        const respuesta =
-            await fetch(
-                ENDPOINTS_GESTIONES.eliminar,
-                {
-                    method: "DELETE",
+        for (
+            const idExpediente
+            of idsEliminarExpedientesPendientes
+        ) {
 
-                    headers: {
-                        "Content-Type":
-                            "application/json"
-                    },
-
-                    credentials: "include",
-
-                    body: JSON.stringify({
-                        ids:
-                            idsEliminarPendientes
-                    })
-                }
-            );
+            const respuesta =
+                await fetch(
+                    endpointEliminarExpediente(
+                        idExpediente
+                    ),
+                    {
+                        method: "DELETE",
+                        credentials: "include"
+                    }
+                );
 
 
-        if (!respuesta.ok) {
+            if (!respuesta.ok) {
 
-            mostrarErrorModalEliminar(
-                await mensajeDeError(
-                    respuesta
-                )
-            );
+                throw new Error(
+                    await mensajeDeError(
+                        respuesta
+                    )
+                );
 
-            return;
+            }
+
         }
 
 
-        gestionesActivosSeleccionadas.clear();
+        expedientesActivosSeleccionados.clear();
 
 
-        cerrarModalEliminar();
+        cerrarModalEliminarExpedientes();
 
 
         await cargarSeccion(
@@ -2323,42 +2452,75 @@ async function confirmarEliminacion() {
         await cargarResumen();
 
 
-    } catch {
+    } catch (error) {
 
-        mostrarErrorModalEliminar(
-            "No se pudo contactar al servidor. Intenta de nuevo."
+        mostrarErrorModalEliminarExpedientes(
+            error.message ||
+            "No se pudo completar la eliminación de los expedientes."
         );
 
     } finally {
 
-        botonConfirmarEliminar.disabled =
+        botonConfirmarEliminarExpedientes.disabled =
             false;
 
-        botonCancelarEliminar.disabled =
+        botonCancelarEliminarExpedientes.disabled =
             false;
-
     }
 }
 
 
-function mostrarErrorModalEliminar(
+function manejarEliminarExpediente(
+    event
+) {
+
+    const idExpediente =
+        Number(
+            event.currentTarget.dataset.id
+        );
+
+
+    /*
+     * Individual y masivo convergen aquí.
+     */
+    abrirModalEliminarExpedientes(
+        [idExpediente]
+    );
+}
+
+
+function cerrarModalEliminarExpedientes() {
+
+    idsEliminarExpedientesPendientes =
+        [];
+
+
+    ocultarErrorModalEliminarExpedientes();
+
+
+    modalEliminarExpedientes.hidden =
+        true;
+}
+
+
+function mostrarErrorModalEliminarExpedientes(
     mensaje
 ) {
 
-    textoModalEliminarError.textContent =
+    textoModalEliminarExpedientesError.textContent =
         mensaje;
 
-    modalEliminarError.hidden =
+    modalEliminarExpedientesError.hidden =
         false;
 }
 
 
-function ocultarErrorModalEliminar() {
+function ocultarErrorModalEliminarExpedientes() {
 
-    textoModalEliminarError.textContent =
+    textoModalEliminarExpedientesError.textContent =
         "";
 
-    modalEliminarError.hidden =
+    modalEliminarExpedientesError.hidden =
         true;
 }
 
@@ -2406,14 +2568,14 @@ function formatearMonto(
 
 function mostrarCarga() {
 
-    estadoGestiones.hidden =
+    estadoExpedientes.hidden =
         false;
 }
 
 
 function ocultarCarga() {
 
-    estadoGestiones.hidden =
+    estadoExpedientes.hidden =
         true;
 }
 
@@ -2422,20 +2584,20 @@ function mostrarError(
     mensaje
 ) {
 
-    textoMensajeGestiones.textContent =
+    textoMensajeExpedientes.textContent =
         mensaje;
 
-    mensajeGestiones.hidden =
+    mensajeExpedientes.hidden =
         false;
 }
 
 
 function ocultarMensaje() {
 
-    textoMensajeGestiones.textContent =
+    textoMensajeExpedientes.textContent =
         "";
 
-    mensajeGestiones.hidden =
+    mensajeExpedientes.hidden =
         true;
 }
 

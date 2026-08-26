@@ -16,6 +16,7 @@ from src.core.exceptions import NoEncontrado, OperacionInvalida
 from src.schemas.expediente import (
     ExpedienteUpdate,
     ExpedienteGestionRead,
+    ExpedienteResumenEliminacion,
 )
 
 from src.services.usuario import UsuarioService
@@ -420,6 +421,30 @@ class ExpedienteService(BaseService):
             )
             for expediente, dia, intentos in resultados
         ]
+
+    def contar_contenido(
+        self,
+        id_expediente: int
+    ) -> ExpedienteResumenEliminacion:
+
+        self.obtener(id_expediente)
+
+        cobranzas = self.session.scalar(
+            select(func.count())
+            .select_from(Cobranza)
+            .where(Cobranza.id_expediente == id_expediente)
+        )
+
+        documentos = self.session.scalar(
+            select(func.count())
+            .select_from(Documento)
+            .where(Documento.id_expediente == id_expediente)
+        )
+
+        return ExpedienteResumenEliminacion(
+            cobranzas=cobranzas,
+            documentos=documentos
+        )
 
     def eliminar(
         self,
