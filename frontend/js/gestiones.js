@@ -155,7 +155,23 @@ export async function iniciar({ usuario, contenedor }) {
    INTERFAZ DE SELECCIÓN
    ───────────────────────────────────────────── */
 
+function puedeSeleccionarActivos() {
+
+    const rol =
+        usuarioSesion?.rol?.nombre;
+
+    return (
+        rol === "Administrador" ||
+        rol === "Supervisor"
+    );
+}
+
+
 function crearInterfazSeleccion() {
+
+    if (!puedeSeleccionarActivos()) {
+        return;
+    }
 
     const seccionActivos =
         document.querySelector(
@@ -194,7 +210,7 @@ function crearInterfazSeleccion() {
 
                 <span
                     id="barra-seleccion-gestiones-texto"
-                    class="barra-seleccion__texto"
+                    class="barra-seleccion__texto u-etiqueta"
                 >
                     0 gestiones seleccionadas
                 </span>
@@ -351,35 +367,36 @@ function crearModalReasignar() {
 
             <div class="modal__encabezado">
 
-                <h2
+                <h3
                     id="titulo-modal-reasignar"
-                    class="modal__titulo"
+                    class="modal__titulo u-titulo"
                 >
                     Reasignar gestiones
-                </h2>
+                </h3>
 
             </div>
 
 
             <div class="modal__cuerpo">
 
-                <p id="modal-reasignar-mensaje">
+                <p
+                    id="modal-reasignar-mensaje"
+                    class="u-cuerpo u-texto-secundario"
+                >
                     Selecciona el nuevo responsable.
                 </p>
 
 
-                <div class="campo-formulario">
+                <div class="campo">
 
                     <label
                         for="select-reasignar-gestion"
+                        class="u-etiqueta u-texto-terciario"
                     >
                         Responsable
                     </label>
 
-                    <select
-                        id="select-reasignar-gestion"
-                        class="campo-filtro__input"
-                    >
+                    <select id="select-reasignar-gestion">
                         <option value="">
                             Cargando usuarios...
                         </option>
@@ -411,7 +428,7 @@ function crearModalReasignar() {
                 <button
                     type="button"
                     id="boton-cancelar-reasignar"
-                    class="boton boton--secundario"
+                    class="boton boton--secundario u-boton-texto"
                 >
                     Cancelar
                 </button>
@@ -419,7 +436,7 @@ function crearModalReasignar() {
                 <button
                     type="button"
                     id="boton-confirmar-reasignar"
-                    class="boton"
+                    class="boton u-boton-texto"
                 >
                     Reasignar
                 </button>
@@ -559,19 +576,22 @@ function crearModalEliminar() {
 
             <div class="modal__encabezado">
 
-                <h2
+                <h3
                     id="titulo-modal-eliminar"
-                    class="modal__titulo"
+                    class="modal__titulo u-titulo"
                 >
                     Eliminar gestiones
-                </h2>
+                </h3>
 
             </div>
 
 
             <div class="modal__cuerpo">
 
-                <p id="modal-eliminar-mensaje">
+                <p
+                    id="modal-eliminar-mensaje"
+                    class="u-cuerpo u-texto-secundario"
+                >
                     ¿Estás seguro de que deseas eliminar
                     las gestiones seleccionadas?
                 </p>
@@ -600,7 +620,7 @@ function crearModalEliminar() {
                 <button
                     type="button"
                     id="boton-cancelar-eliminar"
-                    class="boton boton--secundario"
+                    class="boton boton--secundario u-boton-texto"
                 >
                     Cancelar
                 </button>
@@ -608,7 +628,7 @@ function crearModalEliminar() {
                 <button
                     type="button"
                     id="boton-confirmar-eliminar"
-                    class="boton"
+                    class="boton u-boton-texto"
                 >
                     Eliminar
                 </button>
@@ -1526,6 +1546,10 @@ function renderizarActivos(datos) {
             .join("");
 
 
+    const permiteSeleccion =
+        puedeSeleccionarActivos();
+
+
     contenedorActivos.innerHTML = `
         <table class="tabla">
 
@@ -1533,16 +1557,18 @@ function renderizarActivos(datos) {
 
                 <tr>
 
-                    <th class="tabla__columna-checkbox">
+                    ${permiteSeleccion ? `
+                        <th class="tabla__columna-checkbox">
 
-                        <input
-                            type="checkbox"
-                            id="checkbox-todos-activos"
-                            class="tabla__checkbox"
-                            aria-label="Seleccionar todas las gestiones visibles"
-                        >
+                            <input
+                                type="checkbox"
+                                id="checkbox-todos-activos"
+                                class="tabla__checkbox"
+                                aria-label="Seleccionar todas las gestiones visibles"
+                            >
 
-                    </th>
+                        </th>
+                    ` : ""}
 
                     <th>Cliente</th>
                     <th>Interlocutor</th>
@@ -1579,22 +1605,27 @@ function crearFilaGestionActiva(
             gestion.id
         );
 
+    const permiteSeleccion =
+        puedeSeleccionarActivos();
+
 
     return `
         <tr>
 
-            <td class="tabla__columna-checkbox">
+            ${permiteSeleccion ? `
+                <td class="tabla__columna-checkbox">
 
-                <input
-                    type="checkbox"
-                    class="tabla__checkbox"
-                    data-checkbox-gestion
-                    data-id="${gestion.id}"
-                    aria-label="Seleccionar gestión ${gestion.id}"
-                    ${seleccionada ? "checked" : ""}
-                >
+                    <input
+                        type="checkbox"
+                        class="tabla__checkbox"
+                        data-checkbox-gestion
+                        data-id="${gestion.id}"
+                        aria-label="Seleccionar gestión ${gestion.id}"
+                        ${seleccionada ? "checked" : ""}
+                    >
 
-            </td>
+                </td>
+            ` : ""}
 
 
             <td>
