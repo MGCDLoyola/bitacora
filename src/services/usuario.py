@@ -19,12 +19,15 @@ NOMBRE_FIRMA = "firma.png"
 
 class UsuarioService(BaseService):
 
-    def listar(self, incluir_admin: bool = True) -> Sequence[Usuario]:
+    def listar(self, incluir_admin: bool = True, excluir_id: int | None = None) -> Sequence[Usuario]:
 
         stmt = select(Usuario)
 
         if not incluir_admin:
             stmt = stmt.where(Usuario.id_rol != 1)
+
+        if excluir_id is not None:
+            stmt = stmt.where(Usuario.id != excluir_id)
 
         stmt = stmt.order_by(Usuario.id)
 
@@ -97,6 +100,11 @@ class UsuarioService(BaseService):
 
         cambios = data.model_dump(exclude_unset=True)
 
+        if "id_rol" in cambios and usuario.id == usuario_actual.id:
+            raise OperacionInvalida(
+                "No puedes cambiar tu propio rol."
+            )
+
         if "correo" in cambios and cambios["correo"] != usuario.correo:
             existente = self.session.scalar(
                 select(Usuario)
@@ -119,10 +127,16 @@ class UsuarioService(BaseService):
     def actualizar_supervisor(
         self,
         id_usuario: int,
-        data: UsuarioUpdateSupervisor
+        data: UsuarioUpdateSupervisor,
+        usuario_actual: Usuario
     ) -> Usuario:
 
         usuario = self.obtener(id_usuario)
+
+        if usuario.id == usuario_actual.id:
+            raise OperacionInvalida(
+                "No puedes modificar tu propio usuario."
+            )
 
         if usuario.rol.nombre == "Administrador":
             raise OperacionInvalida(
@@ -137,6 +151,64 @@ class UsuarioService(BaseService):
         self._guardar(usuario)
 
         return usuario
+
+    def actualizar_rol_masivo(
+        self,
+        ids: list[int],
+        id_rol: int,
+        usuario_actual: Usuario
+    ) -> Sequence[Usuario]:
+
+        usuarios = [self.obtener(id_usuario) for id_usuario in ids]
+
+        for usuario in usuarios:
+
+            if usuario.id == usuario_actual.id:
+                raise OperacionInvalida(
+                    "No puedes cambiar tu propio rol."
+                )
+
+            if (
+                usuario.rol.nombre == "Administrador"
+                and usuario.id != usuario_actual.id
+            ):
+                raise OperacionInvalida(
+                    "Un Administrador no puede modificar a otro Administrador."
+                )
+
+        for usuario in usuarios:
+            usuario.id_rol = id_rol
+
+        self._commit()
+
+        return usuarios
+
+
+    def actualizar_estado_masivo(
+        self,
+        ids: list[int],
+        activo: bool,
+        usuario_actual: Usuario
+    ) -> Sequence[Usuario]:
+
+        usuarios = [self.obtener(id_usuario) for id_usuario in ids]
+
+        for usuario in usuarios:
+            if usuario.id == usuario_actual.id:
+                raise OperacionInvalida(
+                    "No puedes modificar tu propio usuario."
+                )
+            if usuario.rol.nombre == "Administrador":
+                raise OperacionInvalida(
+                    f"El usuario '{usuario.nombre}' es Administrador y no puede modificarse."
+                )
+
+        for usuario in usuarios:
+            usuario.activo = activo
+
+        self._commit()
+
+        return usuarios
 
     def guardar_firma(self, usuario: Usuario, contenido: bytes) -> None:
 

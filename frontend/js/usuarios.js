@@ -1,8 +1,13 @@
 let usuarioSesion = null;
 
 let usuarios = [];
+let usuariosFiltradosActuales = [];
+let usuariosSeleccionados = new Set();
+
+let rolesCatalogo = null;
 
 let tablaUsuarios = null;
+let checkboxTodos = null;
 let estadoUsuarios = null;
 
 let mensajeUsuarios = null;
@@ -13,6 +18,13 @@ let botonNuevoUsuario = null;
 let filtroUsuarios = null;
 let filtroRol = null;
 let filtroEstado = null;
+
+let barraSeleccion = null;
+let barraSeleccionTexto = null;
+let botonRolMasivo = null;
+let botonActivarMasivo = null;
+let botonDesactivarMasivo = null;
+let botonCancelarSeleccion = null;
 
 let modalNuevoUsuario = null;
 let formularioNuevoUsuario = null;
@@ -35,7 +47,19 @@ let textoModalEstadoError = null;
 let botonCancelarEstado = null;
 let botonConfirmarEstado = null;
 
-let usuarioEstadoPendiente = null;
+let idsEstadoPendiente = [];
+let activoDestinoPendiente = null;
+
+let modalCambiarRol = null;
+let modalRolMensaje = null;
+let modalRolSelect = null;
+let modalRolError = null;
+let textoModalRolError = null;
+
+let botonCancelarRol = null;
+let botonConfirmarRol = null;
+
+let idsRolPendiente = [];
 
 
 export async function iniciar({ usuario, contenedor }) {
@@ -71,6 +95,30 @@ export async function iniciar({ usuario, contenedor }) {
 
     filtroEstado = contenedor.querySelector(
         "#filtro-estado"
+    );
+
+    barraSeleccion = contenedor.querySelector(
+        "#barra-seleccion"
+    );
+
+    barraSeleccionTexto = contenedor.querySelector(
+        "#barra-seleccion-texto"
+    );
+
+    botonRolMasivo = contenedor.querySelector(
+        "#boton-rol-masivo"
+    );
+
+    botonActivarMasivo = contenedor.querySelector(
+        "#boton-activar-masivo"
+    );
+
+    botonDesactivarMasivo = contenedor.querySelector(
+        "#boton-desactivar-masivo"
+    );
+
+    botonCancelarSeleccion = contenedor.querySelector(
+        "#boton-cancelar-seleccion"
     );
 
     modalNuevoUsuario = contenedor.querySelector(
@@ -131,6 +179,34 @@ export async function iniciar({ usuario, contenedor }) {
 
     botonConfirmarEstado = contenedor.querySelector(
         "#boton-confirmar-estado"
+    );
+
+    modalCambiarRol = contenedor.querySelector(
+        "#modal-cambiar-rol"
+    );
+
+    modalRolMensaje = contenedor.querySelector(
+        "#modal-rol-mensaje"
+    );
+
+    modalRolSelect = contenedor.querySelector(
+        "#modal-rol-select"
+    );
+
+    modalRolError = contenedor.querySelector(
+        "#modal-rol-error"
+    );
+
+    textoModalRolError = contenedor.querySelector(
+        "#texto-modal-rol-error"
+    );
+
+    botonCancelarRol = contenedor.querySelector(
+        "#boton-cancelar-rol"
+    );
+
+    botonConfirmarRol = contenedor.querySelector(
+        "#boton-confirmar-rol"
     );
 
 
@@ -208,6 +284,48 @@ function configurarVista() {
                 cerrarModalEstado
             );
         });
+
+
+    botonCancelarRol.addEventListener(
+        "click",
+        cerrarModalRol
+    );
+
+    botonConfirmarRol.addEventListener(
+        "click",
+        confirmarCambioRol
+    );
+
+
+    modalCambiarRol
+        .querySelectorAll("[data-cerrar-modal-rol]")
+        .forEach((elemento) => {
+            elemento.addEventListener(
+                "click",
+                cerrarModalRol
+            );
+        });
+
+
+    botonCancelarSeleccion.addEventListener(
+        "click",
+        cancelarSeleccion
+    );
+
+    botonRolMasivo.addEventListener(
+        "click",
+        () => abrirModalRol([...usuariosSeleccionados])
+    );
+
+    botonActivarMasivo.addEventListener(
+        "click",
+        () => abrirModalEstado([...usuariosSeleccionados], true)
+    );
+
+    botonDesactivarMasivo.addEventListener(
+        "click",
+        () => abrirModalEstado([...usuariosSeleccionados], false)
+    );
 }
 
 async function cargarUsuarios() {
@@ -337,7 +455,42 @@ function aplicarFiltros() {
 }
 
 
+function permisosFila(usuario) {
+    const esAdministrador =
+        usuarioSesion?.rol?.nombre === "Administrador";
+
+    const esSupervisor =
+        usuarioSesion?.rol?.nombre === "Supervisor";
+
+    const esUsuarioAdministrador =
+        usuario.rol.nombre === "Administrador";
+
+    const esUnoMismo =
+        usuario.id === usuarioSesion?.id;
+
+    return {
+        puedeCambiarRol:
+            esAdministrador &&
+            (!esUsuarioAdministrador || esUnoMismo),
+
+        puedeCambiarEstado:
+            (esAdministrador || esSupervisor) &&
+            !esUsuarioAdministrador
+    };
+}
+
+
+function usuarioEsSeleccionable(usuario) {
+    const { puedeCambiarRol, puedeCambiarEstado } =
+        permisosFila(usuario);
+
+    return puedeCambiarRol || puedeCambiarEstado;
+}
+
+
 function renderizarUsuarios(usuariosFiltrados) {
+    usuariosFiltradosActuales = usuariosFiltrados;
+
     if (usuariosFiltrados.length === 0) {
         tablaUsuarios.innerHTML = `
             <div class="tabla-vacia">
@@ -346,6 +499,10 @@ function renderizarUsuarios(usuariosFiltrados) {
                 </p>
             </div>
         `;
+
+        checkboxTodos = null;
+
+        actualizarBarraAcciones();
 
         return;
     }
@@ -358,13 +515,19 @@ function renderizarUsuarios(usuariosFiltrados) {
         <table class="tabla">
             <thead>
                 <tr>
+                    <th class="tabla__columna-checkbox">
+                        <input
+                            type="checkbox"
+                            id="checkbox-todos"
+                            class="tabla__checkbox"
+                        >
+                    </th>
                     <th>Nombre</th>
                     <th>Correo</th>
                     <th>Rol</th>
                     <th>Estado</th>
                     <th>Firma</th>
                     <th class="tabla__columna-acciones">
-                        Acciones
                     </th>
                 </tr>
             </thead>
@@ -376,6 +539,8 @@ function renderizarUsuarios(usuariosFiltrados) {
     `;
 
     configurarAcciones();
+
+    actualizarBarraAcciones();
 }
 
 
@@ -392,43 +557,69 @@ function crearFilaUsuario(usuario) {
         ? "Sí"
         : "No";
 
-    const esAdministrador =
-        usuarioSesion?.rol?.nombre === "Administrador";
+    const { puedeCambiarRol, puedeCambiarEstado } =
+        permisosFila(usuario);
 
     const accionEstado = usuario.activo
         ? "Desactivar"
         : "Activar";
 
-    const acciones = esAdministrador
+    const botones = [];
+
+    if (puedeCambiarRol) {
+        botones.push(`
+            <button
+                type="button"
+                class="tabla__accion"
+                data-accion="rol"
+                data-id="${usuario.id}"
+            >
+                Cambiar rol
+            </button>
+        `);
+    }
+
+    if (puedeCambiarEstado) {
+        botones.push(`
+            <button
+                type="button"
+                class="tabla__accion tabla__accion--estado"
+                data-accion="estado"
+                data-id="${usuario.id}"
+                data-activo="${usuario.activo}"
+                data-nombre="${escaparHtml(usuario.nombre)}"
+            >
+                ${accionEstado}
+            </button>
+        `);
+    }
+
+    const acciones = botones.length
         ? `
             <div class="tabla__acciones-grupo">
-
-                <button
-                    type="button"
-                    class="tabla__accion"
-                    data-accion="editar"
-                    data-id="${usuario.id}"
-                >
-                    Editar
-                </button>
-
-                <button
-                    type="button"
-                    class="tabla__accion tabla__accion--estado"
-                    data-accion="estado"
-                    data-id="${usuario.id}"
-                    data-activo="${usuario.activo}"
-                    data-nombre="${escaparHtml(usuario.nombre)}"
-                >
-                    ${accionEstado}
-                </button>
-
+                ${botones.join("")}
             </div>
+        `
+        : "";
+
+    const checkbox = usuarioEsSeleccionable(usuario)
+        ? `
+            <input
+                type="checkbox"
+                class="tabla__checkbox"
+                data-checkbox-usuario
+                data-id="${usuario.id}"
+                ${usuariosSeleccionados.has(usuario.id) ? "checked" : ""}
+            >
         `
         : "";
 
     return `
         <tr>
+            <td class="tabla__columna-checkbox">
+                ${checkbox}
+            </td>
+
             <td>
                 <span class="tabla__nombre">
                     ${escaparHtml(usuario.nombre)}
@@ -464,6 +655,17 @@ function crearFilaUsuario(usuario) {
 
 
 function configurarAcciones() {
+    checkboxTodos = tablaUsuarios.querySelector(
+        "#checkbox-todos"
+    );
+
+    if (checkboxTodos) {
+        checkboxTodos.addEventListener(
+            "change",
+            manejarCheckboxTodos
+        );
+    }
+
     tablaUsuarios
         .querySelectorAll("[data-accion]")
         .forEach((boton) => {
@@ -472,6 +674,17 @@ function configurarAcciones() {
                 manejarAccion
             );
         });
+
+    tablaUsuarios
+        .querySelectorAll("[data-checkbox-usuario]")
+        .forEach((checkbox) => {
+            checkbox.addEventListener(
+                "change",
+                manejarCheckboxUsuario
+            );
+        });
+
+    actualizarCheckboxTodos();
 }
 
 
@@ -482,8 +695,8 @@ function manejarAccion(event) {
         boton.dataset.id
     );
 
-    if (accion === "editar") {
-        editarUsuario(idUsuario);
+    if (accion === "rol") {
+        abrirModalRol([idUsuario]);
         return;
     }
 
@@ -495,12 +708,109 @@ function manejarAccion(event) {
             boton.dataset.nombre;
 
         abrirModalEstado(
-            idUsuario,
-            nombre,
-            activo
+            [idUsuario],
+            !activo,
+            nombre
         );
     }
 }
+
+
+function manejarCheckboxUsuario(event) {
+    const checkbox = event.currentTarget;
+    const id = Number(checkbox.dataset.id);
+
+    if (checkbox.checked) {
+        usuariosSeleccionados.add(id);
+    } else {
+        usuariosSeleccionados.delete(id);
+    }
+
+    actualizarCheckboxTodos();
+    actualizarBarraAcciones();
+}
+
+
+function manejarCheckboxTodos(event) {
+    const marcar = event.currentTarget.checked;
+
+    usuariosFiltradosActuales
+        .filter(usuarioEsSeleccionable)
+        .forEach((usuario) => {
+            if (marcar) {
+                usuariosSeleccionados.add(usuario.id);
+            } else {
+                usuariosSeleccionados.delete(usuario.id);
+            }
+        });
+
+    renderizarUsuarios(usuariosFiltradosActuales);
+}
+
+
+function actualizarCheckboxTodos() {
+    if (!checkboxTodos) {
+        return;
+    }
+
+    const seleccionables =
+        usuariosFiltradosActuales.filter(usuarioEsSeleccionable);
+
+    if (seleccionables.length === 0) {
+        checkboxTodos.checked = false;
+        checkboxTodos.indeterminate = false;
+        checkboxTodos.disabled = true;
+
+        return;
+    }
+
+    checkboxTodos.disabled = false;
+
+    const seleccionadosVisibles = seleccionables.filter(
+        (usuario) => usuariosSeleccionados.has(usuario.id)
+    );
+
+    checkboxTodos.checked =
+        seleccionadosVisibles.length === seleccionables.length;
+
+    checkboxTodos.indeterminate =
+        seleccionadosVisibles.length > 0 &&
+        seleccionadosVisibles.length < seleccionables.length;
+}
+
+
+function actualizarBarraAcciones() {
+    const cantidad = usuariosSeleccionados.size;
+
+    barraSeleccion.hidden = cantidad === 0;
+
+    if (cantidad === 0) {
+        return;
+    }
+
+    barraSeleccionTexto.textContent =
+        cantidad === 1
+            ? "1 usuario seleccionado"
+            : `${cantidad} usuarios seleccionados`;
+
+    const esAdministrador =
+        usuarioSesion?.rol?.nombre === "Administrador";
+
+    const esSupervisor =
+        usuarioSesion?.rol?.nombre === "Supervisor";
+
+    botonRolMasivo.hidden = !esAdministrador;
+    botonActivarMasivo.hidden = !(esAdministrador || esSupervisor);
+    botonDesactivarMasivo.hidden = !(esAdministrador || esSupervisor);
+}
+
+
+function cancelarSeleccion() {
+    usuariosSeleccionados.clear();
+
+    renderizarUsuarios(usuariosFiltradosActuales);
+}
+
 
 async function abrirNuevoUsuario() {
     ocultarErrorNuevoUsuario();
@@ -518,7 +828,11 @@ async function abrirNuevoUsuario() {
     modalNuevoUsuario.hidden = false;
 
     try {
-        await cargarRoles();
+        const roles = await obtenerCatalogoRoles();
+
+        poblarSelectRoles(nuevoUsuarioRol, roles);
+
+        nuevoUsuarioRol.disabled = false;
 
         nuevoUsuarioRol.focus();
 
@@ -531,7 +845,11 @@ async function abrirNuevoUsuario() {
 }
 
 
-async function cargarRoles() {
+async function obtenerCatalogoRoles() {
+    if (rolesCatalogo) {
+        return rolesCatalogo;
+    }
+
     const respuesta = await fetch(
         "/roles/",
         {
@@ -546,12 +864,19 @@ async function cargarRoles() {
         );
     }
 
-    const roles = await respuesta.json();
+    rolesCatalogo = await respuesta.json();
 
-    nuevoUsuarioRol.innerHTML = `
-        <option value="">
-            Selecciona un rol
-        </option>
+    return rolesCatalogo;
+}
+
+
+function poblarSelectRoles(select, roles, incluirPlaceholder = true) {
+    select.innerHTML = `
+        ${incluirPlaceholder ? `
+            <option value="">
+                Selecciona un rol
+            </option>
+        ` : ""}
 
         ${roles.map((rol) => `
             <option value="${rol.id}">
@@ -559,8 +884,6 @@ async function cargarRoles() {
             </option>
         `).join("")}
     `;
-
-    nuevoUsuarioRol.disabled = false;
 }
 
 
@@ -694,35 +1017,174 @@ function ocultarErrorNuevoUsuario() {
     mensajeNuevoUsuario.hidden = true;
 }
 
-function editarUsuario(idUsuario) {
-    console.log(
-        "Editar usuario:",
-        idUsuario
-    );
+
+function abrirModalRol(ids) {
+    idsRolPendiente = ids;
+
+    ocultarErrorModalRol();
+
+    modalRolMensaje.textContent =
+        ids.length === 1
+            ? "Selecciona el nuevo rol para este usuario."
+            : `Selecciona el nuevo rol para los ${ids.length} usuarios seleccionados.`;
+
+    modalRolSelect.innerHTML = `
+        <option value="">
+            Cargando roles...
+        </option>
+    `;
+
+    modalRolSelect.disabled = true;
+
+    modalCambiarRol.hidden = false;
+
+    cargarRolesModal(ids);
 }
 
-function abrirModalEstado(
-    idUsuario,
-    nombre,
-    activo
-) {
-    usuarioEstadoPendiente = {
-        id: idUsuario,
-        nombre,
-        activo
-    };
 
-    const accion = activo
-        ? "desactivar"
-        : "activar";
+async function cargarRolesModal(ids) {
+    try {
+        const roles = await obtenerCatalogoRoles();
+
+        poblarSelectRoles(modalRolSelect, roles, true);
+
+        if (ids.length === 1) {
+            const usuario = usuarios.find(
+                (usuario) => usuario.id === ids[0]
+            );
+
+            if (usuario) {
+                modalRolSelect.value = String(usuario.rol.id);
+            }
+        }
+
+        modalRolSelect.disabled = false;
+
+        modalRolSelect.focus();
+
+    } catch (error) {
+        mostrarErrorModalRol(
+            error.message ||
+            "No se pudieron cargar los roles."
+        );
+    }
+}
+
+
+function cerrarModalRol() {
+    idsRolPendiente = [];
+
+    ocultarErrorModalRol();
+
+    modalCambiarRol.hidden = true;
+}
+
+
+async function confirmarCambioRol() {
+    if (idsRolPendiente.length === 0) {
+        return;
+    }
+
+    const idRol = modalRolSelect.value;
+
+    if (!idRol) {
+        mostrarErrorModalRol(
+            "Selecciona un rol."
+        );
+
+        return;
+    }
+
+    ocultarErrorModalRol();
+
+    botonConfirmarRol.disabled = true;
+    botonCancelarRol.disabled = true;
+
+    try {
+        const respuesta = idsRolPendiente.length === 1
+            ? await fetch(
+                `/usuarios/${idsRolPendiente[0]}`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        id_rol: Number(idRol)
+                    })
+                }
+            )
+            : await fetch(
+                "/usuarios/rol-masivo",
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        ids: idsRolPendiente,
+                        id_rol: Number(idRol)
+                    })
+                }
+            );
+
+        if (!respuesta.ok) {
+            mostrarErrorModalRol(
+                await mensajeDeError(respuesta)
+            );
+
+            return;
+        }
+
+        usuariosSeleccionados.clear();
+
+        cerrarModalRol();
+
+        await cargarUsuarios();
+
+    } catch {
+        mostrarErrorModalRol(
+            "No se pudo contactar al servidor. Intenta de nuevo."
+        );
+
+    } finally {
+        botonConfirmarRol.disabled = false;
+        botonCancelarRol.disabled = false;
+    }
+}
+
+
+function mostrarErrorModalRol(mensaje) {
+    textoModalRolError.textContent = mensaje;
+    modalRolError.hidden = false;
+}
+
+
+function ocultarErrorModalRol() {
+    textoModalRolError.textContent = "";
+    modalRolError.hidden = true;
+}
+
+
+function abrirModalEstado(ids, activoDestino, nombre = null) {
+    idsEstadoPendiente = ids;
+    activoDestinoPendiente = activoDestino;
+
+    const accionTexto = activoDestino
+        ? "activar"
+        : "desactivar";
 
     modalEstadoMensaje.textContent =
-        `¿Estás seguro de que deseas ${accion} al usuario "${nombre}"?`;
+        ids.length === 1
+            ? `¿Estás seguro de que deseas ${accionTexto} al usuario "${nombre}"?`
+            : `¿Estás seguro de que deseas ${accionTexto} a los ${ids.length} usuarios seleccionados?`;
 
     botonConfirmarEstado.textContent =
-        activo
-            ? "Desactivar usuario"
-            : "Activar usuario";
+        activoDestino
+            ? "Activar"
+            : "Desactivar";
 
     ocultarErrorModal();
 
@@ -733,7 +1195,8 @@ function abrirModalEstado(
 
 
 function cerrarModalEstado() {
-    usuarioEstadoPendiente = null;
+    idsEstadoPendiente = [];
+    activoDestinoPendiente = null;
 
     ocultarErrorModal();
 
@@ -742,14 +1205,12 @@ function cerrarModalEstado() {
 
 
 async function confirmarCambioEstado() {
-    if (usuarioEstadoPendiente === null) {
+    if (idsEstadoPendiente.length === 0) {
         return;
     }
 
-    const {
-        id,
-        activo
-    } = usuarioEstadoPendiente;
+    const ids = idsEstadoPendiente;
+    const activo = activoDestinoPendiente;
 
     ocultarErrorModal();
 
@@ -757,19 +1218,34 @@ async function confirmarCambioEstado() {
     botonCancelarEstado.disabled = true;
 
     try {
-        const respuesta = await fetch(
-            `/usuarios/${id}/estado`,
-            {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include",
-                body: JSON.stringify({
-                    activo: !activo
-                })
-            }
-        );
+        const respuesta = ids.length === 1
+            ? await fetch(
+                `/usuarios/${ids[0]}/estado`,
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        activo
+                    })
+                }
+            )
+            : await fetch(
+                "/usuarios/estado-masivo",
+                {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    credentials: "include",
+                    body: JSON.stringify({
+                        ids,
+                        activo
+                    })
+                }
+            );
 
         if (!respuesta.ok) {
             mostrarErrorModal(
@@ -778,6 +1254,8 @@ async function confirmarCambioEstado() {
 
             return;
         }
+
+        usuariosSeleccionados.clear();
 
         cerrarModalEstado();
 

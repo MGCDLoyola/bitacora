@@ -27,3 +27,12 @@ class UsuarioRead(UsuarioBase):
     rol   : RolRead
     firma : bool = False
     requiere_cambio_password : bool
+
+class UsuarioRolMasivo(SchemaBase):
+    ids: list[int]
+    id_rol: int
+
+
+class UsuarioEstadoMasivo(SchemaBase):
+    ids: list[int]
+    activo: bool
