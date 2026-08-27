@@ -173,7 +173,7 @@ class ExpedienteService(BaseService):
         ids: list[int],
         id_usuario: int | None,
         usuario_actual: Usuario
-    ) -> Sequence[Expediente]:
+    ) -> None:
 
         expedientes = [
             self.obtener(id_expediente)
@@ -198,9 +198,7 @@ class ExpedienteService(BaseService):
             expediente.id_usuario = id_usuario
 
         self._commit()
-
-        return expedientes
-
+        
     def listar_por_asignado(
         self,
         id_usuario: int

@@ -168,7 +168,7 @@ def obtener_resumen_gestiones(
 
 @router.patch(
     "/asignar",
-    response_model=list[ExpedienteRead],
+    status_code=204,
 )
 def asignar_expedientes(
     data: ExpedienteAsignacionMasiva,
@@ -182,12 +182,11 @@ def asignar_expedientes(
 ):
     servicio = ExpedienteService(session)
 
-    return servicio.asignar(
+    servicio.asignar(
         ids=data.ids,
         id_usuario=data.id_usuario,
         usuario_actual=usuario_actual,
     )
-
 
 @router.get(
     "/{id_expediente}",
