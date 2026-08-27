@@ -62,7 +62,7 @@ function loginApp() {
                 const usuario = await respuesta.json();
 
                 if (usuario.requiere_cambio_password) {
-                    window.location.href = "/cambiar-password";
+                    window.location.replace("/cambiar-password");
                 } else {
                     window.location.replace("/");
                 }
