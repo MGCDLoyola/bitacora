@@ -76,5 +76,7 @@ class Cobranza(AuditoriaMixin, Base):
 
     evidencias: Mapped[list["Evidencia"]] = relationship(
         "Evidencia",
-        back_populates="cobranza"
+        back_populates="cobranza",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )

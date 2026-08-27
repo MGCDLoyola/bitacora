@@ -76,12 +76,16 @@ class Expediente(AuditoriaMixin, Base):
 
     documentos: Mapped[list["Documento"]] = relationship(
         "Documento",
-        back_populates="expediente"
+        back_populates="expediente",
+        cascade="all, delete-orphan",
+        passive_deletes=True
     )
 
     cobranzas: Mapped[list["Cobranza"]] = relationship(
         "Cobranza",
-        back_populates="expediente"
+        back_populates="expediente",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
     )
 
     usuario: Mapped["Usuario | None"] = relationship(

@@ -84,7 +84,7 @@ let idsEliminarExpedientesPendientes = [];
 const ENDPOINTS_EXPEDIENTES = {
 
     asignar:
-        "/expedientes/asignar-masivo",
+        "/expedientes/asignar",
 
 };
 

@@ -417,21 +417,67 @@ class ExpedienteService(BaseService):
 
     def eliminar(
         self,
-        id_expediente: int
+        ids_expediente: list[int],
     ) -> None:
 
-        expediente = self.obtener(id_expediente)
+        if not ids_expediente:
+            raise OperacionInvalida(
+                "Debes proporcionar al menos un expediente para eliminar."
+            )
 
-        cliente = expediente.cliente
-
-        carpeta = carpeta_expediente(
-            cliente,
-            expediente
+        expedientes = (
+            self.session
+            .execute(
+                select(Expediente)
+                .where(
+                    Expediente.id.in_(ids_expediente)
+                )
+            )
+            .scalars()
+            .all()
         )
 
-        self.session.delete(expediente)
+        encontrados = {
+            expediente.id
+            for expediente in expedientes
+        }
 
-        self._commit()
+        faltantes = set(ids_expediente) - encontrados
 
-        if carpeta.exists():
-            shutil.rmtree(carpeta)
+        if faltantes:
+            raise NoEncontrado(
+                f"No existen los expedientes: "
+                f"{', '.join(map(str, sorted(faltantes)))}."
+            )
+
+        errores = []
+
+        for expediente in expedientes:
+            carpeta = carpeta_expediente(
+                expediente.cliente,
+                expediente
+            )
+
+            try:
+                if carpeta.exists():
+                    shutil.rmtree(carpeta)
+            except OSError as error:
+                errores.append(
+                    f"{expediente.id}: no se pudo eliminar la carpeta ({error})"
+                )
+                continue
+
+            try:
+                self.session.delete(expediente)
+                self._commit()
+            except Exception as error:
+                self.session.rollback()
+                errores.append(
+                    f"{expediente.id}: no se pudo eliminar el registro ({error})"
+                )
+
+        if errores:
+            raise OperacionInvalida(
+                f"No se pudieron eliminar todos los expedientes: "
+                f"{'; '.join(errores)}."
+            )

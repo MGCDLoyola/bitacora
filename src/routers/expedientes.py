@@ -262,7 +262,7 @@ def eliminar_expediente(
 ):
     servicio = ExpedienteService(session)
 
-    servicio.eliminar(id_expediente)
+    servicio.eliminar([id_expediente])
 
 
 @router.get(
