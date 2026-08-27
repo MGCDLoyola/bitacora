@@ -1,129 +1,95 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es-MX">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="dark">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="color-scheme" content="dark" />
 
-<title>Bitácora</title>
+        <title>Bitácora</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link
-    href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
-    rel="stylesheet"
->
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+            rel="stylesheet"
+        />
 
-<link rel="stylesheet" href="/static/css/tokens.css">
-<link rel="stylesheet" href="/static/css/utilidades.css">
-<link rel="stylesheet" href="/static/css/componentes.css">
-<link rel="stylesheet" href="/static/css/app.css">
-<link rel="stylesheet" href="/static/css/usuarios.css">
-<link rel="stylesheet" href="/static/css/gestiones.css">
-<link rel="stylesheet" href="/static/css/expediente.css">
+        <link rel="stylesheet" href="/static/css/tokens.css" />
+        <link rel="stylesheet" href="/static/css/utilidades.css" />
+        <link rel="stylesheet" href="/static/css/componentes.css" />
+        <link rel="stylesheet" href="/static/css/app.css" />
+        <link rel="stylesheet" href="/static/css/usuarios.css" />
+        <link rel="stylesheet" href="/static/css/gestiones.css" />
+        <link rel="stylesheet" href="/static/css/expediente.css" />
 
-<script defer src="/static/js/app.js"></script>
-</head>
+        <script defer src="/static/js/app.js"></script>
+    </head>
 
-<body>
+    <body>
+        <div id="app" class="app" hidden>
+            <aside class="barra-lateral">
+                <div class="barra-lateral__marca">
+                    <div class="barra-lateral__nombre">Bitácora</div>
 
-<div id="app" class="app" hidden>
+                    <div class="barra-lateral__seccion">
+                        Supervisión de Cobranza Extrajudicial
+                    </div>
+                </div>
 
-    <aside class="barra-lateral">
+                <div class="barra-lateral__usuario">
+                    <div class="barra-lateral__identidad">
+                        <span
+                            id="usuario-nombre"
+                            class="barra-lateral__usuario-nombre"
+                        ></span>
 
-        <div class="barra-lateral__marca">
+                        <span
+                            id="usuario-rol"
+                            class="barra-lateral__usuario-rol"
+                        ></span>
+                    </div>
+                </div>
 
-            <div class="barra-lateral__nombre">
-                Bitácora
+                <nav
+                    id="navegacion"
+                    class="navegacion"
+                    aria-label="Navegación principal"
+                >
+                    <!-- app.js inserta las opciones según el rol -->
+                </nav>
+
+                <div class="barra-lateral__pie">
+                    <button
+                        id="boton-cerrar-sesion"
+                        type="button"
+                        class="navegacion__item navegacion__item--accion"
+                    >
+                        <span class="navegacion__texto"> Cerrar sesión </span>
+                    </button>
+                </div>
+            </aside>
+
+            <div class="contenido">
+                <main id="contenido-principal" class="contenido__principal">
+                    <!-- Las vistas se cargarán aquí -->
+                </main>
             </div>
-
-            <div class="barra-lateral__seccion">
-                Supervisión de Cobranza Extrajudicial
-            </div>
-
         </div>
 
-
-        <div class="barra-lateral__usuario">
-
-            <div class="barra-lateral__identidad">
-
-                <span
-                    id="usuario-nombre"
-                    class="barra-lateral__usuario-nombre"
-                ></span>
-
-                <span
-                    id="usuario-rol"
-                    class="barra-lateral__usuario-rol"
-                ></span>
-
-            </div>
-
+        <div id="estado-carga" class="estado-carga" aria-live="polite">
+            <span class="boton__spinner"></span>
         </div>
 
-
-        <nav
-            id="navegacion"
-            class="navegacion"
-            aria-label="Navegación principal"
+        <div
+            id="mensaje-aplicacion"
+            class="mensaje-error mensaje-aplicacion"
+            role="alert"
+            aria-live="polite"
+            hidden
         >
-            <!-- app.js inserta las opciones según el rol -->
-        </nav>
+            <span class="mensaje-error__sello"> Error </span>
 
-
-        <div class="barra-lateral__pie">
-
-            <button
-                id="boton-cerrar-sesion"
-                type="button"
-                class="navegacion__item navegacion__item--accion"
-            >
-                <span class="navegacion__texto">
-                    Cerrar sesión
-                </span>
-            </button>
-
+            <span id="texto-mensaje-aplicacion"></span>
         </div>
-
-    </aside>
-
-    <div class="contenido">
-
-        <main
-            id="contenido-principal"
-            class="contenido__principal"
-        >
-            <!-- Las vistas se cargarán aquí -->
-        </main>
-
-    </div>
-
-</div>
-
-
-<div
-    id="estado-carga"
-    class="estado-carga"
-    aria-live="polite"
->
-    <span class="boton__spinner"></span>
-</div>
-
-
-<div
-    id="mensaje-aplicacion"
-    class="mensaje-error mensaje-aplicacion"
-    role="alert"
-    aria-live="polite"
-    hidden
->
-    <span class="mensaje-error__sello">
-        Error
-    </span>
-
-    <span id="texto-mensaje-aplicacion"></span>
-</div>
-
-</body>
+    </body>
 </html>

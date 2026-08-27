@@ -1,35 +1,29 @@
 <section class="vista-gestiones">
-
     <div class="vista-gestiones__encabezado">
-
         <div>
             <h2 class="vista-gestiones__titulo u-titulo">
                 Gestión de expedientes
             </h2>
 
-            <p class="vista-gestiones__descripcion u-subtitulo u-texto-terciario">
+            <p
+                class="vista-gestiones__descripcion u-subtitulo u-texto-terciario"
+            >
                 Seguimiento de expedientes bajo incumplimiento de pago.
             </p>
         </div>
-
     </div>
-
 
     <nav
         class="vista-gestiones__navegacion"
         aria-label="Secciones de gestiones"
     >
-
         <button
             type="button"
             class="vista-gestiones__tab vista-gestiones__tab--activo"
             data-seccion="del-dia"
         >
             <span>Del día</span>
-            <span
-                class="vista-gestiones__contador"
-                data-contador="del-dia"
-            >
+            <span class="vista-gestiones__contador" data-contador="del-dia">
                 0
             </span>
         </button>
@@ -40,10 +34,7 @@
             data-seccion="desfasados"
         >
             <span>Desfasados</span>
-            <span
-                class="vista-gestiones__contador"
-                data-contador="desfasados"
-            >
+            <span class="vista-gestiones__contador" data-contador="desfasados">
                 0
             </span>
         </button>
@@ -68,43 +59,27 @@
             data-seccion="activos"
         >
             <span>Activos</span>
-            <span
-                class="vista-gestiones__contador"
-                data-contador="activos"
-            >
+            <span class="vista-gestiones__contador" data-contador="activos">
                 0
             </span>
         </button>
-
     </nav>
 
-
-    <div
-        id="filtros-gestiones"
-        class="filtros-gestiones"
-    >
+    <div id="filtros-gestiones" class="filtros-gestiones">
         <div class="filtro-gestiones">
-
             <input
                 id="filtro-gestiones"
                 type="search"
                 class="filtro-gestiones__input"
                 placeholder="Buscar por nombre o interlocutor..."
                 autocomplete="off"
-            >
-
+            />
         </div>
     </div>
 
-
-    <div
-        id="estado-gestiones"
-        class="estado-vista u-texto-terciario"
-        hidden
-    >
+    <div id="estado-gestiones" class="estado-vista u-texto-terciario" hidden>
         Cargando gestiones...
     </div>
-
 
     <div
         id="mensaje-gestiones"
@@ -113,13 +88,10 @@
         aria-live="polite"
         hidden
     >
-        <span class="mensaje-error__sello">
-            Error
-        </span>
+        <span class="mensaje-error__sello"> Error </span>
 
         <span id="texto-mensaje-gestiones"></span>
     </div>
-
 
     <!-- DEL DÍA -->
     <section
@@ -127,18 +99,10 @@
         class="seccion-gestiones"
         data-seccion-contenido="del-dia"
     >
-
         <div class="gestiones-box">
-
-            <div
-                id="gestiones-del-dia"
-                class="gestiones-tarjetas"
-            ></div>
-
+            <div id="gestiones-del-dia" class="gestiones-tarjetas"></div>
         </div>
-
     </section>
-
 
     <!-- DESFASADOS -->
     <section
@@ -147,18 +111,10 @@
         data-seccion-contenido="desfasados"
         hidden
     >
-
         <div class="gestiones-box">
-
-            <div
-                id="gestiones-desfasados"
-                class="gestiones-tarjetas"
-            ></div>
-
+            <div id="gestiones-desfasados" class="gestiones-tarjetas"></div>
         </div>
-
     </section>
-
 
     <!-- CONSOLIDACIÓN -->
     <section
@@ -167,16 +123,9 @@
         data-seccion-contenido="consolidacion"
         hidden
     >
-
         <div class="gestiones-box">
-
-            <div
-                id="gestiones-consolidacion"
-                class="gestiones-tarjetas"
-            ></div>
-
+            <div id="gestiones-consolidacion" class="gestiones-tarjetas"></div>
         </div>
-
     </section>
 
     <!-- ACTIVOS -->
@@ -187,11 +136,7 @@
         hidden
     >
         <div class="tabla-contenedor">
-            <div
-                id="gestiones-activos"
-                class="tabla-scroll"
-            ></div>
+            <div id="gestiones-activos" class="tabla-scroll"></div>
         </div>
     </section>
-
 </section>

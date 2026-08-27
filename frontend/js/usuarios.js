@@ -61,57 +61,32 @@ let botonConfirmarRol = null;
 
 let idsRolPendiente = [];
 
-
 export async function iniciar({ usuario, contenedor }) {
     usuarioSesion = usuario;
 
-    tablaUsuarios = contenedor.querySelector(
-        "#tabla-usuarios"
-    );
+    tablaUsuarios = contenedor.querySelector("#tabla-usuarios");
 
-    estadoUsuarios = contenedor.querySelector(
-        "#estado-usuarios"
-    );
+    estadoUsuarios = contenedor.querySelector("#estado-usuarios");
 
-    mensajeUsuarios = contenedor.querySelector(
-        "#mensaje-usuarios"
-    );
+    mensajeUsuarios = contenedor.querySelector("#mensaje-usuarios");
 
-    textoMensajeUsuarios = contenedor.querySelector(
-        "#texto-mensaje-usuarios"
-    );
+    textoMensajeUsuarios = contenedor.querySelector("#texto-mensaje-usuarios");
 
-    botonNuevoUsuario = contenedor.querySelector(
-        "#boton-nuevo-usuario"
-    );
+    botonNuevoUsuario = contenedor.querySelector("#boton-nuevo-usuario");
 
-    filtroUsuarios = contenedor.querySelector(
-        "#filtro-usuarios"
-    );
+    filtroUsuarios = contenedor.querySelector("#filtro-usuarios");
 
-    filtroRol = contenedor.querySelector(
-        "#filtro-rol"
-    );
+    filtroRol = contenedor.querySelector("#filtro-rol");
 
-    filtroEstado = contenedor.querySelector(
-        "#filtro-estado"
-    );
+    filtroEstado = contenedor.querySelector("#filtro-estado");
 
-    barraSeleccion = contenedor.querySelector(
-        "#barra-seleccion"
-    );
+    barraSeleccion = contenedor.querySelector("#barra-seleccion");
 
-    barraSeleccionTexto = contenedor.querySelector(
-        "#barra-seleccion-texto"
-    );
+    barraSeleccionTexto = contenedor.querySelector("#barra-seleccion-texto");
 
-    botonRolMasivo = contenedor.querySelector(
-        "#boton-rol-masivo"
-    );
+    botonRolMasivo = contenedor.querySelector("#boton-rol-masivo");
 
-    botonActivarMasivo = contenedor.querySelector(
-        "#boton-activar-masivo"
-    );
+    botonActivarMasivo = contenedor.querySelector("#boton-activar-masivo");
 
     botonDesactivarMasivo = contenedor.querySelector(
         "#boton-desactivar-masivo"
@@ -121,29 +96,17 @@ export async function iniciar({ usuario, contenedor }) {
         "#boton-cancelar-seleccion"
     );
 
-    modalNuevoUsuario = contenedor.querySelector(
-        "#modal-nuevo-usuario"
-    );
+    modalNuevoUsuario = contenedor.querySelector("#modal-nuevo-usuario");
 
-    formularioNuevoUsuario = contenedor.querySelector(
-        "#form-nuevo-usuario"
-    );
+    formularioNuevoUsuario = contenedor.querySelector("#form-nuevo-usuario");
 
-    nuevoUsuarioNombre = contenedor.querySelector(
-        "#nuevo-usuario-nombre"
-    );
+    nuevoUsuarioNombre = contenedor.querySelector("#nuevo-usuario-nombre");
 
-    nuevoUsuarioCorreo = contenedor.querySelector(
-        "#nuevo-usuario-correo"
-    );
+    nuevoUsuarioCorreo = contenedor.querySelector("#nuevo-usuario-correo");
 
-    nuevoUsuarioRol = contenedor.querySelector(
-        "#nuevo-usuario-rol"
-    );
+    nuevoUsuarioRol = contenedor.querySelector("#nuevo-usuario-rol");
 
-    mensajeNuevoUsuario = contenedor.querySelector(
-        "#mensaje-nuevo-usuario"
-    );
+    mensajeNuevoUsuario = contenedor.querySelector("#mensaje-nuevo-usuario");
 
     textoMensajeNuevoUsuario = contenedor.querySelector(
         "#texto-mensaje-nuevo-usuario"
@@ -157,58 +120,33 @@ export async function iniciar({ usuario, contenedor }) {
         "#boton-guardar-nuevo-usuario"
     );
 
-    modalEstadoUsuario = contenedor.querySelector(
-        "#modal-estado-usuario"
-    );
+    modalEstadoUsuario = contenedor.querySelector("#modal-estado-usuario");
 
-    modalEstadoMensaje = contenedor.querySelector(
-        "#modal-estado-mensaje"
-    );
+    modalEstadoMensaje = contenedor.querySelector("#modal-estado-mensaje");
 
-    modalEstadoError = contenedor.querySelector(
-        "#modal-estado-error"
-    );
+    modalEstadoError = contenedor.querySelector("#modal-estado-error");
 
     textoModalEstadoError = contenedor.querySelector(
         "#texto-modal-estado-error"
     );
 
-    botonCancelarEstado = contenedor.querySelector(
-        "#boton-cancelar-estado"
-    );
+    botonCancelarEstado = contenedor.querySelector("#boton-cancelar-estado");
 
-    botonConfirmarEstado = contenedor.querySelector(
-        "#boton-confirmar-estado"
-    );
+    botonConfirmarEstado = contenedor.querySelector("#boton-confirmar-estado");
 
-    modalCambiarRol = contenedor.querySelector(
-        "#modal-cambiar-rol"
-    );
+    modalCambiarRol = contenedor.querySelector("#modal-cambiar-rol");
 
-    modalRolMensaje = contenedor.querySelector(
-        "#modal-rol-mensaje"
-    );
+    modalRolMensaje = contenedor.querySelector("#modal-rol-mensaje");
 
-    modalRolSelect = contenedor.querySelector(
-        "#modal-rol-select"
-    );
+    modalRolSelect = contenedor.querySelector("#modal-rol-select");
 
-    modalRolError = contenedor.querySelector(
-        "#modal-rol-error"
-    );
+    modalRolError = contenedor.querySelector("#modal-rol-error");
 
-    textoModalRolError = contenedor.querySelector(
-        "#texto-modal-rol-error"
-    );
+    textoModalRolError = contenedor.querySelector("#texto-modal-rol-error");
 
-    botonCancelarRol = contenedor.querySelector(
-        "#boton-cancelar-rol"
-    );
+    botonCancelarRol = contenedor.querySelector("#boton-cancelar-rol");
 
-    botonConfirmarRol = contenedor.querySelector(
-        "#boton-confirmar-rol"
-    );
-
+    botonConfirmarRol = contenedor.querySelector("#boton-confirmar-rol");
 
     configurarVista();
 
@@ -216,115 +154,63 @@ export async function iniciar({ usuario, contenedor }) {
 }
 
 function configurarVista() {
-    const esAdministrador =
-        usuarioSesion?.rol?.nombre === "Administrador";
+    const esAdministrador = usuarioSesion?.rol?.nombre === "Administrador";
 
     botonNuevoUsuario.hidden = !esAdministrador;
 
+    botonNuevoUsuario.addEventListener("click", abrirNuevoUsuario);
 
-    botonNuevoUsuario.addEventListener(
-        "click",
-        abrirNuevoUsuario
-    );
+    filtroUsuarios.addEventListener("input", aplicarFiltros);
 
+    filtroRol.addEventListener("change", aplicarFiltros);
 
-    filtroUsuarios.addEventListener(
-        "input",
-        aplicarFiltros
-    );
+    filtroEstado.addEventListener("change", aplicarFiltros);
 
-    filtroRol.addEventListener(
-        "change",
-        aplicarFiltros
-    );
-
-    filtroEstado.addEventListener(
-        "change",
-        aplicarFiltros
-    );
-
-
-    formularioNuevoUsuario.addEventListener(
-        "submit",
-        crearUsuario
-    );
+    formularioNuevoUsuario.addEventListener("submit", crearUsuario);
 
     botonCancelarNuevoUsuario.addEventListener(
         "click",
         cerrarModalNuevoUsuario
     );
 
-
     modalNuevoUsuario
         .querySelectorAll("[data-cerrar-nuevo-usuario]")
         .forEach((elemento) => {
-            elemento.addEventListener(
-                "click",
-                cerrarModalNuevoUsuario
-            );
+            elemento.addEventListener("click", cerrarModalNuevoUsuario);
         });
 
+    botonCancelarEstado.addEventListener("click", cerrarModalEstado);
 
-    botonCancelarEstado.addEventListener(
-        "click",
-        cerrarModalEstado
-    );
-
-    botonConfirmarEstado.addEventListener(
-        "click",
-        confirmarCambioEstado
-    );
-
+    botonConfirmarEstado.addEventListener("click", confirmarCambioEstado);
 
     modalEstadoUsuario
         .querySelectorAll("[data-cerrar-modal]")
         .forEach((elemento) => {
-            elemento.addEventListener(
-                "click",
-                cerrarModalEstado
-            );
+            elemento.addEventListener("click", cerrarModalEstado);
         });
 
+    botonCancelarRol.addEventListener("click", cerrarModalRol);
 
-    botonCancelarRol.addEventListener(
-        "click",
-        cerrarModalRol
-    );
-
-    botonConfirmarRol.addEventListener(
-        "click",
-        confirmarCambioRol
-    );
-
+    botonConfirmarRol.addEventListener("click", confirmarCambioRol);
 
     modalCambiarRol
         .querySelectorAll("[data-cerrar-modal-rol]")
         .forEach((elemento) => {
-            elemento.addEventListener(
-                "click",
-                cerrarModalRol
-            );
+            elemento.addEventListener("click", cerrarModalRol);
         });
 
+    botonCancelarSeleccion.addEventListener("click", cancelarSeleccion);
 
-    botonCancelarSeleccion.addEventListener(
-        "click",
-        cancelarSeleccion
+    botonRolMasivo.addEventListener("click", () =>
+        abrirModalRol([...usuariosSeleccionados])
     );
 
-    botonRolMasivo.addEventListener(
-        "click",
-        () => abrirModalRol([...usuariosSeleccionados])
+    botonActivarMasivo.addEventListener("click", () =>
+        abrirModalEstado([...usuariosSeleccionados], true)
     );
 
-    botonActivarMasivo.addEventListener(
-        "click",
-        () => abrirModalEstado([...usuariosSeleccionados], true)
-    );
-
-    botonDesactivarMasivo.addEventListener(
-        "click",
-        () => abrirModalEstado([...usuariosSeleccionados], false)
+    botonDesactivarMasivo.addEventListener("click", () =>
+        abrirModalEstado([...usuariosSeleccionados], false)
     );
 }
 
@@ -333,52 +219,32 @@ async function cargarUsuarios() {
     mostrarCarga();
 
     try {
-        const respuesta = await fetch(
-            "/usuarios",
-            {
-                method: "GET",
-                credentials: "include"
-            }
-        );
+        const respuesta = await fetch("/usuarios", {
+            method: "GET",
+            credentials: "include",
+        });
 
         if (!respuesta.ok) {
-            throw new Error(
-                await mensajeDeError(respuesta)
-            );
+            throw new Error(await mensajeDeError(respuesta));
         }
 
         usuarios = await respuesta.json();
 
         cargarOpcionesRol();
         aplicarFiltros();
-
     } catch (error) {
-        mostrarError(
-            error.message ||
-            "No se pudieron cargar los usuarios."
-        );
-
+        mostrarError(error.message || "No se pudieron cargar los usuarios.");
     } finally {
         ocultarCarga();
     }
 }
 
-
 function cargarOpcionesRol() {
     const roles = [
         ...new Map(
-            usuarios.map((usuario) => [
-                usuario.rol.id,
-                usuario.rol
-            ])
-        ).values()
-    ].sort(
-        (a, b) =>
-            a.nombre.localeCompare(
-                b.nombre,
-                "es"
-            )
-    );
+            usuarios.map((usuario) => [usuario.rol.id, usuario.rol])
+        ).values(),
+    ].sort((a, b) => a.nombre.localeCompare(b.nombre, "es"));
 
     const valorActual = filtroRol.value;
 
@@ -387,106 +253,72 @@ function cargarOpcionesRol() {
             Todos
         </option>
 
-        ${roles.map((rol) => `
+        ${roles
+            .map(
+                (rol) => `
             <option value="${rol.id}">
                 ${escaparHtml(rol.nombre)}
             </option>
-        `).join("")}
+        `
+            )
+            .join("")}
     `;
 
-    const existeValor = roles.some(
-        (rol) =>
-            String(rol.id) === valorActual
-    );
+    const existeValor = roles.some((rol) => String(rol.id) === valorActual);
 
-    filtroRol.value = existeValor
-        ? valorActual
-        : "";
+    filtroRol.value = existeValor ? valorActual : "";
 }
 
-
 function aplicarFiltros() {
-    const busqueda =
-        filtroUsuarios.value
-            .trim()
-            .toLocaleLowerCase("es-MX");
+    const busqueda = filtroUsuarios.value.trim().toLocaleLowerCase("es-MX");
 
-    const rolSeleccionado =
-        filtroRol.value;
+    const rolSeleccionado = filtroRol.value;
 
-    const estadoSeleccionado =
-        filtroEstado.value;
+    const estadoSeleccionado = filtroEstado.value;
 
-    const usuariosFiltrados =
-        usuarios.filter((usuario) => {
+    const usuariosFiltrados = usuarios.filter((usuario) => {
+        const coincideBusqueda =
+            !busqueda ||
+            usuario.nombre.toLocaleLowerCase("es-MX").includes(busqueda) ||
+            usuario.correo.toLocaleLowerCase("es-MX").includes(busqueda);
 
-            const coincideBusqueda =
-                !busqueda ||
-                usuario.nombre
-                    .toLocaleLowerCase("es-MX")
-                    .includes(busqueda) ||
-                usuario.correo
-                    .toLocaleLowerCase("es-MX")
-                    .includes(busqueda);
+        const coincideRol =
+            !rolSeleccionado || String(usuario.rol.id) === rolSeleccionado;
 
-            const coincideRol =
-                !rolSeleccionado ||
-                String(usuario.rol.id) === rolSeleccionado;
+        const coincideEstado =
+            !estadoSeleccionado ||
+            (estadoSeleccionado === "activo" && usuario.activo) ||
+            (estadoSeleccionado === "inactivo" && !usuario.activo);
 
-            const coincideEstado =
-                !estadoSeleccionado ||
-                (
-                    estadoSeleccionado === "activo" &&
-                    usuario.activo
-                ) ||
-                (
-                    estadoSeleccionado === "inactivo" &&
-                    !usuario.activo
-                );
-
-            return (
-                coincideBusqueda &&
-                coincideRol &&
-                coincideEstado
-            );
-        });
+        return coincideBusqueda && coincideRol && coincideEstado;
+    });
 
     renderizarUsuarios(usuariosFiltrados);
 }
 
-
 function permisosFila(usuario) {
-    const esAdministrador =
-        usuarioSesion?.rol?.nombre === "Administrador";
+    const esAdministrador = usuarioSesion?.rol?.nombre === "Administrador";
 
-    const esSupervisor =
-        usuarioSesion?.rol?.nombre === "Supervisor";
+    const esSupervisor = usuarioSesion?.rol?.nombre === "Supervisor";
 
-    const esUsuarioAdministrador =
-        usuario.rol.nombre === "Administrador";
+    const esUsuarioAdministrador = usuario.rol.nombre === "Administrador";
 
-    const esUnoMismo =
-        usuario.id === usuarioSesion?.id;
+    const esUnoMismo = usuario.id === usuarioSesion?.id;
 
     return {
         puedeCambiarRol:
-            esAdministrador &&
-            (!esUsuarioAdministrador || esUnoMismo),
+            esAdministrador && (!esUsuarioAdministrador || esUnoMismo),
 
         puedeCambiarEstado:
-            (esAdministrador || esSupervisor) &&
-            !esUsuarioAdministrador
+            (esAdministrador || esSupervisor) && !esUsuarioAdministrador,
     };
 }
 
-
 function usuarioEsSeleccionable(usuario) {
-    const { puedeCambiarRol, puedeCambiarEstado } =
-        permisosFila(usuario);
+    const { puedeCambiarRol, puedeCambiarEstado } = permisosFila(usuario);
 
     return puedeCambiarRol || puedeCambiarEstado;
 }
-
 
 function renderizarUsuarios(usuariosFiltrados) {
     usuariosFiltradosActuales = usuariosFiltrados;
@@ -543,26 +375,18 @@ function renderizarUsuarios(usuariosFiltrados) {
     actualizarBarraAcciones();
 }
 
-
 function crearFilaUsuario(usuario) {
-    const estado = usuario.activo
-        ? "Activo"
-        : "Inactivo";
+    const estado = usuario.activo ? "Activo" : "Inactivo";
 
     const claseEstado = usuario.activo
         ? "tabla__estado--activo"
         : "tabla__estado--inactivo";
 
-    const firma = usuario.firma
-        ? "Sí"
-        : "No";
+    const firma = usuario.firma ? "Sí" : "No";
 
-    const { puedeCambiarRol, puedeCambiarEstado } =
-        permisosFila(usuario);
+    const { puedeCambiarRol, puedeCambiarEstado } = permisosFila(usuario);
 
-    const accionEstado = usuario.activo
-        ? "Desactivar"
-        : "Activar";
+    const accionEstado = usuario.activo ? "Desactivar" : "Activar";
 
     const botones = [];
 
@@ -653,47 +477,30 @@ function crearFilaUsuario(usuario) {
     `;
 }
 
-
 function configurarAcciones() {
-    checkboxTodos = tablaUsuarios.querySelector(
-        "#checkbox-todos"
-    );
+    checkboxTodos = tablaUsuarios.querySelector("#checkbox-todos");
 
     if (checkboxTodos) {
-        checkboxTodos.addEventListener(
-            "change",
-            manejarCheckboxTodos
-        );
+        checkboxTodos.addEventListener("change", manejarCheckboxTodos);
     }
 
-    tablaUsuarios
-        .querySelectorAll("[data-accion]")
-        .forEach((boton) => {
-            boton.addEventListener(
-                "click",
-                manejarAccion
-            );
-        });
+    tablaUsuarios.querySelectorAll("[data-accion]").forEach((boton) => {
+        boton.addEventListener("click", manejarAccion);
+    });
 
     tablaUsuarios
         .querySelectorAll("[data-checkbox-usuario]")
         .forEach((checkbox) => {
-            checkbox.addEventListener(
-                "change",
-                manejarCheckboxUsuario
-            );
+            checkbox.addEventListener("change", manejarCheckboxUsuario);
         });
 
     actualizarCheckboxTodos();
 }
 
-
 function manejarAccion(event) {
     const boton = event.currentTarget;
     const accion = boton.dataset.accion;
-    const idUsuario = Number(
-        boton.dataset.id
-    );
+    const idUsuario = Number(boton.dataset.id);
 
     if (accion === "rol") {
         abrirModalRol([idUsuario]);
@@ -701,20 +508,13 @@ function manejarAccion(event) {
     }
 
     if (accion === "estado") {
-        const activo =
-            boton.dataset.activo === "true";
+        const activo = boton.dataset.activo === "true";
 
-        const nombre =
-            boton.dataset.nombre;
+        const nombre = boton.dataset.nombre;
 
-        abrirModalEstado(
-            [idUsuario],
-            !activo,
-            nombre
-        );
+        abrirModalEstado([idUsuario], !activo, nombre);
     }
 }
-
 
 function manejarCheckboxUsuario(event) {
     const checkbox = event.currentTarget;
@@ -729,7 +529,6 @@ function manejarCheckboxUsuario(event) {
     actualizarCheckboxTodos();
     actualizarBarraAcciones();
 }
-
 
 function manejarCheckboxTodos(event) {
     const marcar = event.currentTarget.checked;
@@ -747,14 +546,14 @@ function manejarCheckboxTodos(event) {
     renderizarUsuarios(usuariosFiltradosActuales);
 }
 
-
 function actualizarCheckboxTodos() {
     if (!checkboxTodos) {
         return;
     }
 
-    const seleccionables =
-        usuariosFiltradosActuales.filter(usuarioEsSeleccionable);
+    const seleccionables = usuariosFiltradosActuales.filter(
+        usuarioEsSeleccionable
+    );
 
     if (seleccionables.length === 0) {
         checkboxTodos.checked = false;
@@ -766,8 +565,8 @@ function actualizarCheckboxTodos() {
 
     checkboxTodos.disabled = false;
 
-    const seleccionadosVisibles = seleccionables.filter(
-        (usuario) => usuariosSeleccionados.has(usuario.id)
+    const seleccionadosVisibles = seleccionables.filter((usuario) =>
+        usuariosSeleccionados.has(usuario.id)
     );
 
     checkboxTodos.checked =
@@ -777,7 +576,6 @@ function actualizarCheckboxTodos() {
         seleccionadosVisibles.length > 0 &&
         seleccionadosVisibles.length < seleccionables.length;
 }
-
 
 function actualizarBarraAcciones() {
     const cantidad = usuariosSeleccionados.size;
@@ -793,24 +591,20 @@ function actualizarBarraAcciones() {
             ? "1 usuario seleccionado"
             : `${cantidad} usuarios seleccionados`;
 
-    const esAdministrador =
-        usuarioSesion?.rol?.nombre === "Administrador";
+    const esAdministrador = usuarioSesion?.rol?.nombre === "Administrador";
 
-    const esSupervisor =
-        usuarioSesion?.rol?.nombre === "Supervisor";
+    const esSupervisor = usuarioSesion?.rol?.nombre === "Supervisor";
 
     botonRolMasivo.hidden = !esAdministrador;
     botonActivarMasivo.hidden = !(esAdministrador || esSupervisor);
     botonDesactivarMasivo.hidden = !(esAdministrador || esSupervisor);
 }
 
-
 function cancelarSeleccion() {
     usuariosSeleccionados.clear();
 
     renderizarUsuarios(usuariosFiltradosActuales);
 }
-
 
 async function abrirNuevoUsuario() {
     ocultarErrorNuevoUsuario();
@@ -835,33 +629,25 @@ async function abrirNuevoUsuario() {
         nuevoUsuarioRol.disabled = false;
 
         nuevoUsuarioRol.focus();
-
     } catch (error) {
         mostrarErrorNuevoUsuario(
-            error.message ||
-            "No se pudieron cargar los roles."
+            error.message || "No se pudieron cargar los roles."
         );
     }
 }
-
 
 async function obtenerCatalogoRoles() {
     if (rolesCatalogo) {
         return rolesCatalogo;
     }
 
-    const respuesta = await fetch(
-        "/roles/",
-        {
-            method: "GET",
-            credentials: "include"
-        }
-    );
+    const respuesta = await fetch("/roles/", {
+        method: "GET",
+        credentials: "include",
+    });
 
     if (!respuesta.ok) {
-        throw new Error(
-            await mensajeDeError(respuesta)
-        );
+        throw new Error(await mensajeDeError(respuesta));
     }
 
     rolesCatalogo = await respuesta.json();
@@ -869,23 +655,29 @@ async function obtenerCatalogoRoles() {
     return rolesCatalogo;
 }
 
-
 function poblarSelectRoles(select, roles, incluirPlaceholder = true) {
     select.innerHTML = `
-        ${incluirPlaceholder ? `
+        ${
+            incluirPlaceholder
+                ? `
             <option value="">
                 Selecciona un rol
             </option>
-        ` : ""}
+        `
+                : ""
+        }
 
-        ${roles.map((rol) => `
+        ${roles
+            .map(
+                (rol) => `
             <option value="${rol.id}">
                 ${escaparHtml(rol.nombre)}
             </option>
-        `).join("")}
+        `
+            )
+            .join("")}
     `;
 }
-
 
 function cerrarModalNuevoUsuario() {
     modalNuevoUsuario.hidden = true;
@@ -895,101 +687,75 @@ function cerrarModalNuevoUsuario() {
     ocultarErrorNuevoUsuario();
 }
 
-
 async function crearUsuario(event) {
     event.preventDefault();
 
     ocultarErrorNuevoUsuario();
 
-    const nombre =
-        nuevoUsuarioNombre.value.trim();
+    const nombre = nuevoUsuarioNombre.value.trim();
 
-    const correo =
-        nuevoUsuarioCorreo.value.trim();
+    const correo = nuevoUsuarioCorreo.value.trim();
 
-    const idRol =
-        nuevoUsuarioRol.value;
-
+    const idRol = nuevoUsuarioRol.value;
 
     if (!nombre) {
-        mostrarErrorNuevoUsuario(
-            "Ingresa el nombre completo."
-        );
+        mostrarErrorNuevoUsuario("Ingresa el nombre completo.");
 
         nuevoUsuarioNombre.focus();
 
         return;
     }
 
-
     if (!correo) {
-        mostrarErrorNuevoUsuario(
-            "Ingresa el correo."
-        );
+        mostrarErrorNuevoUsuario("Ingresa el correo.");
 
         nuevoUsuarioCorreo.focus();
 
         return;
     }
 
-
     if (!idRol) {
-        mostrarErrorNuevoUsuario(
-            "Selecciona un rol."
-        );
+        mostrarErrorNuevoUsuario("Selecciona un rol.");
 
         nuevoUsuarioRol.focus();
 
         return;
     }
 
-
     setCargandoNuevoUsuario(true);
 
-
     try {
-        const respuesta = await fetch(
-            "/usuarios",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                credentials: "include",
-                body: JSON.stringify({
-                    nombre,
-                    correo,
-                    id_rol: Number(idRol),
-                    activo: true
-                })
-            }
-        );
-
+        const respuesta = await fetch("/usuarios", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({
+                nombre,
+                correo,
+                id_rol: Number(idRol),
+                activo: true,
+            }),
+        });
 
         if (!respuesta.ok) {
-            mostrarErrorNuevoUsuario(
-                await mensajeDeError(respuesta)
-            );
+            mostrarErrorNuevoUsuario(await mensajeDeError(respuesta));
 
             return;
         }
 
-
         cerrarModalNuevoUsuario();
 
         await cargarUsuarios();
-
-
     } catch {
         mostrarErrorNuevoUsuario(
             "No se pudo contactar al servidor. Intenta de nuevo."
         );
-
     } finally {
         setCargandoNuevoUsuario(false);
     }
 }
-
 
 function setCargandoNuevoUsuario(cargando) {
     botonGuardarNuevoUsuario.disabled = cargando;
@@ -999,24 +765,20 @@ function setCargandoNuevoUsuario(cargando) {
     nuevoUsuarioCorreo.disabled = cargando;
     nuevoUsuarioRol.disabled = cargando;
 
-    botonGuardarNuevoUsuario.textContent =
-        cargando
-            ? "Creando..."
-            : "Crear usuario";
+    botonGuardarNuevoUsuario.textContent = cargando
+        ? "Creando..."
+        : "Crear usuario";
 }
-
 
 function mostrarErrorNuevoUsuario(mensaje) {
     textoMensajeNuevoUsuario.textContent = mensaje;
     mensajeNuevoUsuario.hidden = false;
 }
 
-
 function ocultarErrorNuevoUsuario() {
     textoMensajeNuevoUsuario.textContent = "";
     mensajeNuevoUsuario.hidden = true;
 }
-
 
 function abrirModalRol(ids) {
     idsRolPendiente = ids;
@@ -1041,7 +803,6 @@ function abrirModalRol(ids) {
     cargarRolesModal(ids);
 }
 
-
 async function cargarRolesModal(ids) {
     try {
         const roles = await obtenerCatalogoRoles();
@@ -1049,9 +810,7 @@ async function cargarRolesModal(ids) {
         poblarSelectRoles(modalRolSelect, roles, true);
 
         if (ids.length === 1) {
-            const usuario = usuarios.find(
-                (usuario) => usuario.id === ids[0]
-            );
+            const usuario = usuarios.find((usuario) => usuario.id === ids[0]);
 
             if (usuario) {
                 modalRolSelect.value = String(usuario.rol.id);
@@ -1061,15 +820,12 @@ async function cargarRolesModal(ids) {
         modalRolSelect.disabled = false;
 
         modalRolSelect.focus();
-
     } catch (error) {
         mostrarErrorModalRol(
-            error.message ||
-            "No se pudieron cargar los roles."
+            error.message || "No se pudieron cargar los roles."
         );
     }
 }
-
 
 function cerrarModalRol() {
     idsRolPendiente = [];
@@ -1079,7 +835,6 @@ function cerrarModalRol() {
     modalCambiarRol.hidden = true;
 }
 
-
 async function confirmarCambioRol() {
     if (idsRolPendiente.length === 0) {
         return;
@@ -1088,9 +843,7 @@ async function confirmarCambioRol() {
     const idRol = modalRolSelect.value;
 
     if (!idRol) {
-        mostrarErrorModalRol(
-            "Selecciona un rol."
-        );
+        mostrarErrorModalRol("Selecciona un rol.");
 
         return;
     }
@@ -1101,39 +854,32 @@ async function confirmarCambioRol() {
     botonCancelarRol.disabled = true;
 
     try {
-        const respuesta = idsRolPendiente.length === 1
-            ? await fetch(
-                `/usuarios/${idsRolPendiente[0]}`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        id_rol: Number(idRol)
-                    })
-                }
-            )
-            : await fetch(
-                "/usuarios/rol-masivo",
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        ids: idsRolPendiente,
-                        id_rol: Number(idRol)
-                    })
-                }
-            );
+        const respuesta =
+            idsRolPendiente.length === 1
+                ? await fetch(`/usuarios/${idsRolPendiente[0]}`, {
+                      method: "PATCH",
+                      headers: {
+                          "Content-Type": "application/json",
+                      },
+                      credentials: "include",
+                      body: JSON.stringify({
+                          id_rol: Number(idRol),
+                      }),
+                  })
+                : await fetch("/usuarios/rol-masivo", {
+                      method: "PATCH",
+                      headers: {
+                          "Content-Type": "application/json",
+                      },
+                      credentials: "include",
+                      body: JSON.stringify({
+                          ids: idsRolPendiente,
+                          id_rol: Number(idRol),
+                      }),
+                  });
 
         if (!respuesta.ok) {
-            mostrarErrorModalRol(
-                await mensajeDeError(respuesta)
-            );
+            mostrarErrorModalRol(await mensajeDeError(respuesta));
 
             return;
         }
@@ -1143,48 +889,38 @@ async function confirmarCambioRol() {
         cerrarModalRol();
 
         await cargarUsuarios();
-
     } catch {
         mostrarErrorModalRol(
             "No se pudo contactar al servidor. Intenta de nuevo."
         );
-
     } finally {
         botonConfirmarRol.disabled = false;
         botonCancelarRol.disabled = false;
     }
 }
 
-
 function mostrarErrorModalRol(mensaje) {
     textoModalRolError.textContent = mensaje;
     modalRolError.hidden = false;
 }
-
 
 function ocultarErrorModalRol() {
     textoModalRolError.textContent = "";
     modalRolError.hidden = true;
 }
 
-
 function abrirModalEstado(ids, activoDestino, nombre = null) {
     idsEstadoPendiente = ids;
     activoDestinoPendiente = activoDestino;
 
-    const accionTexto = activoDestino
-        ? "activar"
-        : "desactivar";
+    const accionTexto = activoDestino ? "activar" : "desactivar";
 
     modalEstadoMensaje.textContent =
         ids.length === 1
             ? `¿Estás seguro de que deseas ${accionTexto} al usuario "${nombre}"?`
             : `¿Estás seguro de que deseas ${accionTexto} a los ${ids.length} usuarios seleccionados?`;
 
-    botonConfirmarEstado.textContent =
-        activoDestino
-            ? "Activar"
-            : "Desactivar";
+    botonConfirmarEstado.textContent = activoDestino ? "Activar" : "Desactivar";
 
     ocultarErrorModal();
 
@@ -1192,7 +928,6 @@ function abrirModalEstado(ids, activoDestino, nombre = null) {
 
     botonConfirmarEstado.focus();
 }
-
 
 function cerrarModalEstado() {
     idsEstadoPendiente = [];
@@ -1202,7 +937,6 @@ function cerrarModalEstado() {
 
     modalEstadoUsuario.hidden = true;
 }
-
 
 async function confirmarCambioEstado() {
     if (idsEstadoPendiente.length === 0) {
@@ -1218,39 +952,32 @@ async function confirmarCambioEstado() {
     botonCancelarEstado.disabled = true;
 
     try {
-        const respuesta = ids.length === 1
-            ? await fetch(
-                `/usuarios/${ids[0]}/estado`,
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        activo
-                    })
-                }
-            )
-            : await fetch(
-                "/usuarios/estado-masivo",
-                {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    credentials: "include",
-                    body: JSON.stringify({
-                        ids,
-                        activo
-                    })
-                }
-            );
+        const respuesta =
+            ids.length === 1
+                ? await fetch(`/usuarios/${ids[0]}/estado`, {
+                      method: "PATCH",
+                      headers: {
+                          "Content-Type": "application/json",
+                      },
+                      credentials: "include",
+                      body: JSON.stringify({
+                          activo,
+                      }),
+                  })
+                : await fetch("/usuarios/estado-masivo", {
+                      method: "PATCH",
+                      headers: {
+                          "Content-Type": "application/json",
+                      },
+                      credentials: "include",
+                      body: JSON.stringify({
+                          ids,
+                          activo,
+                      }),
+                  });
 
         if (!respuesta.ok) {
-            mostrarErrorModal(
-                await mensajeDeError(respuesta)
-            );
+            mostrarErrorModal(await mensajeDeError(respuesta));
 
             return;
         }
@@ -1260,12 +987,10 @@ async function confirmarCambioEstado() {
         cerrarModalEstado();
 
         await cargarUsuarios();
-
     } catch {
         mostrarErrorModal(
             "No se pudo contactar al servidor. Intenta de nuevo."
         );
-
     } finally {
         botonConfirmarEstado.disabled = false;
         botonCancelarEstado.disabled = false;
@@ -1276,35 +1001,29 @@ function mostrarCarga() {
     estadoUsuarios.hidden = false;
 }
 
-
 function ocultarCarga() {
     estadoUsuarios.hidden = true;
 }
-
 
 function mostrarError(mensaje) {
     textoMensajeUsuarios.textContent = mensaje;
     mensajeUsuarios.hidden = false;
 }
 
-
 function ocultarMensaje() {
     textoMensajeUsuarios.textContent = "";
     mensajeUsuarios.hidden = true;
 }
-
 
 function mostrarErrorModal(mensaje) {
     textoModalEstadoError.textContent = mensaje;
     modalEstadoError.hidden = false;
 }
 
-
 function ocultarErrorModal() {
     textoModalEstadoError.textContent = "";
     modalEstadoError.hidden = true;
 }
-
 
 async function mensajeDeError(respuesta) {
     try {
@@ -1313,40 +1032,31 @@ async function mensajeDeError(respuesta) {
         if (cuerpo.detail) {
             return cuerpo.detail;
         }
-
-    } catch {
-    }
-
+    } catch {}
 
     if (respuesta.status === 400) {
         return "La información proporcionada no es válida.";
     }
 
-
     if (respuesta.status === 401) {
         return "La sesión no es válida.";
     }
-
 
     if (respuesta.status === 403) {
         return "No tienes autorización para realizar esta acción.";
     }
 
-
     if (respuesta.status === 404) {
         return "No se encontró el recurso solicitado.";
     }
-
 
     if (respuesta.status === 409) {
         return "No se pudo completar la operación debido a una regla de negocio.";
     }
 
-
     if (respuesta.status === 500) {
         return "Ocurrió un error interno del servidor.";
     }
-
 
     return "No se pudo completar la solicitud.";
 }

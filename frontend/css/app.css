@@ -37,7 +37,6 @@ textarea {
     background: var(--ink-950);
 }
 
-
 /* ─────────────────────────────────────────────
    BARRA LATERAL
    ───────────────────────────────────────────── */
@@ -50,7 +49,6 @@ textarea {
     background: var(--ink-900);
     border-right: 1px solid var(--ink-700);
 }
-
 
 /* Marca */
 
@@ -76,7 +74,6 @@ textarea {
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
-
 
 /* Usuario */
 
@@ -104,7 +101,6 @@ textarea {
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }
-
 
 /* Navegación */
 
@@ -134,7 +130,6 @@ textarea {
 .navegacion::-webkit-scrollbar-thumb:hover {
     background: var(--ink-800);
 }
-
 
 /* Elementos de navegación */
 
@@ -181,14 +176,12 @@ textarea {
     font-size: 14px;
 }
 
-
 /* Cerrar sesión */
 
 .barra-lateral__pie {
     padding: 12px;
     border-top: 1px solid var(--ink-700);
 }
-
 
 /* ─────────────────────────────────────────────
    CONTENIDO
@@ -232,7 +225,6 @@ textarea {
     background: var(--ink-800);
 }
 
-
 /* ─────────────────────────────────────────────
    ESTADOS GLOBALES
    ───────────────────────────────────────────── */
@@ -261,13 +253,11 @@ textarea {
     box-shadow: var(--shadow-card);
 }
 
-
 /* ─────────────────────────────────────────────
    RESPONSIVE
    ───────────────────────────────────────────── */
 
 @media (max-width: 900px) {
-
     .app {
         grid-template-columns: 210px minmax(0, 1fr);
     }
@@ -277,9 +267,7 @@ textarea {
     }
 }
 
-
 @media (max-width: 720px) {
-
     body {
         overflow: auto;
     }
@@ -342,9 +330,7 @@ textarea {
     }
 }
 
-
 @media (max-width: 520px) {
-
     .contenido__principal {
         padding: 18px;
     }

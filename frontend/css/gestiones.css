@@ -24,7 +24,6 @@
     margin: 6px 0 0;
 }
 
-
 /* ─────────────────────────────────────────────
    NAVEGACIÓN
    ───────────────────────────────────────────── */
@@ -84,7 +83,6 @@
     outline-offset: -2px;
 }
 
-
 /* ─────────────────────────────────────────────
    CONTADORES
    ───────────────────────────────────────────── */
@@ -117,7 +115,6 @@
     border-color: var(--gold-500);
     color: var(--ink-950);
 }
-
 
 /* ─────────────────────────────────────────────
    FILTRO DE GESTIONES
@@ -175,7 +172,6 @@
     outline-offset: 1px;
 }
 
-
 /* ─────────────────────────────────────────────
    SECCIONES
    ───────────────────────────────────────────── */
@@ -186,7 +182,6 @@
     width: 100%;
     min-height: 0;
 }
-
 
 /* ─────────────────────────────────────────────
    BOX DE GESTIONES
@@ -203,7 +198,6 @@
 
     overflow: hidden;
 }
-
 
 /* ─────────────────────────────────────────────
    CONTENEDOR DE TARJETAS
@@ -224,9 +218,7 @@
     overflow-x: hidden;
 
     scrollbar-width: thin;
-    scrollbar-color:
-        var(--ink-700)
-        transparent;
+    scrollbar-color: var(--ink-700) transparent;
 }
 
 .gestiones-tarjetas::-webkit-scrollbar {
@@ -245,7 +237,6 @@
 .gestiones-tarjetas::-webkit-scrollbar-thumb:hover {
     background: var(--ink-800);
 }
-
 
 /* ─────────────────────────────────────────────
    TARJETA DE GESTIÓN
@@ -276,7 +267,6 @@
     background: var(--ink-850);
 }
 
-
 /* ─────────────────────────────────────────────
    ENCABEZADO
    ───────────────────────────────────────────── */
@@ -290,7 +280,6 @@
 
     border-bottom: 1px solid var(--ink-700);
 }
-
 
 /* ─────────────────────────────────────────────
    INFORMACIÓN DEL CLIENTE
@@ -311,7 +300,6 @@
     text-overflow: ellipsis;
 }
 
-
 .gestion-card__interlocutor {
     display: block;
 
@@ -324,7 +312,6 @@
     font-weight: 500;
     letter-spacing: 0.04em;
 }
-
 
 /* ─────────────────────────────────────────────
    FOLIO + BOTÓN
@@ -341,7 +328,6 @@
     color: var(--text-500);
 }
 
-
 .gestion-card__acciones {
     display: flex;
     justify-content: flex-end;
@@ -350,7 +336,6 @@
 
     border: none;
 }
-
 
 .gestion-card__boton {
     width: auto;
@@ -361,7 +346,6 @@
     font-size: 13px;
 }
 
-
 /* ─────────────────────────────────────────────
    DATOS DE TARJETA
    ───────────────────────────────────────────── */
@@ -369,14 +353,12 @@
 .gestion-card__datos {
     display: grid;
 
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 
     gap: 1px;
 
     background: var(--ink-700);
 }
-
 
 .gestion-card__dato {
     display: flex;
@@ -391,7 +373,6 @@
 
     background: var(--ink-900);
 }
-
 
 .gestion-card__dato .u-cuerpo {
     overflow: hidden;
@@ -424,7 +405,6 @@
     margin: 0;
 }
 
-
 /* ─────────────────────────────────────────────
    ACTIVOS
    ───────────────────────────────────────────── */
@@ -452,36 +432,36 @@
     overflow: auto;
 
     scrollbar-width: thin;
-    scrollbar-color:
-        var(--ink-700)
-        transparent;
+    scrollbar-color: var(--ink-700) transparent;
 }
 
-.seccion-gestiones[data-seccion-contenido="activos"] .tabla-scroll::-webkit-scrollbar {
+.seccion-gestiones[data-seccion-contenido="activos"]
+    .tabla-scroll::-webkit-scrollbar {
     width: 7px;
     height: 7px;
 }
 
-.seccion-gestiones[data-seccion-contenido="activos"] .tabla-scroll::-webkit-scrollbar-track {
+.seccion-gestiones[data-seccion-contenido="activos"]
+    .tabla-scroll::-webkit-scrollbar-track {
     background: transparent;
 }
 
-.seccion-gestiones[data-seccion-contenido="activos"] .tabla-scroll::-webkit-scrollbar-thumb {
+.seccion-gestiones[data-seccion-contenido="activos"]
+    .tabla-scroll::-webkit-scrollbar-thumb {
     background: var(--ink-700);
     border-radius: 10px;
 }
 
-.seccion-gestiones[data-seccion-contenido="activos"] .tabla-scroll::-webkit-scrollbar-thumb:hover {
+.seccion-gestiones[data-seccion-contenido="activos"]
+    .tabla-scroll::-webkit-scrollbar-thumb:hover {
     background: var(--ink-800);
 }
-
 
 /* ─────────────────────────────────────────────
    RESPONSIVE
    ───────────────────────────────────────────── */
 
 @media (max-width: 900px) {
-
     .gestion-card__datos {
         grid-template-columns: 1fr 1fr;
     }
@@ -491,9 +471,7 @@
     }
 }
 
-
 @media (max-width: 720px) {
-
     .vista-gestiones__navegacion {
         overflow-x: auto;
         scrollbar-width: none;
@@ -519,9 +497,7 @@
     }
 }
 
-
 @media (max-width: 520px) {
-
     .gestion-card__encabezado {
         padding: 16px;
     }

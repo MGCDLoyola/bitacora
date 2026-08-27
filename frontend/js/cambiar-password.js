@@ -12,131 +12,88 @@ const textoError = document.getElementById("texto-error");
 
 const fecha = document.getElementById("fecha");
 
-
 /*
  * Estado inicial
  */
 
 ocultarError();
 
-fecha.textContent = new Date().toLocaleDateString(
-    "es-MX",
-    {
-        day: "2-digit",
-        month: "long",
-        year: "numeric"
-    }
-);
-
+fecha.textContent = new Date().toLocaleDateString("es-MX", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+});
 
 /*
  * Mostrar / ocultar contraseña
  */
 
-document
-    .querySelectorAll("[data-toggle-password]")
-    .forEach((botonAlternar) => {
+document.querySelectorAll("[data-toggle-password]").forEach((botonAlternar) => {
+    botonAlternar.addEventListener("click", () => {
+        const id = botonAlternar.dataset.togglePassword;
+        const input = document.getElementById(id);
 
-        botonAlternar.addEventListener("click", () => {
+        if (input.type === "password") {
+            input.type = "text";
 
-            const id = botonAlternar.dataset.togglePassword;
-            const input = document.getElementById(id);
+            botonAlternar.setAttribute("aria-label", "Ocultar contraseña");
+        } else {
+            input.type = "password";
 
-            if (input.type === "password") {
-
-                input.type = "text";
-
-                botonAlternar.setAttribute(
-                    "aria-label",
-                    "Ocultar contraseña"
-                );
-
-            } else {
-
-                input.type = "password";
-
-                botonAlternar.setAttribute(
-                    "aria-label",
-                    "Mostrar contraseña"
-                );
-            }
-        });
-
+            botonAlternar.setAttribute("aria-label", "Mostrar contraseña");
+        }
     });
-
+});
 
 /*
  * Cambio de contraseña
  */
 
-formulario.addEventListener(
-    "submit",
-    cambiarPassword
-);
-
+formulario.addEventListener("submit", cambiarPassword);
 
 async function cambiarPassword(event) {
-
     event.preventDefault();
 
     ocultarError();
 
-
     const nueva = passwordNueva.value.trim();
     const confirmar = passwordConfirmar.value.trim();
-
 
     /*
      * Validaciones
      */
 
     if (!nueva) {
-
-        mostrarError(
-            "Ingresa una nueva contraseña."
-        );
+        mostrarError("Ingresa una nueva contraseña.");
 
         passwordNueva.focus();
 
         return;
     }
-
 
     if (nueva.length < 8) {
-
-        mostrarError(
-            "La nueva contraseña debe tener al menos 8 caracteres."
-        );
+        mostrarError("La nueva contraseña debe tener al menos 8 caracteres.");
 
         passwordNueva.focus();
 
         return;
     }
 
-
     if (!confirmar) {
-
-        mostrarError(
-            "Confirma tu nueva contraseña."
-        );
+        mostrarError("Confirma tu nueva contraseña.");
 
         passwordConfirmar.focus();
 
         return;
     }
-
 
     if (nueva !== confirmar) {
-
-        mostrarError(
-            "Las contraseñas no coinciden."
-        );
+        mostrarError("Las contraseñas no coinciden.");
 
         passwordConfirmar.focus();
 
         return;
     }
-
 
     /*
      * Envío
@@ -144,36 +101,26 @@ async function cambiarPassword(event) {
 
     setCargando(true);
 
-
     try {
+        const respuesta = await fetch("/auth/cambiar-password", {
+            method: "POST",
 
-        const respuesta = await fetch(
-            "/auth/cambiar-password",
-            {
-                method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            credentials: "include",
 
-                credentials: "include",
-
-                body: JSON.stringify({
-                    password_nueva: nueva
-                })
-            }
-        );
-
+            body: JSON.stringify({
+                password_nueva: nueva,
+            }),
+        });
 
         if (!respuesta.ok) {
-
-            mostrarError(
-                await obtenerMensajeError(respuesta)
-            );
+            mostrarError(await obtenerMensajeError(respuesta));
 
             return;
         }
-
 
         /*
          * El backend devuelve 204 y elimina
@@ -181,37 +128,20 @@ async function cambiarPassword(event) {
          */
 
         window.location.replace("/login");
+    } catch (error) {
+        console.error("Error al cambiar contraseña:", error);
 
-    }
-
-    catch (error) {
-
-        console.error(
-            "Error al cambiar contraseña:",
-            error
-        );
-
-        mostrarError(
-            "No se pudo contactar al servidor. Intenta de nuevo."
-        );
-
-    }
-
-    finally {
-
+        mostrarError("No se pudo contactar al servidor. Intenta de nuevo.");
+    } finally {
         setCargando(false);
-
     }
-
 }
-
 
 /*
  * Estado de carga
  */
 
 function setCargando(cargando) {
-
     boton.disabled = cargando;
 
     passwordNueva.disabled = cargando;
@@ -219,51 +149,37 @@ function setCargando(cargando) {
 
     spinner.hidden = !cargando;
 
-    textoBoton.textContent = cargando
-        ? "Cambiando..."
-        : "Cambiar contraseña";
+    textoBoton.textContent = cargando ? "Cambiando..." : "Cambiar contraseña";
 }
-
 
 /*
  * Mensaje de error
  */
 
 function mostrarError(mensaje) {
-
     textoError.textContent = mensaje;
 
     mensajeError.hidden = false;
 }
 
-
 function ocultarError() {
-
     textoError.textContent = "";
 
     mensajeError.hidden = true;
 }
 
-
 async function obtenerMensajeError(respuesta) {
-
     try {
-
         const cuerpo = await respuesta.json();
 
         if (cuerpo.detail) {
             return cuerpo.detail;
         }
-
-    }
-
-    catch {
+    } catch {
         // La respuesta no contiene JSON.
     }
 
-
     switch (respuesta.status) {
-
         case 401:
             return "La sesión no es válida.";
 

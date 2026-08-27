@@ -29,3 +29,5 @@ Thumbs.db
 /logs
 
 backups/
+
+node_modules/

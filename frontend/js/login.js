@@ -6,14 +6,14 @@ function loginApp() {
             login: "Acceso al sistema de expedientes",
             solicitar: "Te enviaremos un código de verificación a tu correo",
             confirmar: "Ingresa el código y tu nueva contraseña",
-            exito: "Listo"
+            exito: "Listo",
         },
 
         correo: "",
         password: "",
         mostrarPassword: false,
         mostrarPasswordNueva: false,
-        mostrarPasswordConfirmar: false,    
+        mostrarPasswordConfirmar: false,
 
         codigo: "",
         passwordNueva: "",
@@ -45,13 +45,13 @@ function loginApp() {
                 const respuesta = await fetch("/auth/login", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
                     },
                     credentials: "include",
                     body: JSON.stringify({
                         correo: this.correo,
-                        password: this.password
-                    })
+                        password: this.password,
+                    }),
                 });
 
                 if (!respuesta.ok) {
@@ -66,9 +66,9 @@ function loginApp() {
                 } else {
                     window.location.replace("/");
                 }
-
             } catch {
-                this.error = "No se pudo contactar al servidor. Intenta de nuevo.";
+                this.error =
+                    "No se pudo contactar al servidor. Intenta de nuevo.";
             } finally {
                 this.cargando = false;
             }
@@ -82,11 +82,11 @@ function loginApp() {
                 const respuesta = await fetch("/auth/recuperar-pw", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        correo: this.correo
-                    })
+                        correo: this.correo,
+                    }),
                 });
 
                 if (!respuesta.ok) {
@@ -95,9 +95,9 @@ function loginApp() {
                 }
 
                 this.vista = "confirmar";
-
             } catch {
-                this.error = "No se pudo contactar al servidor. Intenta de nuevo.";
+                this.error =
+                    "No se pudo contactar al servidor. Intenta de nuevo.";
             } finally {
                 this.cargando = false;
             }
@@ -127,13 +127,13 @@ function loginApp() {
                 const respuesta = await fetch("/auth/recuperar-pw/confirmar", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
                         correo: this.correo,
                         codigo: this.codigo,
-                        password_nueva: this.passwordNueva
-                    })
+                        password_nueva: this.passwordNueva,
+                    }),
                 });
 
                 if (!respuesta.ok) {
@@ -142,16 +142,15 @@ function loginApp() {
                 }
 
                 this.vista = "exito";
-
             } catch {
-                this.error = "No se pudo contactar al servidor. Intenta de nuevo.";
+                this.error =
+                    "No se pudo contactar al servidor. Intenta de nuevo.";
             } finally {
                 this.cargando = false;
             }
-        }
+        },
     };
 }
-
 
 async function mensajeDeError(respuesta) {
     try {
@@ -179,11 +178,10 @@ async function mensajeDeError(respuesta) {
     return "No se pudo completar la solicitud.";
 }
 
-
 function fechaLegible() {
     return new Date().toLocaleDateString("es-MX", {
         day: "2-digit",
         month: "short",
-        year: "numeric"
+        year: "numeric",
     });
 }

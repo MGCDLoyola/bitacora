@@ -14,59 +14,54 @@ const textoMensajeAplicacion = document.getElementById(
     "texto-mensaje-aplicacion"
 );
 
-
 const navegacionPorRol = {
     Administrador: [
         {
             id: "gestiones",
-            texto: "Gestión de expedientes"
+            texto: "Gestión de expedientes",
         },
         {
             id: "usuarios",
-            texto: "Usuarios"
-        }
+            texto: "Usuarios",
+        },
     ],
 
     Supervisor: [
         {
             id: "gestiones",
-            texto: "Gestión de expedientes"
+            texto: "Gestión de expedientes",
         },
         {
             id: "usuarios",
-            texto: "Usuarios"
-        }
+            texto: "Usuarios",
+        },
     ],
 
     Cobranza: [
         {
             id: "gestiones",
-            texto: "Gestión de expedientes"
-        }
+            texto: "Gestión de expedientes",
+        },
     ],
 
     Visualizador: [
         {
             id: "gestiones",
-            texto: "Gestión de expedientes"
-        }
-    ]
+            texto: "Gestión de expedientes",
+        },
+    ],
 };
-
 
 const vistas = {
     gestiones: {},
     usuarios: {},
-    expediente: {}
+    expediente: {},
 };
-
 
 let usuarioActual = null;
 let vistaActual = null;
 
-
 iniciar();
-
 
 async function iniciar() {
     try {
@@ -75,30 +70,23 @@ async function iniciar() {
         configurarUsuario(usuarioActual);
         configurarNavegacion(usuarioActual.rol.nombre);
 
-        const vistaInicial = obtenerVistaInicial(
-            usuarioActual.rol.nombre
-        );
+        const vistaInicial = obtenerVistaInicial(usuarioActual.rol.nombre);
 
         if (vistaInicial !== null) {
-
             history.replaceState(
                 {
                     vista: vistaInicial,
-                    datos: {}
+                    datos: {},
                 },
                 "",
                 window.location.pathname
             );
 
-            await cargarVista(
-                vistaInicial,
-                {}
-            );
+            await cargarVista(vistaInicial, {});
         }
 
         estadoCarga.hidden = true;
         app.hidden = false;
-
     } catch (error) {
         estadoCarga.hidden = true;
 
@@ -107,24 +95,18 @@ async function iniciar() {
             return;
         }
 
-        mostrarError(
-            error.message ||
-            "No se pudo cargar la aplicación."
-        );
+        mostrarError(error.message || "No se pudo cargar la aplicación.");
     }
 }
-
 
 async function obtenerUsuarioActual() {
     const respuesta = await fetch("/auth/me", {
         method: "GET",
-        credentials: "include"
+        credentials: "include",
     });
 
     if (!respuesta.ok) {
-        const error = new Error(
-            await mensajeDeError(respuesta)
-        );
+        const error = new Error(await mensajeDeError(respuesta));
 
         error.status = respuesta.status;
 
@@ -134,12 +116,10 @@ async function obtenerUsuarioActual() {
     return await respuesta.json();
 }
 
-
 function configurarUsuario(usuario) {
     usuarioNombre.textContent = usuario.nombre;
     usuarioRol.textContent = usuario.rol.nombre;
 }
-
 
 function configurarNavegacion(rol) {
     navegacion.innerHTML = "";
@@ -167,7 +147,6 @@ function configurarNavegacion(rol) {
     });
 }
 
-
 function obtenerVistaInicial(rol) {
     const opciones = navegacionPorRol[rol] || [];
 
@@ -178,15 +157,11 @@ function obtenerVistaInicial(rol) {
     return opciones[0].id;
 }
 
-
 async function navegar(idVista, datos = {}) {
-
     const vista = vistas[idVista];
 
     if (!vista) {
-        mostrarError(
-            "La vista solicitada no está disponible."
-        );
+        mostrarError("La vista solicitada no está disponible.");
         return;
     }
 
@@ -195,7 +170,7 @@ async function navegar(idVista, datos = {}) {
     history.pushState(
         {
             vista: idVista,
-            datos: datos
+            datos: datos,
         },
         "",
         window.location.pathname
@@ -205,78 +180,52 @@ async function navegar(idVista, datos = {}) {
 
     limpiarMensajeError();
 
-    await cargarVista(
-        idVista,
-        datos
-    );
+    await cargarVista(idVista, datos);
 }
-
 
 window.navegar = navegar;
 
+window.addEventListener("popstate", async (event) => {
+    const estado = event.state;
 
-window.addEventListener(
-    "popstate",
-    async (event) => {
-
-        const estado =
-            event.state;
-
-        if (!estado?.vista) {
-            return;
-        }
-
-        const idVista =
-            estado.vista;
-
-        const datos =
-            estado.datos ?? {};
-
-        if (!vistas[idVista]) {
-            return;
-        }
-
-        vistaActual =
-            idVista;
-
-        actualizarNavegacionActiva(
-            idVista
-        );
-
-        limpiarMensajeError();
-
-        await cargarVista(
-            idVista,
-            datos
-        );
+    if (!estado?.vista) {
+        return;
     }
-);
 
+    const idVista = estado.vista;
+
+    const datos = estado.datos ?? {};
+
+    if (!vistas[idVista]) {
+        return;
+    }
+
+    vistaActual = idVista;
+
+    actualizarNavegacionActiva(idVista);
+
+    limpiarMensajeError();
+
+    await cargarVista(idVista, datos);
+});
 
 function actualizarNavegacionActiva(idVista) {
-    document.querySelectorAll(".navegacion__item").forEach(
-        (elemento) => {
-            elemento.classList.toggle(
-                "navegacion__item--activo",
-                elemento.dataset.vista === idVista
-            );
-        }
-    );
+    document.querySelectorAll(".navegacion__item").forEach((elemento) => {
+        elemento.classList.toggle(
+            "navegacion__item--activo",
+            elemento.dataset.vista === idVista
+        );
+    });
 }
-
 
 async function cargarVista(idVista, datos = {}) {
     contenidoPrincipal.innerHTML = "";
 
     try {
-        const respuesta = await fetch(
-            `/static/vistas/${idVista}.html`
-        );
+        const respuesta = await fetch(`/static/vistas/${idVista}.html`);
 
         if (!respuesta.ok) {
-            throw new Error(
-                `No se pudo cargar la vista "${idVista}".`
-            );
+            throw new Error(`No se pudo cargar la vista "${idVista}".`);
         }
 
         contenidoPrincipal.innerHTML = await respuesta.text();
@@ -287,44 +236,31 @@ async function cargarVista(idVista, datos = {}) {
             await modulo.iniciar({
                 usuario: usuarioActual,
                 contenedor: contenidoPrincipal,
-                ...datos
+                ...datos,
             });
         }
-
     } catch (error) {
         contenidoPrincipal.innerHTML = "";
 
-        mostrarError(
-            error.message ||
-            "No se pudo cargar la vista."
-        );
+        mostrarError(error.message || "No se pudo cargar la vista.");
     }
 }
 
-
 async function obtenerModuloVista(idVista) {
     switch (idVista) {
-
         case "gestiones":
-            return await import(
-                "./gestiones.js"
-            );
+            return await import("./gestiones.js");
 
         case "usuarios":
-            return await import(
-                "./usuarios.js"
-            );
+            return await import("./usuarios.js");
 
         case "expediente":
-            return await import(
-                "./expediente.js"
-            );
+            return await import("./expediente.js");
 
         default:
             return null;
     }
 }
-
 
 async function cerrarSesion() {
     botonCerrarSesion.disabled = true;
@@ -332,20 +268,14 @@ async function cerrarSesion() {
     try {
         const respuesta = await fetch("/auth/logout", {
             method: "POST",
-            credentials: "include"
+            credentials: "include",
         });
 
         if (!respuesta.ok && respuesta.status !== 401) {
-            throw new Error(
-                await mensajeDeError(respuesta)
-            );
+            throw new Error(await mensajeDeError(respuesta));
         }
-
     } catch (error) {
-        mostrarError(
-            error.message ||
-            "No se pudo cerrar la sesión."
-        );
+        mostrarError(error.message || "No se pudo cerrar la sesión.");
 
         botonCerrarSesion.disabled = false;
         return;
@@ -354,12 +284,7 @@ async function cerrarSesion() {
     window.location.replace("/login");
 }
 
-
-botonCerrarSesion.addEventListener(
-    "click",
-    cerrarSesion
-);
-
+botonCerrarSesion.addEventListener("click", cerrarSesion);
 
 async function mensajeDeError(respuesta) {
     try {
@@ -368,7 +293,6 @@ async function mensajeDeError(respuesta) {
         if (cuerpo.detail) {
             return cuerpo.detail;
         }
-
     } catch {
         // La respuesta no contiene JSON.
     }
@@ -388,12 +312,10 @@ async function mensajeDeError(respuesta) {
     return "No se pudo completar la solicitud.";
 }
 
-
 function mostrarError(mensaje) {
     textoMensajeAplicacion.textContent = mensaje;
     mensajeAplicacion.hidden = false;
 }
-
 
 function limpiarMensajeError() {
     textoMensajeAplicacion.textContent = "";

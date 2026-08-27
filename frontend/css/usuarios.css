@@ -29,7 +29,6 @@
     margin-top: 0;
 }
 
-
 /* ─────────────────────────────────────────────
    FILTROS
    ───────────────────────────────────────────── */
@@ -84,7 +83,6 @@
 select.campo-filtro__input {
     cursor: pointer;
 }
-
 
 /* ─────────────────────────────────────────────
    TABLA
@@ -246,7 +244,6 @@ select.campo-filtro__input {
     text-align: center;
 }
 
-
 /* ─────────────────────────────────────────────
    ESTADO
    ───────────────────────────────────────────── */
@@ -256,7 +253,6 @@ select.campo-filtro__input {
     margin-top: 12px;
     font-size: 12.5px;
 }
-
 
 /* ─────────────────────────────────────────────
    MODAL
@@ -341,20 +337,17 @@ select.campo-filtro__input {
     color: var(--text-100);
 }
 
-
 /* ─────────────────────────────────────────────
    RESPONSIVE
    ───────────────────────────────────────────── */
 
 @media (max-width: 900px) {
-
     .vista-usuarios__filtros {
         grid-template-columns: minmax(220px, 1fr) 160px 160px;
     }
 }
 
 @media (max-width: 720px) {
-
     .vista-usuarios__encabezado {
         align-items: flex-start;
         flex-direction: column;
@@ -378,7 +371,6 @@ select.campo-filtro__input {
 }
 
 @media (max-width: 520px) {
-
     .vista-usuarios__filtros {
         grid-template-columns: 1fr;
     }
@@ -419,7 +411,9 @@ select.campo-filtro__input {
     border: 1px solid var(--ink-700);
     border-radius: 2px;
     cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
 }
 
 .tabla__checkbox:hover {
@@ -546,7 +540,7 @@ select.campo-filtro__input {
 }
 
 .barra-seleccion__accion--desactivar:hover {
-    color: #E8B4B4;
+    color: #e8b4b4;
 }
 
 .barra-seleccion__cancelar {
@@ -569,7 +563,6 @@ select.campo-filtro__input {
 }
 
 @media (max-width: 720px) {
-
     .barra-seleccion {
         flex-direction: column;
         align-items: flex-start;

@@ -1,25 +1,25 @@
 :root {
-    --ink-950: #0A0F1C;
-    --ink-900: #111B2E;
-    --ink-850: #16223A;
-    --ink-800: #1E2C48;
-    --ink-700: #2A3A5C;
+    --ink-950: #0a0f1c;
+    --ink-900: #111b2e;
+    --ink-850: #16223a;
+    --ink-800: #1e2c48;
+    --ink-700: #2a3a5c;
 
-    --paper-100: #ECE7DA;
-    --paper-200: #DCD5C1;
+    --paper-100: #ece7da;
+    --paper-200: #dcd5c1;
 
-    --gold-300: #E0C468;
-    --gold-500: #C9A227;
-    --gold-700: #8F7419;
+    --gold-300: #e0c468;
+    --gold-500: #c9a227;
+    --gold-700: #8f7419;
 
-    --forest-600: #2F6C4F;
+    --forest-600: #2f6c4f;
 
-    --rose-500: #B24C4C;
-    --rose-700: #7A2E2E;
+    --rose-500: #b24c4c;
+    --rose-700: #7a2e2e;
 
-    --text-100: #EDEFF3;
-    --text-300: #B7BECC;
-    --text-500: #8C93A6;
+    --text-100: #edeff3;
+    --text-300: #b7becc;
+    --text-500: #8c93a6;
 
     --font-display: "Source Serif 4", Georgia, serif;
     --font-sans: "IBM Plex Sans", system-ui, sans-serif;
