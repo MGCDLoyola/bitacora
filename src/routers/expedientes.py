@@ -200,7 +200,7 @@ def obtener_expediente(
 ):
     servicio = ExpedienteService(session)
 
-    return servicio.obtener(id_expediente)
+    return servicio.obtener_read(id_expediente)
 
 
 @router.patch(

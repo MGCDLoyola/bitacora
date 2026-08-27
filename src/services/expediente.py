@@ -14,6 +14,7 @@ from src.core.almacenamiento import carpeta_expediente
 from src.core.exceptions import NoEncontrado, OperacionInvalida
 
 from src.schemas.expediente import (
+    ExpedienteRead,
     ExpedienteUpdate,
     ExpedienteGestionRead,
     ExpedienteResumenEliminacion,
@@ -51,6 +52,50 @@ class ExpedienteService(BaseService):
             )
 
         return expediente
+
+    def obtener_read(
+        self,
+        id_expediente: int
+    ) -> ExpedienteRead:
+
+        stmt = (
+            select(Expediente)
+            .options(
+                joinedload(Expediente.cliente),
+                joinedload(Expediente.usuario)
+            )
+            .where(
+                Expediente.id == id_expediente
+            )
+        )
+
+        resultado = (
+            self.session
+            .execute(stmt)
+            .unique()
+            .scalar_one_or_none()
+        )
+
+        if resultado is None:
+            raise NoEncontrado(
+                f"No existe un expediente con id '{id_expediente}'."
+            )
+
+        return ExpedienteRead(
+            id=resultado.id,
+            interlocutor=resultado.interlocutor,
+            nombre_cliente=resultado.cliente.nombre,
+            contrato=resultado.cliente.contrato,
+            fecha_incumplimiento=resultado.fecha_incumplimiento,
+            dia_actual=resultado.dia_actual,
+            monto_vencido=resultado.monto_vencido,
+            usuario=(
+                resultado.usuario.nombre
+                if resultado.usuario is not None
+                else None
+            ),
+            comentarios=resultado.comentarios,
+        )
 
     def crear(
         self,
@@ -388,7 +433,8 @@ class ExpedienteService(BaseService):
                     else None
                 ),
                 dia=dia,
-                intentos=intentos
+                intentos=intentos,
+                comentarios=None
             )
             for expediente, dia, intentos in resultados
         ]

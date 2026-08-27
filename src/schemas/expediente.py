@@ -19,14 +19,6 @@ class ExpedienteUpdate(SchemaBase):
 class ExpedienteRead(ExpedienteBase):
 
     id: int
-    cliente: ClienteRead
-    usuario: UsuarioRead | None = None
-    comentarios: str | None = None
-
-
-class ExpedienteGestionRead(SchemaBase):
-
-    id: int
     interlocutor: str
     nombre_cliente: str
     contrato: str | None = None
@@ -34,6 +26,11 @@ class ExpedienteGestionRead(SchemaBase):
     dia_actual: int
     monto_vencido: Decimal | None = None
     usuario: str | None = None
+    comentarios: str | None = None
+
+
+class ExpedienteGestionRead(ExpedienteRead):
+
     dia: int | None = None
     intentos: int | None = None
 
