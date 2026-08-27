@@ -56,7 +56,8 @@ const navegacionPorRol = {
 
 const vistas = {
     gestiones: {},
-    usuarios: {}
+    usuarios: {},
+    expediente: {}
 };
 
 
@@ -79,7 +80,20 @@ async function iniciar() {
         );
 
         if (vistaInicial !== null) {
-            await navegar(vistaInicial);
+
+            history.replaceState(
+                {
+                    vista: vistaInicial,
+                    datos: {}
+                },
+                "",
+                window.location.pathname
+            );
+
+            await cargarVista(
+                vistaInicial,
+                {}
+            );
         }
 
         estadoCarga.hidden = true;
@@ -165,7 +179,8 @@ function obtenerVistaInicial(rol) {
 }
 
 
-async function navegar(idVista) {
+async function navegar(idVista, datos = {}) {
+
     const vista = vistas[idVista];
 
     if (!vista) {
@@ -177,12 +192,65 @@ async function navegar(idVista) {
 
     vistaActual = idVista;
 
+    history.pushState(
+        {
+            vista: idVista,
+            datos: datos
+        },
+        "",
+        window.location.pathname
+    );
+
     actualizarNavegacionActiva(idVista);
 
     limpiarMensajeError();
 
-    await cargarVista(idVista);
+    await cargarVista(
+        idVista,
+        datos
+    );
 }
+
+
+window.navegar = navegar;
+
+
+window.addEventListener(
+    "popstate",
+    async (event) => {
+
+        const estado =
+            event.state;
+
+        if (!estado?.vista) {
+            return;
+        }
+
+        const idVista =
+            estado.vista;
+
+        const datos =
+            estado.datos ?? {};
+
+        if (!vistas[idVista]) {
+            return;
+        }
+
+        vistaActual =
+            idVista;
+
+        actualizarNavegacionActiva(
+            idVista
+        );
+
+        limpiarMensajeError();
+
+        await cargarVista(
+            idVista,
+            datos
+        );
+    }
+);
 
 
 function actualizarNavegacionActiva(idVista) {
@@ -197,7 +265,7 @@ function actualizarNavegacionActiva(idVista) {
 }
 
 
-async function cargarVista(idVista) {
+async function cargarVista(idVista, datos = {}) {
     contenidoPrincipal.innerHTML = "";
 
     try {
@@ -218,7 +286,8 @@ async function cargarVista(idVista) {
         if (modulo?.iniciar) {
             await modulo.iniciar({
                 usuario: usuarioActual,
-                contenedor: contenidoPrincipal
+                contenedor: contenidoPrincipal,
+                ...datos
             });
         }
 
@@ -244,6 +313,11 @@ async function obtenerModuloVista(idVista) {
         case "usuarios":
             return await import(
                 "./usuarios.js"
+            );
+
+        case "expediente":
+            return await import(
+                "./expediente.js"
             );
 
         default:
@@ -277,7 +351,7 @@ async function cerrarSesion() {
         return;
     }
 
-    window.location.href = "/login";
+    window.location.replace("/login");
 }
 
 

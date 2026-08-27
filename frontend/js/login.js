@@ -64,7 +64,7 @@ function loginApp() {
                 if (usuario.requiere_cambio_password) {
                     window.location.href = "/cambiar-password";
                 } else {
-                    window.location.href = "/";
+                    window.location.replace("/");
                 }
 
             } catch {
