@@ -380,6 +380,7 @@ class ExpedienteService(BaseService):
                 nombre_cliente=expediente.cliente.nombre,
                 contrato=expediente.cliente.contrato,
                 fecha_incumplimiento=expediente.fecha_incumplimiento,
+                dia_actual=expediente.dia_actual,
                 monto_vencido=expediente.monto_vencido,
                 usuario=(
                     expediente.usuario.nombre
