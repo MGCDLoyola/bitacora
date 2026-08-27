@@ -1,0 +1,429 @@
+/* ─────────────────────────────────────────────
+   VISTA DE EXPEDIENTE
+   ───────────────────────────────────────────── */
+
+.vista-expediente {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* ─────────────────────────────────────────────
+   FIJO (regreso + encabezado)
+   ───────────────────────────────────────────── */
+
+.vista-expediente__fijo {
+    position: sticky;
+    top: -30px;
+    z-index: 5;
+
+    flex-shrink: 0;
+
+    margin-bottom: 16px;
+
+    padding-top: 4px;
+    padding-bottom: 12px;
+
+    background: var(--ink-950);
+
+    border-bottom: 1px solid var(--ink-700);
+}
+
+
+/* ─────────────────────────────────────────────
+   REGRESO
+   ───────────────────────────────────────────── */
+
+.vista-expediente__regreso {
+    margin-bottom: 10px;
+}
+
+.vista-expediente__regreso .enlace {
+    font-size: 12px;
+}
+
+
+/* ─────────────────────────────────────────────
+   ENCABEZADO
+   ───────────────────────────────────────────── */
+
+.vista-expediente__encabezado {
+    flex-shrink: 0;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+
+    column-gap: 28px;
+}
+
+
+/* ─────────────────────────────────────────────
+   CLIENTE
+   ───────────────────────────────────────────── */
+
+.vista-expediente__cliente {
+    min-width: 0;
+}
+
+
+.vista-expediente__cliente .u-titulo {
+    margin: 0;
+
+    line-height: 1.2;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
+.vista-expediente__cliente .u-subtitulo {
+    display: block;
+
+    margin: 6px 0 0;
+}
+
+
+/* ─────────────────────────────────────────────
+   FOLIO
+   ───────────────────────────────────────────── */
+
+.vista-expediente__folio {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    gap: 5px;
+
+    padding-top: 7px;
+
+    text-align: right;
+
+    white-space: nowrap;
+}
+
+
+/* ─────────────────────────────────────────────
+   MENSAJE DE ERROR
+   ───────────────────────────────────────────── */
+
+#mensaje-expediente {
+    display: flex;
+
+    margin-bottom: 18px;
+}
+
+
+/* ─────────────────────────────────────────────
+   CONTENIDO
+   ───────────────────────────────────────────── */
+
+#contenido-expediente {
+    width: 100%;
+    min-height: 0;
+}
+
+
+/* ─────────────────────────────────────────────
+   DATOS DEL EXPEDIENTE
+   ───────────────────────────────────────────── */
+
+.expediente-datos {
+    width: 100%;
+
+    margin-bottom: 18px;
+
+    background: var(--ink-900);
+
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-card);
+
+    overflow: hidden;
+}
+
+
+.expediente-datos__encabezado {
+    padding: 11px 15px;
+
+    background: var(--ink-850);
+
+    border-bottom: 1px solid var(--ink-700);
+}
+
+
+.expediente-datos__encabezado .u-etiqueta {
+    color: var(--text-500);
+}
+
+
+/* ─────────────────────────────────────────────
+   GRID DE DATOS
+   ───────────────────────────────────────────── */
+
+.expediente-datos__grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 1px;
+
+    background: var(--ink-700);
+}
+
+
+.expediente-datos__dato {
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+
+    min-width: 0;
+
+    padding: 14px 15px;
+
+    background: var(--ink-900);
+}
+
+
+.expediente-datos__dato .u-cuerpo {
+    overflow: hidden;
+
+    font-size: 15px;
+    line-height: 1.35;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+
+/* ─────────────────────────────────────────────
+   COMENTARIO GENERAL
+   ───────────────────────────────────────────── */
+
+.expediente-comentarios {
+    margin-bottom: 18px;
+
+    padding: 15px 17px;
+
+    background: var(--ink-900);
+
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-card);
+}
+
+
+.expediente-comentarios__encabezado {
+    margin-bottom: 7px;
+}
+
+
+.expediente-comentarios__encabezado .u-etiqueta {
+    color: var(--text-500);
+}
+
+
+#expediente-comentarios-texto {
+    margin: 0;
+
+    color: var(--text-300);
+
+    line-height: 1.55;
+
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+
+/* ─────────────────────────────────────────────
+   DÍAS DE GESTIÓN
+   ───────────────────────────────────────────── */
+
+.expediente-dias {
+    width: 100%;
+}
+
+
+.expediente-dias__navegacion {
+    display: flex;
+    align-items: center;
+
+    gap: 0;
+
+    margin-bottom: 18px;
+
+    border-bottom: 1px solid var(--ink-700);
+}
+
+
+.expediente-dias__tab {
+    position: relative;
+
+    display: inline-flex;
+    align-items: center;
+
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+
+    margin-bottom: -1px;
+    padding: 11px 18px 12px;
+
+    color: var(--text-500);
+
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    cursor: pointer;
+
+    transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+
+.expediente-dias__tab:hover {
+    color: var(--text-100);
+}
+
+
+.expediente-dias__tab--activo {
+    color: var(--gold-300);
+    border-bottom-color: var(--gold-500);
+}
+
+
+.expediente-dias__tab:focus-visible {
+    outline: 2px solid var(--gold-300);
+    outline-offset: -2px;
+}
+
+
+.expediente-dias__contenido {
+    width: 100%;
+    min-height: 0;
+}
+
+
+/* ─────────────────────────────────────────────
+   ESTADO
+   ───────────────────────────────────────────── */
+
+#estado-expediente {
+    flex-shrink: 0;
+}
+
+
+/* ─────────────────────────────────────────────
+   RESPONSIVE
+   ───────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+
+    .vista-expediente__fijo {
+        top: -22px;
+    }
+
+    .vista-expediente__encabezado {
+        column-gap: 20px;
+    }
+
+    .expediente-datos__grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 720px) {
+
+    .vista-expediente__fijo {
+        top: 0;
+    }
+
+    .vista-expediente__encabezado {
+        grid-template-columns: minmax(0, 1fr) auto;
+
+        column-gap: 18px;
+    }
+
+    .vista-expediente__cliente .u-titulo {
+        font-size: 26px;
+    }
+
+    .expediente-datos__encabezado {
+        padding-left: 13px;
+        padding-right: 13px;
+    }
+
+    .expediente-datos__dato {
+        padding-left: 13px;
+        padding-right: 13px;
+    }
+
+    .expediente-dias__navegacion {
+        overflow-x: auto;
+        scrollbar-width: none;
+    }
+
+    .expediente-dias__navegacion::-webkit-scrollbar {
+        display: none;
+    }
+
+    .expediente-dias__tab {
+        flex-shrink: 0;
+
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+}
+
+
+@media (max-width: 520px) {
+
+    .vista-expediente__regreso {
+        margin-bottom: 8px;
+    }
+
+    .vista-expediente__encabezado {
+        grid-template-columns: 1fr;
+
+        row-gap: 10px;
+
+        margin-bottom: 18px;
+        padding-bottom: 15px;
+    }
+
+    .vista-expediente__cliente .u-titulo {
+        font-size: 23px;
+    }
+
+    .vista-expediente__folio {
+        flex-direction: row;
+        align-items: baseline;
+
+        gap: 8px;
+
+        padding-top: 0;
+
+        text-align: left;
+    }
+
+    .expediente-datos__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .expediente-comentarios {
+        padding: 13px 14px;
+    }
+
+}

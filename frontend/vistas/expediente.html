@@ -1,0 +1,275 @@
+<section class="vista-expediente">
+
+    <!-- ─────────────────────────────────────────────
+         FIJO (regreso + encabezado)
+         ───────────────────────────────────────────── -->
+
+    <div class="vista-expediente__fijo">
+
+        <div class="vista-expediente__regreso">
+
+            <button
+                type="button"
+                class="enlace"
+                id="boton-regresar-gestiones"
+            >
+                ← Volver a gestión
+            </button>
+
+        </div>
+
+
+        <header class="vista-expediente__encabezado">
+
+            <div class="vista-expediente__cliente">
+
+                <h1
+                    id="expediente-nombre-cliente"
+                    class="u-titulo"
+                >
+                    —
+                </h1>
+
+                <p
+                    id="expediente-interlocutor"
+                    class="u-subtitulo u-texto-oro"
+                >
+                    —
+                </p>
+
+            </div>
+
+
+            <div class="vista-expediente__folio">
+
+                <span class="u-etiqueta u-texto-terciario">
+                    Folio
+                </span>
+
+                <span
+                    id="expediente-folio"
+                    class="u-mono-sm u-texto-oro"
+                >
+                    —
+                </span>
+
+            </div>
+
+        </header>
+
+    </div>
+
+
+    <!-- ─────────────────────────────────────────────
+         ESTADO
+         ───────────────────────────────────────────── -->
+
+    <div
+        id="estado-expediente"
+        class="estado-vista u-texto-terciario"
+        hidden
+    >
+        Cargando expediente...
+    </div>
+
+
+    <!-- ─────────────────────────────────────────────
+         MENSAJE
+         ───────────────────────────────────────────── -->
+
+    <div
+        id="mensaje-expediente"
+        class="mensaje-error"
+        role="alert"
+        aria-live="polite"
+        hidden
+    >
+        <span class="mensaje-error__sello">
+            Error
+        </span>
+
+        <span id="texto-mensaje-expediente"></span>
+    </div>
+
+
+    <!-- ─────────────────────────────────────────────
+         CONTENIDO
+         ───────────────────────────────────────────── -->
+
+    <main id="contenido-expediente">
+
+        <!-- ─────────────────────────────────────────
+             DATOS DEL EXPEDIENTE
+             ───────────────────────────────────────── -->
+
+        <section class="expediente-datos">
+
+            <div class="expediente-datos__encabezado">
+
+                <span class="u-etiqueta u-texto-terciario">
+                    Información del expediente
+                </span>
+
+            </div>
+
+
+            <div class="expediente-datos__grid">
+
+                <div class="expediente-datos__dato">
+
+                    <span class="u-etiqueta u-texto-terciario">
+                        Contrato
+                    </span>
+
+                    <span
+                        id="expediente-contrato"
+                        class="u-cuerpo u-texto-primario"
+                    >
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="expediente-datos__dato">
+
+                    <span class="u-etiqueta u-texto-terciario">
+                        Fecha de incumplimiento
+                    </span>
+
+                    <span
+                        id="expediente-fecha-incumplimiento"
+                        class="u-cuerpo u-texto-primario"
+                    >
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="expediente-datos__dato">
+
+                    <span class="u-etiqueta u-texto-terciario">
+                        Monto vencido
+                    </span>
+
+                    <span
+                        id="expediente-monto-vencido"
+                        class="u-cuerpo u-texto-primario"
+                    >
+                        —
+                    </span>
+
+                </div>
+
+
+                <div class="expediente-datos__dato">
+
+                    <span class="u-etiqueta u-texto-terciario">
+                        Responsable
+                    </span>
+
+                    <span
+                        id="expediente-responsable"
+                        class="u-cuerpo u-texto-primario"
+                    >
+                        —
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ─────────────────────────────────────────
+             COMENTARIO GENERAL
+             ───────────────────────────────────────── -->
+
+        <section
+            id="expediente-comentarios-contenedor"
+            class="expediente-comentarios"
+            hidden
+        >
+
+            <div class="expediente-comentarios__encabezado">
+
+                <span class="u-etiqueta u-texto-terciario">
+                    Comentario general
+                </span>
+
+            </div>
+
+            <p
+                id="expediente-comentarios-texto"
+                class="u-cuerpo u-texto-secundario"
+            ></p>
+
+        </section>
+
+
+        <!-- ─────────────────────────────────────────
+             DÍAS DE GESTIÓN
+             ───────────────────────────────────────── -->
+
+        <section class="expediente-dias">
+
+            <nav
+                id="expediente-dias-navegacion"
+                class="expediente-dias__navegacion"
+                aria-label="Días de gestión"
+            >
+
+                <!-- Placeholder: js/expediente.js generará estos botones
+                     dinámicamente según dia_actual. Se deja el ejemplo
+                     visual con 4 días (MAX_DIAS) y el día 1 activo. -->
+
+                <button
+                    type="button"
+                    class="expediente-dias__tab expediente-dias__tab--activo"
+                    data-dia="1"
+                >
+                    Día 1
+                </button>
+
+                <button
+                    type="button"
+                    class="expediente-dias__tab"
+                    data-dia="2"
+                >
+                    Día 2
+                </button>
+
+                <button
+                    type="button"
+                    class="expediente-dias__tab"
+                    data-dia="3"
+                >
+                    Día 3
+                </button>
+
+                <button
+                    type="button"
+                    class="expediente-dias__tab"
+                    data-dia="4"
+                >
+                    Día 4
+                </button>
+
+            </nav>
+
+
+            <!-- Placeholder: aquí irán las 3 tarjetas desplegables
+                 de intentos por día, en la siguiente iteración. -->
+
+            <div
+                id="expediente-dias-contenido"
+                class="expediente-dias__contenido"
+            ></div>
+
+        </section>
+
+    </main>
+
+</section>
