@@ -1,15 +1,16 @@
 from src.schemas.base import SchemaBase
 from src.schemas.rol import RolRead
 
-class UsuarioBase(SchemaBase):
 
-    nombre  : str
-    correo  : str
-    activo  : bool = True
+class UsuarioBase(SchemaBase):
+    nombre: str
+    correo: str
+    activo: bool = True
+
 
 class UsuarioCreate(UsuarioBase):
-
     id_rol: int
+
 
 class UsuarioUpdate(SchemaBase):
     nombre: str | None = None
@@ -21,12 +22,13 @@ class UsuarioUpdate(SchemaBase):
 class UsuarioUpdateSupervisor(SchemaBase):
     activo: bool | None = None
 
-class UsuarioRead(UsuarioBase):
 
-    id    : int
-    rol   : RolRead
-    firma : bool = False
-    requiere_cambio_password : bool
+class UsuarioRead(UsuarioBase):
+    id: int
+    rol: RolRead
+    firma: bool = False
+    requiere_cambio_password: bool
+
 
 class UsuarioRolMasivo(SchemaBase):
     ids: list[int]

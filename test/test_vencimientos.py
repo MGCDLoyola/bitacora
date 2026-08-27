@@ -13,10 +13,7 @@ def main():
     session = SessionLocal()
 
     try:
-        procesar_clientes(
-            pg,
-            session
-        )
+        procesar_clientes(pg, session)
 
     finally:
         session.close()

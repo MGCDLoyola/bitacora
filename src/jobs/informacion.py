@@ -31,14 +31,13 @@ def obtener_cliente_por_contrato(session: Session, contrato: str) -> Cliente | N
     return session.execute(stmt).scalar_one_or_none()
 
 
-def obtener_expediente_abierto(session: Session, interlocutor: str) -> Expediente | None:
-    stmt = (
-        select(Expediente)
-        .where(
-            Expediente.interlocutor == interlocutor,
-            Expediente.estado.is_(True),
-            Expediente.fecha_consolidacion.is_(None)
-        )
+def obtener_expediente_abierto(
+    session: Session, interlocutor: str
+) -> Expediente | None:
+    stmt = select(Expediente).where(
+        Expediente.interlocutor == interlocutor,
+        Expediente.estado.is_(True),
+        Expediente.fecha_consolidacion.is_(None),
     )
     return session.execute(stmt).scalar_one_or_none()
 
@@ -50,8 +49,7 @@ def relacionar_correo_expediente(session: Session, mensaje: dict) -> Expediente 
 
     if contrato is None:
         logger.warning(
-            "Correo sin contrato reconocible (asunto: '%s')",
-            mensaje.get("subject")
+            "Correo sin contrato reconocible (asunto: '%s')", mensaje.get("subject")
         )
         return None
 
@@ -59,8 +57,7 @@ def relacionar_correo_expediente(session: Session, mensaje: dict) -> Expediente 
 
     if cliente is None:
         logger.warning(
-            "Contrato '%s' extraído del correo no coincide con ningún cliente",
-            contrato
+            "Contrato '%s' extraído del correo no coincide con ningún cliente", contrato
         )
         return None
 
@@ -70,7 +67,7 @@ def relacionar_correo_expediente(session: Session, mensaje: dict) -> Expediente 
         logger.warning(
             "Cliente '%s' (contrato '%s') no tiene expediente abierto",
             cliente.interlocutor,
-            contrato
+            contrato,
         )
         return None
 
@@ -78,7 +75,9 @@ def relacionar_correo_expediente(session: Session, mensaje: dict) -> Expediente 
 
 
 def obtener_tipo_documento_informacion(session: Session) -> TipoDocumento | None:
-    stmt = select(TipoDocumento).where(TipoDocumento.nombre == TIPO_DOCUMENTO_INFORMACION)
+    stmt = select(TipoDocumento).where(
+        TipoDocumento.nombre == TIPO_DOCUMENTO_INFORMACION
+    )
     return session.execute(stmt).scalar_one_or_none()
 
 
@@ -88,13 +87,13 @@ def registrar_documento_informacion(
     uuid_archivo: uuid.UUID,
     ruta_archivo,
     nombre_original: str,
-    id_tipo_documento: int
+    id_tipo_documento: int,
 ) -> Documento | None:
 
     if expediente.id_usuario is None:
         logger.warning(
             "Expediente '%s' sin usuario asignado, no se registra el documento en Documentos",
-            expediente.interlocutor
+            expediente.interlocutor,
         )
         return None
 
@@ -104,7 +103,7 @@ def registrar_documento_informacion(
         id_tipo_documento=id_tipo_documento,
         uuid_archivo=uuid_archivo,
         nombre_original=nombre_original,
-        ruta_archivo=str(ruta_archivo)
+        ruta_archivo=str(ruta_archivo),
     )
 
     session.add(documento)
@@ -123,20 +122,19 @@ def procesar_informacion(session: Session, mailbox: Mailbox) -> None:
             f"No existe el tipo de documento '{TIPO_DOCUMENTO_INFORMACION}'."
         )
 
-    mensajes = mailbox.buscar(ASUNTO_SUSPENSION, hoy, carpeta='SentItems')
+    mensajes = mailbox.buscar(ASUNTO_SUSPENSION, hoy, carpeta="SentItems")
 
     print(f"Correos encontrados: {len(mensajes)}")
 
     for mensaje in mensajes:
         print(
-            "ID:", mensaje["id"],
-            "| CONTRATO:", extraer_contrato(
-                mensaje.get("body", {}).get("content", "")
-            )
+            "ID:",
+            mensaje["id"],
+            "| CONTRATO:",
+            extraer_contrato(mensaje.get("body", {}).get("content", "")),
         )
 
     for mensaje in mensajes:
-
         expediente = relacionar_correo_expediente(session, mensaje)
 
         if expediente is None:
@@ -159,7 +157,7 @@ def procesar_informacion(session: Session, mailbox: Mailbox) -> None:
                 uuid_archivo,
                 destino,
                 nombre_original,
-                tipo_documento.id
+                tipo_documento.id,
             )
             session.commit()
         except Exception:

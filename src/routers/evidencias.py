@@ -8,16 +8,10 @@ from src.schemas.evidencia import EvidenciaRead
 from src.services.evidencia import EvidenciaService
 
 
-router = APIRouter(
-    prefix="/cobranzas",
-    tags=["Evidencias"]
-)
+router = APIRouter(prefix="/cobranzas", tags=["Evidencias"])
 
 
-@router.post(
-    "/{id_cobranza}/evidencias",
-    response_model=EvidenciaRead
-)
+@router.post("/{id_cobranza}/evidencias", response_model=EvidenciaRead)
 def subir_evidencia(
     id_cobranza: int,
     tipo: str = Form(...),
@@ -33,14 +27,11 @@ def subir_evidencia(
         id_cobranza=id_cobranza,
         id_usuario=usuario_actual.id,
         tipo=tipo,
-        archivo=archivo
+        archivo=archivo,
     )
 
 
-@router.get(
-    "/{id_cobranza}/evidencias",
-    response_model=list[EvidenciaRead]
-)
+@router.get("/{id_cobranza}/evidencias", response_model=list[EvidenciaRead])
 def listar_evidencias(
     id_cobranza: int,
     session: Session = Depends(get_session),

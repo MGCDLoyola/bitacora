@@ -1,5 +1,4 @@
 class BitacoraError(Exception):
-
     def __init__(self, mensaje: str):
         self.mensaje = mensaje
         super().__init__(mensaje)
@@ -23,6 +22,7 @@ class NoAutorizado(BitacoraError):
 
 class CambioPasswordRequerido(BitacoraError):
     pass
+
 
 class PermisoDenegado(BitacoraError):
     pass

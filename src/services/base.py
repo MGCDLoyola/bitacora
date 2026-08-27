@@ -6,7 +6,6 @@ from pathlib import Path
 
 
 class BaseService:
-
     def __init__(self, session: Session):
         self.session = session
 

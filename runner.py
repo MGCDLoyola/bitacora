@@ -40,8 +40,7 @@ def ejecutar_cadena(pg: PostgreSQL, session, mailbox: Mailbox) -> None:
 
         except Exception:
             logger.exception(
-                "Job '%s' falló. Se continúa con el resto de la cadena.",
-                nombre
+                "Job '%s' falló. Se continúa con el resto de la cadena.", nombre
             )
 
 

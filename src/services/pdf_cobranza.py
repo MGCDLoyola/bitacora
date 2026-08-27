@@ -30,7 +30,6 @@ _entorno = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
 
 
 class PDFCobranzaService(BaseService):
-
     NOMBRE_ARCHIVO = "Bitácora.pdf"
 
     def generar(self, id_expediente: int, dia: int) -> Path:
@@ -39,15 +38,12 @@ class PDFCobranzaService(BaseService):
 
         cliente = expediente.cliente
 
-        intentos = (
-            self.session.scalars(
-                select(Cobranza)
-                .where(Cobranza.id_expediente == id_expediente)
-                .where(Cobranza.dia == dia)
-                .order_by(Cobranza.orden)
-            )
-            .all()
-        )
+        intentos = self.session.scalars(
+            select(Cobranza)
+            .where(Cobranza.id_expediente == id_expediente)
+            .where(Cobranza.dia == dia)
+            .order_by(Cobranza.orden)
+        ).all()
 
         if not intentos:
             raise NoEncontrado(
@@ -99,8 +95,7 @@ class PDFCobranzaService(BaseService):
                     "contacto": intento.contacto,
                     "comentarios": intento.comentarios,
                     "evidencias": [
-                        evidencia.nombre_original
-                        for evidencia in intento.evidencias
+                        evidencia.nombre_original for evidencia in intento.evidencias
                     ],
                 }
                 for intento in intentos
@@ -123,17 +118,14 @@ class PDFCobranzaService(BaseService):
         ruta.write_bytes(pdf_bytes)
 
         tipo_documento = self.session.scalar(
-            select(TipoDocumento)
-            .where(TipoDocumento.nombre == f"Bitácora {dia}")
+            select(TipoDocumento).where(TipoDocumento.nombre == f"Bitácora {dia}")
         )
 
         if tipo_documento is None:
             if ruta.exists():
                 ruta.unlink()
 
-            raise ConflictoNegocio(
-                f"No existe el tipo de documento 'Bitácora {dia}'."
-            )
+            raise ConflictoNegocio(f"No existe el tipo de documento 'Bitácora {dia}'.")
 
         documento = Documento(
             id_expediente=expediente.id,

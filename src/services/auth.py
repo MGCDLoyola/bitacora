@@ -26,28 +26,20 @@ logger = logging.getLogger("bitacora")
 
 
 class AuthService(BaseService):
-
     def login(self, correo: str, password: str) -> tuple[Usuario, Sesion]:
 
-        usuario = self.session.scalar(
-            select(Usuario)
-            .where(Usuario.correo == correo)
-        )
+        usuario = self.session.scalar(select(Usuario).where(Usuario.correo == correo))
 
         if usuario is None or not usuario.check_password(password):
-            raise NoAutorizado(
-                "Correo o contraseña incorrectos."
-            )
+            raise NoAutorizado("Correo o contraseña incorrectos.")
 
         if not usuario.activo:
-            raise NoAutorizado(
-                "El usuario no está activo."
-            )
+            raise NoAutorizado("El usuario no está activo.")
 
         sesion = Sesion(
             id_usuario=usuario.id,
             fecha_expiracion=datetime.now(timezone.utc)
-            + timedelta(hours=SESION_DURACION_HORAS)
+            + timedelta(hours=SESION_DURACION_HORAS),
         )
 
         self.session.add(sesion)
@@ -60,19 +52,15 @@ class AuthService(BaseService):
         usuario: Usuario,
         sesion_actual: Sesion,
         password_actual: str | None,
-        password_nueva: str
+        password_nueva: str,
     ) -> None:
 
         if not usuario.requiere_cambio_password:
             if not password_actual:
-                raise OperacionInvalida(
-                    "Debes proporcionar la contraseña actual."
-                )
+                raise OperacionInvalida("Debes proporcionar la contraseña actual.")
 
             if not usuario.check_password(password_actual):
-                raise NoAutorizado(
-                    "La contraseña actual es incorrecta."
-                )
+                raise NoAutorizado("La contraseña actual es incorrecta.")
 
         if usuario.check_password(password_nueva):
             raise OperacionInvalida(
@@ -94,19 +82,15 @@ class AuthService(BaseService):
         mailbox: Mailbox,
     ) -> None:
 
-        usuario = self.session.scalar(
-            select(Usuario)
-            .where(Usuario.correo == correo)
-        )
+        usuario = self.session.scalar(select(Usuario).where(Usuario.correo == correo))
 
         if usuario is None or not usuario.activo:
             return
 
         codigo = f"{secrets.randbelow(1_000_000):06d}"
 
-        expira = (
-            datetime.now(timezone.utc)
-            + timedelta(minutes=RECUPERACION_DURACION_MINUTOS)
+        expira = datetime.now(timezone.utc) + timedelta(
+            minutes=RECUPERACION_DURACION_MINUTOS
         )
 
         usuario.set_codigo_recuperacion(
@@ -133,7 +117,6 @@ class AuthService(BaseService):
             mail.enviar(message_id=message_id)
 
         except MailError as exc:
-
             usuario.limpiar_codigo_recuperacion()
 
             try:
@@ -178,20 +161,13 @@ class AuthService(BaseService):
         password_nueva: str,
     ) -> None:
 
-        usuario = self.session.scalar(
-            select(Usuario)
-            .where(Usuario.correo == correo)
-        )
+        usuario = self.session.scalar(select(Usuario).where(Usuario.correo == correo))
 
         if usuario is None or not usuario.activo:
-            raise NoAutorizado(
-                "El código de recuperación no es válido."
-            )
+            raise NoAutorizado("El código de recuperación no es válido.")
 
         if not usuario.check_codigo_recuperacion(codigo):
-            raise NoAutorizado(
-                "El código de recuperación no es válido o ya expiró."
-            )
+            raise NoAutorizado("El código de recuperación no es válido o ya expiró.")
 
         if usuario.check_password(password_nueva):
             raise OperacionInvalida(

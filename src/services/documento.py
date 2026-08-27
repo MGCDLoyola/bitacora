@@ -16,7 +16,6 @@ from collections.abc import Sequence
 
 
 class DocumentoService(BaseService):
-
     def listar_por_expediente(self, id_expediente: int) -> Sequence[Documento]:
 
         stmt = (
@@ -25,24 +24,23 @@ class DocumentoService(BaseService):
             .order_by(Documento.fecha_creacion)
         )
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        return self.session.execute(stmt).scalars().all()
 
     def obtener(self, id_documento: int) -> Documento:
         documento = self.session.get(Documento, id_documento)
 
         if documento is None:
-            raise NoEncontrado(
-                f"No existe el documento con id '{id_documento}'."
-            )
+            raise NoEncontrado(f"No existe el documento con id '{id_documento}'.")
 
         return documento
 
-    def crear(self, id_expediente: int, id_usuario: int, id_tipo_documento: int, archivo: UploadFile) -> Documento:
+    def crear(
+        self,
+        id_expediente: int,
+        id_usuario: int,
+        id_tipo_documento: int,
+        archivo: UploadFile,
+    ) -> Documento:
 
         expediente = ExpedienteService(self.session).obtener(id_expediente)
 
@@ -60,7 +58,7 @@ class DocumentoService(BaseService):
             id_tipo_documento=id_tipo_documento,
             uuid_archivo=uuid_archivo,
             nombre_original=archivo.filename,
-            ruta_archivo=str(ruta_destino)
+            ruta_archivo=str(ruta_destino),
         )
 
         self.session.add(documento)

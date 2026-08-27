@@ -26,9 +26,7 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/login", response_model=UsuarioRead)
 def login(
-    data: LoginRequest,
-    response: Response,
-    session: Session = Depends(get_session)
+    data: LoginRequest, response: Response, session: Session = Depends(get_session)
 ):
     servicio = AuthService(session)
     usuario, sesion = servicio.login(data.correo, data.password)
@@ -39,7 +37,7 @@ def login(
         httponly=True,
         secure=COOKIE_SECURE,
         samesite="lax",
-        max_age=SESION_DURACION_HORAS * 3600
+        max_age=SESION_DURACION_HORAS * 3600,
     )
 
     return usuario
@@ -50,14 +48,11 @@ def cambiar_password(
     data: CambiarPasswordRequest,
     response: Response,
     sesion: Sesion = Depends(sesion_actual),
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
 ):
     servicio = AuthService(session)
     servicio.cambiar_password(
-        sesion.usuario,
-        sesion,
-        data.password_actual,
-        data.password_nueva
+        sesion.usuario, sesion, data.password_actual, data.password_nueva
     )
 
     response.delete_cookie(NOMBRE_COOKIE_SESION)
@@ -104,7 +99,7 @@ def obtener_usuario_actual(
 def logout(
     response: Response,
     sesion: Sesion = Depends(sesion_actual),
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
 ):
     servicio = AuthService(session)
     servicio.logout(sesion)

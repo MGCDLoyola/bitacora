@@ -27,7 +27,7 @@ def renderizar_pdf(html: str) -> bytes:
                     "bottom": "1.5cm",
                     "left": "1.5cm",
                     "right": "1.5cm",
-                }
+                },
             )
         finally:
             navegador.close()

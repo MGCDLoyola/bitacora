@@ -13,30 +13,16 @@ if TYPE_CHECKING:
 class Cliente(AuditoriaMixin, Base):
     __tablename__ = "clientes"
 
-    interlocutor: Mapped[str] = mapped_column(
-        String(20),
-        primary_key=True
-    )
+    interlocutor: Mapped[str] = mapped_column(String(20), primary_key=True)
 
-    central: Mapped[str] = mapped_column(
-        String(10),
-        nullable=False
-    )
+    central: Mapped[str] = mapped_column(String(10), nullable=False)
 
-    nombre: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False
-    )
+    nombre: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    correo: Mapped[str | None] = mapped_column(
-        String(255)
-    )
+    correo: Mapped[str | None] = mapped_column(String(255))
 
-    contrato: Mapped[str | None] = mapped_column(
-        String(50)
-    )
+    contrato: Mapped[str | None] = mapped_column(String(50))
 
     expedientes: Mapped[list["Expediente"]] = relationship(
-        "Expediente",
-        back_populates="cliente"
+        "Expediente", back_populates="cliente"
     )

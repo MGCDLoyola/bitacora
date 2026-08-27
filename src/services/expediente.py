@@ -27,59 +27,33 @@ from collections.abc import Sequence
 
 
 class ExpedienteService(BaseService):
-
     def listar(self) -> Sequence[Expediente]:
 
-        stmt = (
-            select(Expediente)
-            .order_by(Expediente.id)
-        )
+        stmt = select(Expediente).order_by(Expediente.id)
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        return self.session.execute(stmt).scalars().all()
 
     def obtener(self, id_expediente: int) -> Expediente:
 
         expediente = self.session.get(Expediente, id_expediente)
 
         if expediente is None:
-            raise NoEncontrado(
-                f"No existe un expediente con id '{id_expediente}'."
-            )
+            raise NoEncontrado(f"No existe un expediente con id '{id_expediente}'.")
 
         return expediente
 
-    def obtener_read(
-        self,
-        id_expediente: int
-    ) -> ExpedienteRead:
+    def obtener_read(self, id_expediente: int) -> ExpedienteRead:
 
         stmt = (
             select(Expediente)
-            .options(
-                joinedload(Expediente.cliente),
-                joinedload(Expediente.usuario)
-            )
-            .where(
-                Expediente.id == id_expediente
-            )
+            .options(joinedload(Expediente.cliente), joinedload(Expediente.usuario))
+            .where(Expediente.id == id_expediente)
         )
 
-        resultado = (
-            self.session
-            .execute(stmt)
-            .unique()
-            .scalar_one_or_none()
-        )
+        resultado = self.session.execute(stmt).unique().scalar_one_or_none()
 
         if resultado is None:
-            raise NoEncontrado(
-                f"No existe un expediente con id '{id_expediente}'."
-            )
+            raise NoEncontrado(f"No existe un expediente con id '{id_expediente}'.")
 
         return ExpedienteRead(
             id=resultado.id,
@@ -90,9 +64,7 @@ class ExpedienteService(BaseService):
             dia_actual=resultado.dia_actual,
             monto_vencido=resultado.monto_vencido,
             usuario=(
-                resultado.usuario.nombre
-                if resultado.usuario is not None
-                else None
+                resultado.usuario.nombre if resultado.usuario is not None else None
             ),
             comentarios=resultado.comentarios,
         )
@@ -102,14 +74,14 @@ class ExpedienteService(BaseService):
         interlocutor: str,
         fecha_incumplimiento: date | None = None,
         id_usuario: int | None = None,
-        monto_vencido: float | None = None
+        monto_vencido: float | None = None,
     ) -> Expediente:
 
         expediente = Expediente(
             interlocutor=interlocutor,
             fecha_incumplimiento=fecha_incumplimiento,
             id_usuario=id_usuario,
-            monto_vencido=monto_vencido
+            monto_vencido=monto_vencido,
         )
 
         self.session.add(expediente)
@@ -122,40 +94,25 @@ class ExpedienteService(BaseService):
         self,
         interlocutor: str | None = None,
         fecha_desde: date | None = None,
-        fecha_hasta: date | None = None
+        fecha_hasta: date | None = None,
     ) -> Sequence[Expediente]:
 
         stmt = select(Expediente)
 
         if interlocutor is not None:
-            stmt = stmt.where(
-                Expediente.interlocutor == interlocutor
-            )
+            stmt = stmt.where(Expediente.interlocutor == interlocutor)
 
         if fecha_desde is not None:
-            stmt = stmt.where(
-                Expediente.fecha_incumplimiento >= fecha_desde
-            )
+            stmt = stmt.where(Expediente.fecha_incumplimiento >= fecha_desde)
 
         if fecha_hasta is not None:
-            stmt = stmt.where(
-                Expediente.fecha_incumplimiento <= fecha_hasta
-            )
+            stmt = stmt.where(Expediente.fecha_incumplimiento <= fecha_hasta)
 
         stmt = stmt.order_by(Expediente.id)
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        return self.session.execute(stmt).scalars().all()
 
-    def actualizar(
-        self,
-        id_expediente: int,
-        data: ExpedienteUpdate
-    ) -> Expediente:
+    def actualizar(self, id_expediente: int, data: ExpedienteUpdate) -> Expediente:
 
         expediente = self.obtener(id_expediente)
 
@@ -169,27 +126,17 @@ class ExpedienteService(BaseService):
         return expediente
 
     def asignar(
-        self,
-        ids: list[int],
-        id_usuario: int | None,
-        usuario_actual: Usuario
+        self, ids: list[int], id_usuario: int | None, usuario_actual: Usuario
     ) -> None:
 
-        expedientes = [
-            self.obtener(id_expediente)
-            for id_expediente in ids
-        ]
+        expedientes = [self.obtener(id_expediente) for id_expediente in ids]
 
         if id_usuario is not None:
-
             usuario_service = UsuarioService(self.session)
 
             usuario_destino = usuario_service.obtener(id_usuario)
 
-            if not usuario_service.puede_asignar(
-                usuario_actual,
-                usuario_destino
-            ):
+            if not usuario_service.puede_asignar(usuario_actual, usuario_destino):
                 raise OperacionInvalida(
                     "No tienes permisos para asignar el expediente a este usuario."
                 )
@@ -198,196 +145,124 @@ class ExpedienteService(BaseService):
             expediente.id_usuario = id_usuario
 
         self._commit()
-        
-    def listar_por_asignado(
-        self,
-        id_usuario: int
-    ) -> Sequence[Expediente]:
+
+    def listar_por_asignado(self, id_usuario: int) -> Sequence[Expediente]:
 
         stmt = (
             select(Expediente)
-            .where(
-                Expediente.id_usuario == id_usuario
-            )
+            .where(Expediente.id_usuario == id_usuario)
             .order_by(Expediente.id)
         )
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        return self.session.execute(stmt).scalars().all()
 
     def listar_gestiones_del_dia(
-        self,
-        id_usuario: int
+        self, id_usuario: int
     ) -> Sequence[ExpedienteGestionRead]:
 
         return self._listar_gestiones(
             Expediente.id_usuario == id_usuario,
             Expediente.fecha_desfase.is_(None),
-            Expediente.fecha_consolidacion.is_(None)
+            Expediente.fecha_consolidacion.is_(None),
         )
 
     def listar_gestiones_desfasadas(
-        self,
-        id_usuario: int
+        self, id_usuario: int
     ) -> Sequence[ExpedienteGestionRead]:
 
         return self._listar_gestiones(
             Expediente.id_usuario == id_usuario,
             Expediente.fecha_desfase.is_not(None),
-            Expediente.fecha_consolidacion.is_(None)
+            Expediente.fecha_consolidacion.is_(None),
         )
 
     def listar_gestiones_consolidacion(
-        self,
-        id_usuario: int
+        self, id_usuario: int
     ) -> Sequence[ExpedienteGestionRead]:
 
         tiene_documento_consolidacion = exists(
             select(Documento.id)
-            .join(
-                TipoDocumento,
-                Documento.id_tipo_documento == TipoDocumento.id
-            )
+            .join(TipoDocumento, Documento.id_tipo_documento == TipoDocumento.id)
             .where(
                 Documento.id_expediente == Expediente.id,
-                TipoDocumento.nombre == "Consolidación"
+                TipoDocumento.nombre == "Consolidación",
             )
         )
 
         return self._listar_gestiones(
             Expediente.id_usuario == id_usuario,
             Expediente.fecha_consolidacion.is_not(None),
-            ~tiene_documento_consolidacion
+            ~tiene_documento_consolidacion,
         )
 
-    def listar_gestiones_activas(
-        self
-    ) -> Sequence[ExpedienteGestionRead]:
+    def listar_gestiones_activas(self) -> Sequence[ExpedienteGestionRead]:
 
-        return self._listar_gestiones(
-            Expediente.fecha_consolidacion.is_(None)
-        )
+        return self._listar_gestiones(Expediente.fecha_consolidacion.is_(None))
 
-    def contar_gestiones(
-        self,
-        id_usuario: int,
-        rol: str
-    ) -> dict[str, int]:
+    def contar_gestiones(self, id_usuario: int, rol: str) -> dict[str, int]:
 
         if rol == "Visualizador":
-            activos = (
-                select(func.count(Expediente.id))
-                .where(
-                    Expediente.estado.is_(True),
-                    Expediente.fecha_consolidacion.is_(None)
-                )
+            activos = select(func.count(Expediente.id)).where(
+                Expediente.estado.is_(True), Expediente.fecha_consolidacion.is_(None)
             )
 
-            return {
-                "activos": self.session.execute(
-                    activos
-                ).scalar_one()
-            }
+            return {"activos": self.session.execute(activos).scalar_one()}
 
         tiene_documento_consolidacion = exists(
             select(Documento.id)
-            .join(
-                TipoDocumento,
-                Documento.id_tipo_documento == TipoDocumento.id
-            )
+            .join(TipoDocumento, Documento.id_tipo_documento == TipoDocumento.id)
             .where(
                 Documento.id_expediente == Expediente.id,
-                TipoDocumento.nombre == "Consolidación"
+                TipoDocumento.nombre == "Consolidación",
             )
         )
 
-        del_dia = (
-            select(func.count(Expediente.id))
-            .where(
-                Expediente.estado.is_(True),
-                Expediente.id_usuario == id_usuario,
-                Expediente.fecha_desfase.is_(None),
-                Expediente.fecha_consolidacion.is_(None)
-            )
+        del_dia = select(func.count(Expediente.id)).where(
+            Expediente.estado.is_(True),
+            Expediente.id_usuario == id_usuario,
+            Expediente.fecha_desfase.is_(None),
+            Expediente.fecha_consolidacion.is_(None),
         )
 
-        desfasados = (
-            select(func.count(Expediente.id))
-            .where(
-                Expediente.estado.is_(True),
-                Expediente.id_usuario == id_usuario,
-                Expediente.fecha_desfase.is_not(None),
-                Expediente.fecha_consolidacion.is_(None)
-            )
+        desfasados = select(func.count(Expediente.id)).where(
+            Expediente.estado.is_(True),
+            Expediente.id_usuario == id_usuario,
+            Expediente.fecha_desfase.is_not(None),
+            Expediente.fecha_consolidacion.is_(None),
         )
 
-        consolidacion = (
-            select(func.count(Expediente.id))
-            .where(
-                Expediente.estado.is_(True),
-                Expediente.id_usuario == id_usuario,
-                Expediente.fecha_consolidacion.is_not(None),
-                ~tiene_documento_consolidacion
-            )
+        consolidacion = select(func.count(Expediente.id)).where(
+            Expediente.estado.is_(True),
+            Expediente.id_usuario == id_usuario,
+            Expediente.fecha_consolidacion.is_not(None),
+            ~tiene_documento_consolidacion,
         )
 
-        activos = (
-            select(func.count(Expediente.id))
-            .where(
-                Expediente.estado.is_(True),
-                Expediente.fecha_consolidacion.is_(None)
-            )
+        activos = select(func.count(Expediente.id)).where(
+            Expediente.estado.is_(True), Expediente.fecha_consolidacion.is_(None)
         )
 
         return {
-            "del-dia": self.session.execute(
-                del_dia
-            ).scalar_one(),
-
-            "desfasados": self.session.execute(
-                desfasados
-            ).scalar_one(),
-
-            "consolidacion": self.session.execute(
-                consolidacion
-            ).scalar_one(),
-
-            "activos": self.session.execute(
-                activos
-            ).scalar_one(),
+            "del-dia": self.session.execute(del_dia).scalar_one(),
+            "desfasados": self.session.execute(desfasados).scalar_one(),
+            "consolidacion": self.session.execute(consolidacion).scalar_one(),
+            "activos": self.session.execute(activos).scalar_one(),
         }
 
-    def _listar_gestiones(
-        self,
-        *filtros
-    ) -> Sequence[ExpedienteGestionRead]:
+    def _listar_gestiones(self, *filtros) -> Sequence[ExpedienteGestionRead]:
 
         ultima_cobranza_dia = (
             select(Cobranza.dia)
-            .where(
-                Cobranza.id_expediente == Expediente.id
-            )
-            .order_by(
-                Cobranza.fecha.desc(),
-                Cobranza.id.desc()
-            )
+            .where(Cobranza.id_expediente == Expediente.id)
+            .order_by(Cobranza.fecha.desc(), Cobranza.id.desc())
             .limit(1)
             .scalar_subquery()
         )
 
         ultima_cobranza_intentos = (
             select(Cobranza.orden)
-            .where(
-                Cobranza.id_expediente == Expediente.id
-            )
-            .order_by(
-                Cobranza.fecha.desc(),
-                Cobranza.id.desc()
-            )
+            .where(Cobranza.id_expediente == Expediente.id)
+            .order_by(Cobranza.fecha.desc(), Cobranza.id.desc())
             .limit(1)
             .scalar_subquery()
         )
@@ -396,25 +271,14 @@ class ExpedienteService(BaseService):
             select(
                 Expediente,
                 ultima_cobranza_dia.label("dia"),
-                ultima_cobranza_intentos.label("intentos")
+                ultima_cobranza_intentos.label("intentos"),
             )
-            .options(
-                joinedload(Expediente.cliente),
-                joinedload(Expediente.usuario)
-            )
-            .where(
-                Expediente.estado.is_(True),
-                *filtros
-            )
+            .options(joinedload(Expediente.cliente), joinedload(Expediente.usuario))
+            .where(Expediente.estado.is_(True), *filtros)
             .order_by(Expediente.id)
         )
 
-        resultados = (
-            self.session
-            .execute(stmt)
-            .unique()
-            .all()
-        )
+        resultados = self.session.execute(stmt).unique().all()
 
         return [
             ExpedienteGestionRead(
@@ -432,15 +296,12 @@ class ExpedienteService(BaseService):
                 ),
                 dia=dia,
                 intentos=intentos,
-                comentarios=None
+                comentarios=None,
             )
             for expediente, dia, intentos in resultados
         ]
 
-    def contar_contenido(
-        self,
-        id_expediente: int
-    ) -> ExpedienteResumenEliminacion:
+    def contar_contenido(self, id_expediente: int) -> ExpedienteResumenEliminacion:
 
         self.obtener(id_expediente)
 
@@ -456,10 +317,7 @@ class ExpedienteService(BaseService):
             .where(Documento.id_expediente == id_expediente)
         )
 
-        return ExpedienteResumenEliminacion(
-            cobranzas=cobranzas,
-            documentos=documentos
-        )
+        return ExpedienteResumenEliminacion(cobranzas=cobranzas, documentos=documentos)
 
     def eliminar(
         self,
@@ -472,37 +330,26 @@ class ExpedienteService(BaseService):
             )
 
         expedientes = (
-            self.session
-            .execute(
-                select(Expediente)
-                .where(
-                    Expediente.id.in_(ids_expediente)
-                )
+            self.session.execute(
+                select(Expediente).where(Expediente.id.in_(ids_expediente))
             )
             .scalars()
             .all()
         )
 
-        encontrados = {
-            expediente.id
-            for expediente in expedientes
-        }
+        encontrados = {expediente.id for expediente in expedientes}
 
         faltantes = set(ids_expediente) - encontrados
 
         if faltantes:
             raise NoEncontrado(
-                f"No existen los expedientes: "
-                f"{', '.join(map(str, sorted(faltantes)))}."
+                f"No existen los expedientes: {', '.join(map(str, sorted(faltantes)))}."
             )
 
         errores = []
 
         for expediente in expedientes:
-            carpeta = carpeta_expediente(
-                expediente.cliente,
-                expediente
-            )
+            carpeta = carpeta_expediente(expediente.cliente, expediente)
 
             try:
                 if carpeta.exists():
@@ -524,6 +371,5 @@ class ExpedienteService(BaseService):
 
         if errores:
             raise OperacionInvalida(
-                f"No se pudieron eliminar todos los expedientes: "
-                f"{'; '.join(errores)}."
+                f"No se pudieron eliminar todos los expedientes: {'; '.join(errores)}."
             )

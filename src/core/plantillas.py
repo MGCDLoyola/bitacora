@@ -1,5 +1,6 @@
 from src.core.config import RECUPERACION_DURACION_MINUTOS
 
+
 def correo_alta_usuario(
     nombre: str,
     correo: str,
@@ -39,6 +40,7 @@ def correo_alta_usuario(
     </body>
     </html>
     """
+
 
 def correo_recuperacion_password(
     nombre: str,

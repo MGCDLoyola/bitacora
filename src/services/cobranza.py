@@ -14,9 +14,8 @@ from src.schemas.cobranza import CobranzaCreate, CobranzaUpdate
 
 from src.services.base import BaseService
 
+
 class CobranzaService(BaseService):
-
-
     def listar_por_expediente(self, id_expediente: int) -> Sequence[Cobranza]:
         stmt = (
             select(Cobranza)
@@ -24,51 +23,32 @@ class CobranzaService(BaseService):
             .order_by(Cobranza.dia, Cobranza.orden)
         )
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        return self.session.execute(stmt).scalars().all()
 
     def obtener(self, id_cobranza: int) -> Cobranza:
 
         cobranza = self.session.get(Cobranza, id_cobranza)
 
         if cobranza is None:
-            raise NoEncontrado(
-                f"No existe una cobranza con id '{id_cobranza}'."
-            )
+            raise NoEncontrado(f"No existe una cobranza con id '{id_cobranza}'.")
 
         return cobranza
 
     def crear(
-        self,
-        id_expediente: int,
-        id_usuario: int,
-        dia: int,
-        data: CobranzaCreate
+        self, id_expediente: int, id_usuario: int, dia: int, data: CobranzaCreate
     ) -> Cobranza:
 
-        expediente = self.session.get(
-            Expediente,
-            id_expediente
-        )
+        expediente = self.session.get(Expediente, id_expediente)
 
         if expediente.id_usuario != id_usuario:
-            raise OperacionInvalida(
-                "El expediente no está asignado al usuario actual."
-            )
+            raise OperacionInvalida("El expediente no está asignado al usuario actual.")
 
         if expediente is None:
-            raise NoEncontrado(
-                f"No existe un expediente con id '{id_expediente}'."
-            )
+            raise NoEncontrado(f"No existe un expediente con id '{id_expediente}'.")
 
         if not expediente.estado:
             raise ConflictoNegocio(
-                "No se puede registrar una cobranza "
-                "en un expediente cerrado."
+                "No se puede registrar una cobranza en un expediente cerrado."
             )
 
         if not 1 <= dia <= MAX_DIAS:
@@ -82,16 +62,10 @@ class CobranzaService(BaseService):
                 f"El día actual del expediente es {expediente.dia_actual}."
             )
 
-        orden = self._orden(
-            id_expediente=id_expediente,
-            dia=dia
-        )
+        orden = self._orden(id_expediente=id_expediente, dia=dia)
 
         if dia == expediente.dia_actual:
-            self._validar_horario(
-                orden,
-                data.fecha
-            )
+            self._validar_horario(orden, data.fecha)
 
         cobranza = Cobranza(
             id_expediente=id_expediente,
@@ -101,7 +75,7 @@ class CobranzaService(BaseService):
             fecha=data.fecha,
             contacto=data.contacto,
             medio=data.medio,
-            comentarios=data.comentarios
+            comentarios=data.comentarios,
         )
 
         self._guardar(cobranza)
@@ -109,27 +83,19 @@ class CobranzaService(BaseService):
         return cobranza
 
     def actualizar(
-        self,
-        id_cobranza: int,
-        id_usuario: int,
-        data: CobranzaUpdate
+        self, id_cobranza: int, id_usuario: int, data: CobranzaUpdate
     ) -> Cobranza:
 
         cobranza = self.obtener(id_cobranza)
 
         if cobranza.expediente.id_usuario != id_usuario:
-            raise OperacionInvalida(
-                "El expediente no está asignado al usuario actual."
-            )
+            raise OperacionInvalida("El expediente no está asignado al usuario actual.")
 
         cambios = data.model_dump(exclude_unset=True)
 
         for campo, valor in cambios.items():
-
             if valor is None and campo in ("fecha", "contacto"):
-                raise OperacionInvalida(
-                    f"El campo '{campo}' no puede ser nulo."
-                )
+                raise OperacionInvalida(f"El campo '{campo}' no puede ser nulo.")
 
             setattr(cobranza, campo, valor)
 
@@ -137,23 +103,14 @@ class CobranzaService(BaseService):
 
         return cobranza
 
-    def eliminar(
-        self,
-        id_cobranza: int,
-        id_usuario: int
-    ) -> None:
+    def eliminar(self, id_cobranza: int, id_usuario: int) -> None:
 
         cobranza = self.obtener(id_cobranza)
 
         if cobranza.expediente.id_usuario != id_usuario:
-            raise OperacionInvalida(
-                "El expediente no está asignado al usuario actual."
-            )
+            raise OperacionInvalida("El expediente no está asignado al usuario actual.")
 
-        rutas = [
-            Path(evidencia.ruta_archivo)
-            for evidencia in cobranza.evidencias
-        ]
+        rutas = [Path(evidencia.ruta_archivo) for evidencia in cobranza.evidencias]
 
         self.session.delete(cobranza)
 
@@ -163,11 +120,7 @@ class CobranzaService(BaseService):
             if ruta.exists():
                 ruta.unlink()
 
-    def _orden(
-        self,
-        id_expediente: int,
-        dia: int
-    ) -> int:
+    def _orden(self, id_expediente: int, dia: int) -> int:
 
         ordenes = self.session.scalars(
             select(Cobranza.orden)
@@ -176,12 +129,7 @@ class CobranzaService(BaseService):
         ).all()
 
         orden = next(
-            (
-                i
-                for i in range(1, MAX_GESTIONES_DIA + 1)
-                if i not in ordenes
-            ),
-            None
+            (i for i in range(1, MAX_GESTIONES_DIA + 1) if i not in ordenes), None
         )
 
         if orden is None:

@@ -30,14 +30,15 @@ _entorno = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
 
 
 class PDFConsolidacionService(BaseService):
-
     NOMBRE_ARCHIVO = "Consolidación.pdf"
 
     def generar(self, id_expediente: int) -> Path:
 
         expediente = ExpedienteService(self.session).obtener(id_expediente)
 
-        preconsolidacion = ConsolidacionService(self.session).preconsolidar(id_expediente)
+        preconsolidacion = ConsolidacionService(self.session).preconsolidar(
+            id_expediente
+        )
 
         cobranzas = preconsolidacion["cobranzas"]
         documentos_edc = preconsolidacion["documentos_edc"]
@@ -64,19 +65,20 @@ class PDFConsolidacionService(BaseService):
         dias = []
 
         for dia in range(1, 5):
-
             intentos_dia = sorted(
                 (cobranza for cobranza in cobranzas if cobranza.dia == dia),
-                key=lambda cobranza: cobranza.orden
+                key=lambda cobranza: cobranza.orden,
             )
 
             if not intentos_dia:
-                dias.append({
-                    "dia": dia,
-                    "fecha_dia": "N/D",
-                    "monto_vencido": "",
-                    "intentos": [],
-                })
+                dias.append(
+                    {
+                        "dia": dia,
+                        "fecha_dia": "N/D",
+                        "monto_vencido": "",
+                        "intentos": [],
+                    }
+                )
                 continue
 
             fecha_dia = intentos_dia[0].fecha.date()
@@ -86,32 +88,34 @@ class PDFConsolidacionService(BaseService):
                 fecha_ancla=fecha_dia,
             )
 
-            dias.append({
-                "dia": dia,
-                "fecha_dia": fecha_dia.strftime("%d/%m/%Y"),
-                "monto_vencido": money(monto_vencido),
-                "intentos": [
-                    {
-                        "orden": intento.orden,
-                        "horario_programado": f"{HORARIOS_GESTION[intento.orden]:02d}:00",
-                        "hora": intento.fecha.strftime("%H:%M"),
-                        "medio": intento.medio,
-                        "contacto": intento.contacto,
-                        "comentarios": intento.comentarios,
-                        "avisos": [
-                            evidencia.nombre_original
-                            for evidencia in intento.evidencias
-                            if evidencia.tipo == "AVISO"
-                        ],
-                        "respuestas": [
-                            evidencia.nombre_original
-                            for evidencia in intento.evidencias
-                            if evidencia.tipo == "RESPUESTA"
-                        ],
-                    }
-                    for intento in intentos_dia
-                ],
-            })
+            dias.append(
+                {
+                    "dia": dia,
+                    "fecha_dia": fecha_dia.strftime("%d/%m/%Y"),
+                    "monto_vencido": money(monto_vencido),
+                    "intentos": [
+                        {
+                            "orden": intento.orden,
+                            "horario_programado": f"{HORARIOS_GESTION[intento.orden]:02d}:00",
+                            "hora": intento.fecha.strftime("%H:%M"),
+                            "medio": intento.medio,
+                            "contacto": intento.contacto,
+                            "comentarios": intento.comentarios,
+                            "avisos": [
+                                evidencia.nombre_original
+                                for evidencia in intento.evidencias
+                                if evidencia.tipo == "AVISO"
+                            ],
+                            "respuestas": [
+                                evidencia.nombre_original
+                                for evidencia in intento.evidencias
+                                if evidencia.tipo == "RESPUESTA"
+                            ],
+                        }
+                        for intento in intentos_dia
+                    ],
+                }
+            )
 
         contexto = {
             "fecha_registro": expediente.fecha_creacion.strftime("%d/%m/%Y"),
@@ -146,17 +150,14 @@ class PDFConsolidacionService(BaseService):
         ruta.write_bytes(pdf_bytes)
 
         tipo_documento = self.session.scalar(
-            select(TipoDocumento)
-            .where(TipoDocumento.nombre == "Consolidación")
+            select(TipoDocumento).where(TipoDocumento.nombre == "Consolidación")
         )
 
         if tipo_documento is None:
             if ruta.exists():
                 ruta.unlink()
 
-            raise ConflictoNegocio(
-                "No existe el tipo de documento 'Consolidación'."
-            )
+            raise ConflictoNegocio("No existe el tipo de documento 'Consolidación'.")
 
         documento = Documento(
             id_expediente=expediente.id,

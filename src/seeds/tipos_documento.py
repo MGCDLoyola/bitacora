@@ -15,12 +15,7 @@ def seed_tipos_documento(session: Session) -> None:
     ]
 
     for datos in tipos:
-
-        existe = (
-            session.query(TipoDocumento)
-            .filter_by(nombre=datos["nombre"])
-            .first()
-        )
+        existe = session.query(TipoDocumento).filter_by(nombre=datos["nombre"]).first()
 
         if existe is None:
             session.add(TipoDocumento(**datos))

@@ -9,25 +9,14 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .usuario import Usuario
 
+
 class Rol(AuditoriaMixin, Base):
     __tablename__ = "roles"
 
-    id: Mapped[int] = mapped_column(
-        "id_rol",
-        primary_key=True
-    )
+    id: Mapped[int] = mapped_column("id_rol", primary_key=True)
 
-    nombre: Mapped[str] = mapped_column(
-        String(50),
-        unique=True,
-        nullable=False
-    )
+    nombre: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 
-    descripcion: Mapped[str | None] = mapped_column(
-        String(255)
-    )
+    descripcion: Mapped[str | None] = mapped_column(String(255))
 
-    usuarios: Mapped[list["Usuario"]] = relationship(
-        "Usuario",
-        back_populates="rol"
-    )
+    usuarios: Mapped[list["Usuario"]] = relationship("Usuario", back_populates="rol")

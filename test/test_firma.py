@@ -29,11 +29,9 @@ def test_procesar_firma():
 
     print("Colores predominantes:")
 
-    for color, cantidad in sorted(
-        colores.items(),
-        key=lambda x: x[1],
-        reverse=True
-    )[:10]:
+    for color, cantidad in sorted(colores.items(), key=lambda x: x[1], reverse=True)[
+        :10
+    ]:
         print(f"{color}: {cantidad}")
 
     resultado = FirmaService.procesar(contenido)

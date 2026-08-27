@@ -12,8 +12,12 @@ from src.core.exceptions import ErrorEnvioCredenciales, OperacionInvalida
 from src.core.plantillas import correo_alta_usuario
 from src.models.usuario import Usuario
 from src.schemas.usuario import (
-    UsuarioCreate, UsuarioRead, UsuarioUpdate,
-    UsuarioUpdateSupervisor, UsuarioRolMasivo, UsuarioEstadoMasivo
+    UsuarioCreate,
+    UsuarioRead,
+    UsuarioUpdate,
+    UsuarioUpdateSupervisor,
+    UsuarioRolMasivo,
+    UsuarioEstadoMasivo,
 )
 from src.services.firma import FirmaService
 from src.services.usuario import UsuarioService
@@ -37,24 +41,19 @@ def crear_usuario(
     usuario, codigo = servicio.crear(data)
 
     body = correo_alta_usuario(
-        nombre   = usuario.nombre,
-        correo   = usuario.correo,
-        password = codigo
+        nombre=usuario.nombre, correo=usuario.correo, password=codigo
     )
 
     message_id = None
 
     try:
         message_id = mail.crear(
-            to      = usuario.correo,
-            subject = "Alta de usuario en Bitácora",
-            body    = body
+            to=usuario.correo, subject="Alta de usuario en Bitácora", body=body
         )
 
-        mail.enviar(message_id = message_id)
+        mail.enviar(message_id=message_id)
 
     except MailError as exc:
-
         if message_id is not None:
             try:
                 mailbox.eliminar(message_id)
@@ -66,8 +65,7 @@ def crear_usuario(
                 )
 
         raise ErrorEnvioCredenciales(
-            f"No fue posible enviar las credenciales al usuario "
-            f"'{usuario.correo}'."
+            f"No fue posible enviar las credenciales al usuario '{usuario.correo}'."
         ) from exc
 
     else:
@@ -83,6 +81,7 @@ def crear_usuario(
 
     return usuario
 
+
 @router.get("", response_model=list[UsuarioRead])
 def listar_usuarios(
     usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor")),
@@ -91,20 +90,17 @@ def listar_usuarios(
     incluir_admin = usuario_actual.rol.nombre == "Administrador"
 
     return UsuarioService(session).listar(
-        incluir_admin=incluir_admin,
-        excluir_id=usuario_actual.id
+        incluir_admin=incluir_admin, excluir_id=usuario_actual.id
     )
+
 
 @router.get("/asignables", response_model=list[UsuarioRead])
 def listar_usuarios_asignables(
-    usuario_actual: Usuario = Depends(
-        requiere_rol("Administrador", "Supervisor")
-    ),
+    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor")),
     session: Session = Depends(get_session),
 ):
-    return UsuarioService(session).listar_asignables(
-        usuario_actual
-    )
+    return UsuarioService(session).listar_asignables(usuario_actual)
+
 
 @router.patch("/rol-masivo", response_model=list[UsuarioRead])
 def actualizar_rol_masivo(
@@ -113,10 +109,9 @@ def actualizar_rol_masivo(
     session: Session = Depends(get_session),
 ):
     return UsuarioService(session).actualizar_rol_masivo(
-        data.ids,
-        data.id_rol,
-        usuario_actual
+        data.ids, data.id_rol, usuario_actual
     )
+
 
 @router.patch("/estado-masivo", response_model=list[UsuarioRead])
 def actualizar_estado_masivo(
@@ -125,10 +120,9 @@ def actualizar_estado_masivo(
     session: Session = Depends(get_session),
 ):
     return UsuarioService(session).actualizar_estado_masivo(
-        data.ids,
-        data.activo,
-        usuario_actual
+        data.ids, data.activo, usuario_actual
     )
+
 
 @router.patch("/{id_usuario}", response_model=UsuarioRead)
 def actualizar_usuario(
@@ -137,11 +131,8 @@ def actualizar_usuario(
     usuario_actual: Usuario = Depends(requiere_rol("Administrador")),
     session: Session = Depends(get_session),
 ):
-    return UsuarioService(session).actualizar(
-        id_usuario,
-        data,
-        usuario_actual
-    )
+    return UsuarioService(session).actualizar(id_usuario, data, usuario_actual)
+
 
 @router.patch("/{id_usuario}/estado", response_model=UsuarioRead)
 def actualizar_estado_usuario(
@@ -151,10 +142,9 @@ def actualizar_estado_usuario(
     session: Session = Depends(get_session),
 ):
     return UsuarioService(session).actualizar_supervisor(
-        id_usuario,
-        data,
-        usuario_actual
+        id_usuario, data, usuario_actual
     )
+
 
 @router.post("/me/firma", response_model=UsuarioRead)
 def subir_firma(
@@ -169,12 +159,10 @@ def subir_firma(
 
     servicio = UsuarioService(session)
 
-    servicio.guardar_firma(
-        usuario=usuario_actual,
-        contenido=contenido
-    )
+    servicio.guardar_firma(usuario=usuario_actual, contenido=contenido)
 
     return usuario_actual
+
 
 @router.get("/me/firma")
 def obtener_firma(

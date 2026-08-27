@@ -3,7 +3,12 @@ from src.core.database import SessionLocal
 from mdb import PostgreSQL
 from src.core.config import PSQL_DATA_DB, PSQL_DATA_HOST, PSQL_DATA_PW, PSQL_DATA_USR
 from src.jobs.informacion import procesar_informacion
-from src.core.config import GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, GRAPH_MAILBOX
+from src.core.config import (
+    GRAPH_TENANT_ID,
+    GRAPH_CLIENT_ID,
+    GRAPH_CLIENT_SECRET,
+    GRAPH_MAILBOX,
+)
 from mgc_graph import GraphAuth, GraphClient, Mailbox
 from src.jobs.asignacion import asignar_expedientes
 
@@ -14,7 +19,9 @@ def main():
 
     pg.conectar()
 
-    auth = GraphAuth(GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, verify_ssl=False)
+    auth = GraphAuth(
+        GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, verify_ssl=False
+    )
 
     client = GraphClient(auth)
 
@@ -23,13 +30,9 @@ def main():
     session = SessionLocal()
 
     try:
-        procesar_clientes(
-            pg,
-            session
-        )
+        procesar_clientes(pg, session)
         asignar_expedientes(session)
         procesar_informacion(session, mailbox)
-
 
     finally:
         session.close()

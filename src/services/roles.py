@@ -8,17 +8,8 @@ from collections.abc import Sequence
 
 
 class RolService(BaseService):
-
     def listar(self) -> Sequence[Rol]:
 
-        stmt = (
-            select(Rol)
-            .order_by(Rol.id)
-        )
+        stmt = select(Rol).order_by(Rol.id)
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        return self.session.execute(stmt).scalars().all()

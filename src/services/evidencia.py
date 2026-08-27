@@ -16,7 +16,6 @@ from collections.abc import Sequence
 
 
 class EvidenciaService(BaseService):
-
     def listar_por_cobranza(self, id_cobranza: int) -> Sequence[Evidencia]:
 
         stmt = (
@@ -25,31 +24,28 @@ class EvidenciaService(BaseService):
             .order_by(Evidencia.fecha_creacion)
         )
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        return self.session.execute(stmt).scalars().all()
 
     def obtener(self, id_evidencia: int) -> Evidencia:
         evidencia = self.session.get(Evidencia, id_evidencia)
 
         if evidencia is None:
-            raise NoEncontrado(
-                f"No existe la evidencia con id '{id_evidencia}'."
-            )
+            raise NoEncontrado(f"No existe la evidencia con id '{id_evidencia}'.")
 
         return evidencia
 
-    def crear(self, id_cobranza: int, id_usuario: int, tipo: str, archivo: UploadFile) -> Evidencia:
+    def crear(
+        self, id_cobranza: int, id_usuario: int, tipo: str, archivo: UploadFile
+    ) -> Evidencia:
 
         cobranza = CobranzaService(self.session).obtener(id_cobranza)
 
         expediente = cobranza.expediente
         cliente = expediente.cliente
 
-        carpeta = carpeta_gestion(cliente, expediente, cobranza.fecha.date(), cobranza.orden, tipo)
+        carpeta = carpeta_gestion(
+            cliente, expediente, cobranza.fecha.date(), cobranza.orden, tipo
+        )
 
         uuid_archivo = uuid.uuid4()
         extension = Path(archivo.filename).suffix
@@ -61,7 +57,7 @@ class EvidenciaService(BaseService):
             tipo=tipo,
             uuid_archivo=uuid_archivo,
             nombre_original=archivo.filename,
-            ruta_archivo=str(ruta_destino)
+            ruta_archivo=str(ruta_destino),
         )
 
         self.session.add(evidencia)

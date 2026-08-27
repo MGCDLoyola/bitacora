@@ -8,16 +8,10 @@ from src.schemas.documento import DocumentoRead
 from src.services.documento import DocumentoService
 
 
-router = APIRouter(
-    prefix="/expedientes",
-    tags=["Documentos"]
-)
+router = APIRouter(prefix="/expedientes", tags=["Documentos"])
 
 
-@router.post(
-    "/{id_expediente}/documentos",
-    response_model=DocumentoRead
-)
+@router.post("/{id_expediente}/documentos", response_model=DocumentoRead)
 def subir_documento(
     id_expediente: int,
     id_tipo_documento: int = Form(...),
@@ -33,14 +27,11 @@ def subir_documento(
         id_expediente=id_expediente,
         id_usuario=usuario_actual.id,
         id_tipo_documento=id_tipo_documento,
-        archivo=archivo
+        archivo=archivo,
     )
 
 
-@router.get(
-    "/{id_expediente}/documentos",
-    response_model=list[DocumentoRead]
-)
+@router.get("/{id_expediente}/documentos", response_model=list[DocumentoRead])
 def listar_documentos(
     id_expediente: int,
     session: Session = Depends(get_session),

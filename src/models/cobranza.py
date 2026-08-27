@@ -1,6 +1,15 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, SmallInteger, String, Text, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    SmallInteger,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.base import Base
@@ -13,6 +22,7 @@ if TYPE_CHECKING:
     from .usuario import Usuario
     from .evidencia import Evidencia
 
+
 class Cobranza(AuditoriaMixin, Base):
     __tablename__ = "cobranzas"
     __table_args__ = (
@@ -21,58 +31,33 @@ class Cobranza(AuditoriaMixin, Base):
         UniqueConstraint("id_expediente", "dia", "orden", name="uq_dia_orden"),
     )
 
-    id: Mapped[int] = mapped_column(
-        "id_cobranza",
-        primary_key=True
-    )
+    id: Mapped[int] = mapped_column("id_cobranza", primary_key=True)
 
     id_expediente: Mapped[int] = mapped_column(
-        ForeignKey("expedientes.id_expediente", ondelete="CASCADE"),
-        nullable=False
+        ForeignKey("expedientes.id_expediente", ondelete="CASCADE"), nullable=False
     )
 
     id_usuario: Mapped[int] = mapped_column(
-        ForeignKey("usuarios.id_usuario", ondelete="RESTRICT"),
-        nullable=False
+        ForeignKey("usuarios.id_usuario", ondelete="RESTRICT"), nullable=False
     )
 
-    dia: Mapped[int] = mapped_column(
-        SmallInteger,
-        nullable=False
-    )
+    dia: Mapped[int] = mapped_column(SmallInteger, nullable=False)
 
-    orden: Mapped[int] = mapped_column(
-        SmallInteger,
-        nullable=False
-    )
+    orden: Mapped[int] = mapped_column(SmallInteger, nullable=False)
 
-    fecha: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=False
-    )
+    fecha: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
-    contacto: Mapped[bool] = mapped_column(
-        Boolean,
-        nullable=False
-    )
+    contacto: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
-    medio: Mapped[str | None] = mapped_column(
-        String(50)
-    )
+    medio: Mapped[str | None] = mapped_column(String(50))
 
-    comentarios: Mapped[str | None] = mapped_column(
-        Text
-    )
+    comentarios: Mapped[str | None] = mapped_column(Text)
 
     expediente: Mapped["Expediente"] = relationship(
-        "Expediente",
-        back_populates="cobranzas"
+        "Expediente", back_populates="cobranzas"
     )
 
-    usuario: Mapped["Usuario"] = relationship(
-        "Usuario",
-        back_populates="cobranzas"
-    )
+    usuario: Mapped["Usuario"] = relationship("Usuario", back_populates="cobranzas")
 
     evidencias: Mapped[list["Evidencia"]] = relationship(
         "Evidencia",

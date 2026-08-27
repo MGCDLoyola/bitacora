@@ -61,7 +61,7 @@ def usuario_normal(db, rol_cobranza):
         nombre="Test Etapa8 Normal",
         correo=f"test_normal_{uuid.uuid4().hex[:8]}@bitacora.test",
         activo=True,
-        ultimo_acceso=datetime.now(timezone.utc)
+        ultimo_acceso=datetime.now(timezone.utc),
     )
     usuario.set_password("PasswordActual123")
 
@@ -82,7 +82,7 @@ def usuario_pendiente(db, rol_cobranza):
         id_rol=rol_cobranza.id,
         nombre="Test Etapa8 Pendiente",
         correo=f"test_pendiente_{uuid.uuid4().hex[:8]}@bitacora.test",
-        activo=True
+        activo=True,
     )
     usuario.set_password("123456")
 
@@ -103,7 +103,7 @@ def usuario_inactivo(db, rol_cobranza):
         nombre="Test Etapa8 Inactivo",
         correo=f"test_inactivo_{uuid.uuid4().hex[:8]}@bitacora.test",
         activo=False,
-        ultimo_acceso=datetime.now(timezone.utc)
+        ultimo_acceso=datetime.now(timezone.utc),
     )
     usuario.set_password("PasswordActual123")
 
@@ -121,7 +121,7 @@ def sesion_expirada(db, usuario_normal):
 
     sesion = Sesion(
         id_usuario=usuario_normal.id,
-        fecha_expiracion=datetime.now(timezone.utc) - timedelta(hours=1)
+        fecha_expiracion=datetime.now(timezone.utc) - timedelta(hours=1),
     )
 
     db.add(sesion)
@@ -135,6 +135,7 @@ def sesion_expirada(db, usuario_normal):
         db.delete(existe)
         db.commit()
 
+
 @pytest.fixture
 def usuario_administrador(db, rol_administrador):
 
@@ -143,7 +144,7 @@ def usuario_administrador(db, rol_administrador):
         nombre="Test Etapa8 Administrador",
         correo=f"test_admin_{uuid.uuid4().hex[:8]}@bitacora.test",
         activo=True,
-        ultimo_acceso=datetime.now(timezone.utc)
+        ultimo_acceso=datetime.now(timezone.utc),
     )
 
     usuario.set_password("PasswordAdmin123")
@@ -156,15 +157,14 @@ def usuario_administrador(db, rol_administrador):
 
     _borrar_usuario_y_sesiones(db, usuario)
 
+
 @pytest.fixture
 def usuario_creado(db):
     correo = "diego.loyola@mgcmexico.com.mx"
 
     yield correo
 
-    usuario = db.scalar(
-        select(Usuario).where(Usuario.correo == correo)
-    )
+    usuario = db.scalar(select(Usuario).where(Usuario.correo == correo))
 
     if usuario is not None:
         _borrar_usuario_y_sesiones(db, usuario)

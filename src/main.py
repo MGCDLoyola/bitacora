@@ -18,7 +18,7 @@ from src.core.exceptions import (
     NoAutorizado,
     CambioPasswordRequerido,
     PermisoDenegado,
-    ErrorEnvioCredenciales
+    ErrorEnvioCredenciales,
 )
 from src.core.logging import configurar_logging
 from src.core.pg import pg
@@ -36,6 +36,7 @@ configurar_logging()
 
 logger = logging.getLogger("bitacora")
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     pg.conectar()
@@ -45,13 +46,11 @@ async def lifespan(app: FastAPI):
     finally:
         pg.desconectar()
 
+
 app = FastAPI(lifespan=lifespan)
 
-app.mount(
-    "/static",
-    StaticFiles(directory="frontend"),
-    name="static"
-)
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
+
 
 @app.get("/")
 def pagina_inicio(
@@ -59,13 +58,16 @@ def pagina_inicio(
 ):
     return FileResponse("frontend/app.html")
 
+
 @app.get("/login")
 def pagina_login():
     return FileResponse("frontend/login.html")
 
+
 @app.get("/cambiar-password")
 def pagina_cambiar_password():
     return FileResponse("frontend/cambiar-password.html")
+
 
 app.include_router(auth_router)
 app.include_router(roles_router)
@@ -77,128 +79,64 @@ app.include_router(documentos_router)
 
 
 @app.exception_handler(NoEncontrado)
-def handle_no_encontrado(
-    request: Request,
-    exc: NoEncontrado
-):
-    return JSONResponse(
-        status_code=404,
-        content={"detail": exc.mensaje}
-    )
+def handle_no_encontrado(request: Request, exc: NoEncontrado):
+    return JSONResponse(status_code=404, content={"detail": exc.mensaje})
 
 
 @app.exception_handler(NoAutorizado)
-def handle_no_autorizado(
-    request: Request,
-    exc: NoAutorizado
-):
+def handle_no_autorizado(request: Request, exc: NoAutorizado):
     if request.url.path == "/":
-        return RedirectResponse(
-            url="/login",
-            status_code=303
-        )
+        return RedirectResponse(url="/login", status_code=303)
 
-    return JSONResponse(
-        status_code=401,
-        content={"detail": exc.mensaje}
-    )
+    return JSONResponse(status_code=401, content={"detail": exc.mensaje})
 
 
 @app.exception_handler(CambioPasswordRequerido)
-def handle_cambio_password_requerido(
-    request: Request,
-    exc: CambioPasswordRequerido
-):
-    return JSONResponse(
-        status_code=403,
-        content={"detail": exc.mensaje}
-    )
+def handle_cambio_password_requerido(request: Request, exc: CambioPasswordRequerido):
+    return JSONResponse(status_code=403, content={"detail": exc.mensaje})
 
 
 @app.exception_handler(PermisoDenegado)
-def handle_permiso_denegado(
-    request: Request,
-    exc: PermisoDenegado
-):
-    return JSONResponse(
-        status_code=403,
-        content={"detail": exc.mensaje}
-    )
+def handle_permiso_denegado(request: Request, exc: PermisoDenegado):
+    return JSONResponse(status_code=403, content={"detail": exc.mensaje})
 
 
 @app.exception_handler(ErrorEnvioCredenciales)
-def handle_error_envio_credenciales(
-    request: Request,
-    exc: ErrorEnvioCredenciales
-):
+def handle_error_envio_credenciales(request: Request, exc: ErrorEnvioCredenciales):
     logger.error(
-        "Error al enviar credenciales en %s: %s",
-        request.url.path,
-        exc.mensaje
+        "Error al enviar credenciales en %s: %s", request.url.path, exc.mensaje
     )
 
-    return JSONResponse(
-        status_code=500,
-        content={"detail": exc.mensaje}
-    )
+    return JSONResponse(status_code=500, content={"detail": exc.mensaje})
+
 
 @app.exception_handler(ConflictoNegocio)
-def handle_conflicto(
-    request: Request,
-    exc: ConflictoNegocio
-):
-    logger.warning(
-        "Conflicto de negocio en %s: %s",
-        request.url.path,
-        exc.mensaje
-    )
+def handle_conflicto(request: Request, exc: ConflictoNegocio):
+    logger.warning("Conflicto de negocio en %s: %s", request.url.path, exc.mensaje)
 
-    return JSONResponse(
-        status_code=409,
-        content={"detail": exc.mensaje}
-    )
+    return JSONResponse(status_code=409, content={"detail": exc.mensaje})
 
 
 @app.exception_handler(OperacionInvalida)
-def handle_operacion_invalida(
-    request: Request,
-    exc: OperacionInvalida
-):
-    return JSONResponse(
-        status_code=400,
-        content={"detail": exc.mensaje}
-    )
+def handle_operacion_invalida(request: Request, exc: OperacionInvalida):
+    return JSONResponse(status_code=400, content={"detail": exc.mensaje})
 
 
 @app.exception_handler(BitacoraError)
-def handle_bitacora_error(
-    request: Request,
-    exc: BitacoraError
-):
+def handle_bitacora_error(request: Request, exc: BitacoraError):
     logger.warning(
         "Error de dominio sin handler específico en %s: %s",
         request.url.path,
-        exc.mensaje
+        exc.mensaje,
     )
 
-    return JSONResponse(
-        status_code=400,
-        content={"detail": exc.mensaje}
-    )
+    return JSONResponse(status_code=400, content={"detail": exc.mensaje})
 
 
 @app.exception_handler(Exception)
-def handle_no_esperado(
-    request: Request,
-    exc: Exception
-):
-    logger.exception(
-        "Error no manejado en %s %s",
-        request.method,
-        request.url.path
-    )
+def handle_no_esperado(request: Request, exc: Exception):
+    logger.exception("Error no manejado en %s %s", request.method, request.url.path)
 
     return JSONResponse(
-        status_code=500,
-        content={"detail": "Error interno del servidor"}
+        status_code=500, content={"detail": "Error interno del servidor"}
     )

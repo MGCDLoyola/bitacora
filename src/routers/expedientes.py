@@ -50,9 +50,7 @@ def listar_mis_expedientes(
 ):
     servicio = ExpedienteService(session)
 
-    return servicio.listar_por_asignado(
-        usuario_actual.id
-    )
+    return servicio.listar_por_asignado(usuario_actual.id)
 
 
 @router.get(
@@ -91,9 +89,7 @@ def listar_gestiones_del_dia(
 ):
     servicio = ExpedienteService(session)
 
-    return servicio.listar_gestiones_del_dia(
-        usuario_actual.id
-    )
+    return servicio.listar_gestiones_del_dia(usuario_actual.id)
 
 
 @router.get(
@@ -112,9 +108,7 @@ def listar_gestiones_desfasados(
 ):
     servicio = ExpedienteService(session)
 
-    return servicio.listar_gestiones_desfasadas(
-        usuario_actual.id
-    )
+    return servicio.listar_gestiones_desfasadas(usuario_actual.id)
 
 
 @router.get(
@@ -133,9 +127,7 @@ def listar_gestiones_consolidacion(
 ):
     servicio = ExpedienteService(session)
 
-    return servicio.listar_gestiones_consolidacion(
-        usuario_actual.id
-    )
+    return servicio.listar_gestiones_consolidacion(usuario_actual.id)
 
 
 @router.get(
@@ -187,6 +179,7 @@ def asignar_expedientes(
         id_usuario=data.id_usuario,
         usuario_actual=usuario_actual,
     )
+
 
 @router.get(
     "/{id_expediente}",
@@ -273,13 +266,9 @@ def listar_cobranzas(
     session: Session = Depends(get_session),
     usuario_actual: Usuario = Depends(usuario_actual),
 ):
-    ExpedienteService(session).obtener(
-        id_expediente
-    )
+    ExpedienteService(session).obtener(id_expediente)
 
-    return CobranzaService(session).listar_por_expediente(
-        id_expediente
-    )
+    return CobranzaService(session).listar_por_expediente(id_expediente)
 
 
 @router.post(
@@ -352,9 +341,7 @@ def generar_pdf_consolidacion(
 ):
     servicio = PDFConsolidacionService(session)
 
-    ruta = servicio.generar(
-        id_expediente
-    )
+    ruta = servicio.generar(id_expediente)
 
     return FileResponse(
         path=ruta,

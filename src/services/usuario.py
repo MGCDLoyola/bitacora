@@ -20,8 +20,9 @@ NOMBRE_FIRMA = "firma.png"
 
 
 class UsuarioService(BaseService):
-
-    def listar(self, incluir_admin: bool = True, excluir_id: int | None = None) -> Sequence[Usuario]:
+    def listar(
+        self, incluir_admin: bool = True, excluir_id: int | None = None
+    ) -> Sequence[Usuario]:
 
         stmt = select(Usuario)
 
@@ -35,11 +36,7 @@ class UsuarioService(BaseService):
 
         return self.session.execute(stmt).scalars().all()
 
-    def puede_asignar(
-        self,
-        usuario_actual: Usuario,
-        usuario_destino: Usuario
-    ) -> bool:
+    def puede_asignar(self, usuario_actual: Usuario, usuario_destino: Usuario) -> bool:
 
         if not usuario_destino.activo:
             return False
@@ -58,10 +55,7 @@ class UsuarioService(BaseService):
 
         return False
 
-    def listar_asignables(
-        self,
-        usuario_actual: Usuario
-    ) -> Sequence[Usuario]:
+    def listar_asignables(self, usuario_actual: Usuario) -> Sequence[Usuario]:
 
         if usuario_actual.rol.nombre == "Administrador":
             roles_permitidos = ["Supervisor", "Cobranza"]
@@ -76,39 +70,28 @@ class UsuarioService(BaseService):
             select(Usuario)
             .where(
                 Usuario.activo.is_(True),
-                (
-                    Usuario.id == usuario_actual.id
-                )
+                (Usuario.id == usuario_actual.id)
                 | (
                     Usuario.id_rol.in_(
-                        select(Rol.id).where(
-                            Rol.nombre.in_(roles_permitidos)
-                        )
+                        select(Rol.id).where(Rol.nombre.in_(roles_permitidos))
                     )
-                )
+                ),
             )
             .order_by(Usuario.nombre)
         )
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        return self.session.execute(stmt).scalars().all()
 
-    def obtener(self, id_usuario: int, activos: bool = False, cobranza: bool = False) -> Usuario:
+    def obtener(
+        self, id_usuario: int, activos: bool = False, cobranza: bool = False
+    ) -> Usuario:
         usuario = self.session.get(Usuario, id_usuario)
 
         if usuario is None:
-            raise NoEncontrado(
-                f"No existe el usuario con id '{id_usuario}'."
-            )
+            raise NoEncontrado(f"No existe el usuario con id '{id_usuario}'.")
 
         if not usuario.activo and activos:
-            raise OperacionInvalida(
-                f"El usuario con id '{id_usuario}' no esta activo"
-            )
+            raise OperacionInvalida(f"El usuario con id '{id_usuario}' no esta activo")
 
         if usuario.rol.nombre != "Cobranza" and cobranza:
             raise OperacionInvalida(
@@ -120,8 +103,7 @@ class UsuarioService(BaseService):
     def crear(self, data: UsuarioCreate) -> tuple[Usuario, str]:
 
         existente = self.session.scalar(
-            select(Usuario)
-            .where(Usuario.correo == data.correo)
+            select(Usuario).where(Usuario.correo == data.correo)
         )
 
         if existente is not None:
@@ -135,7 +117,7 @@ class UsuarioService(BaseService):
             nombre=data.nombre,
             correo=data.correo,
             id_rol=data.id_rol,
-            activo=data.activo
+            activo=data.activo,
         )
 
         usuario.set_password(codigo)
@@ -146,18 +128,12 @@ class UsuarioService(BaseService):
         return usuario, codigo
 
     def actualizar(
-        self,
-        id_usuario: int,
-        data: UsuarioUpdate,
-        usuario_actual: Usuario
+        self, id_usuario: int, data: UsuarioUpdate, usuario_actual: Usuario
     ) -> Usuario:
 
         usuario = self.obtener(id_usuario)
 
-        if (
-            usuario.rol.nombre == "Administrador"
-            and usuario.id != usuario_actual.id
-        ):
+        if usuario.rol.nombre == "Administrador" and usuario.id != usuario_actual.id:
             raise OperacionInvalida(
                 "Un Administrador no puede modificar a otro Administrador."
             )
@@ -165,14 +141,11 @@ class UsuarioService(BaseService):
         cambios = data.model_dump(exclude_unset=True)
 
         if "id_rol" in cambios and usuario.id == usuario_actual.id:
-            raise OperacionInvalida(
-                "No puedes cambiar tu propio rol."
-            )
+            raise OperacionInvalida("No puedes cambiar tu propio rol.")
 
         if "correo" in cambios and cambios["correo"] != usuario.correo:
             existente = self.session.scalar(
-                select(Usuario)
-                .where(Usuario.correo == cambios["correo"])
+                select(Usuario).where(Usuario.correo == cambios["correo"])
             )
 
             if existente is not None:
@@ -187,20 +160,14 @@ class UsuarioService(BaseService):
 
         return usuario
 
-
     def actualizar_supervisor(
-        self,
-        id_usuario: int,
-        data: UsuarioUpdateSupervisor,
-        usuario_actual: Usuario
+        self, id_usuario: int, data: UsuarioUpdateSupervisor, usuario_actual: Usuario
     ) -> Usuario:
 
         usuario = self.obtener(id_usuario)
 
         if usuario.id == usuario_actual.id:
-            raise OperacionInvalida(
-                "No puedes modificar tu propio usuario."
-            )
+            raise OperacionInvalida("No puedes modificar tu propio usuario.")
 
         if usuario.rol.nombre == "Administrador":
             raise OperacionInvalida(
@@ -217,20 +184,14 @@ class UsuarioService(BaseService):
         return usuario
 
     def actualizar_rol_masivo(
-        self,
-        ids: list[int],
-        id_rol: int,
-        usuario_actual: Usuario
+        self, ids: list[int], id_rol: int, usuario_actual: Usuario
     ) -> Sequence[Usuario]:
 
         usuarios = [self.obtener(id_usuario) for id_usuario in ids]
 
         for usuario in usuarios:
-
             if usuario.id == usuario_actual.id:
-                raise OperacionInvalida(
-                    "No puedes cambiar tu propio rol."
-                )
+                raise OperacionInvalida("No puedes cambiar tu propio rol.")
 
             if (
                 usuario.rol.nombre == "Administrador"
@@ -247,21 +208,15 @@ class UsuarioService(BaseService):
 
         return usuarios
 
-
     def actualizar_estado_masivo(
-        self,
-        ids: list[int],
-        activo: bool,
-        usuario_actual: Usuario
+        self, ids: list[int], activo: bool, usuario_actual: Usuario
     ) -> Sequence[Usuario]:
 
         usuarios = [self.obtener(id_usuario) for id_usuario in ids]
 
         for usuario in usuarios:
             if usuario.id == usuario_actual.id:
-                raise OperacionInvalida(
-                    "No puedes modificar tu propio usuario."
-                )
+                raise OperacionInvalida("No puedes modificar tu propio usuario.")
             if usuario.rol.nombre == "Administrador":
                 raise OperacionInvalida(
                     f"El usuario '{usuario.nombre}' es Administrador y no puede modificarse."
@@ -294,15 +249,11 @@ class UsuarioService(BaseService):
 
     def obtener_firma(self, usuario: Usuario) -> Path:
         if not usuario.firma:
-            raise NoEncontrado(
-                "El usuario no tiene una firma registrada."
-            )
+            raise NoEncontrado("El usuario no tiene una firma registrada.")
 
         ruta = carpeta_firmas(usuario) / NOMBRE_FIRMA
 
         if not ruta.is_file():
-            raise NoEncontrado(
-                "No se encontró el archivo de firma del usuario."
-            )
+            raise NoEncontrado("No se encontró el archivo de firma del usuario.")
 
         return ruta

@@ -1,12 +1,19 @@
 from src.jobs.informacion import procesar_informacion
 from src.core.database import SessionLocal
-from src.core.config import GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, GRAPH_MAILBOX
+from src.core.config import (
+    GRAPH_TENANT_ID,
+    GRAPH_CLIENT_ID,
+    GRAPH_CLIENT_SECRET,
+    GRAPH_MAILBOX,
+)
 from mgc_graph import GraphAuth, GraphClient, Mailbox
 
 
 def main():
 
-    auth = GraphAuth(GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, verify_ssl=False)
+    auth = GraphAuth(
+        GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, verify_ssl=False
+    )
 
     client = GraphClient(auth)
 

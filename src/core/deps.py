@@ -21,70 +21,56 @@ from mgc_graph import GraphAuth, GraphClient, Mail, Mailbox
 
 def sesion_actual(
     id_sesion: uuid.UUID | None = Cookie(default=None, alias=NOMBRE_COOKIE_SESION),
-    session: Session = Depends(get_session)
+    session: Session = Depends(get_session),
 ) -> Sesion:
 
     if id_sesion is None:
-        raise NoAutorizado(
-            "No se encontró una sesión activa."
-        )
+        raise NoAutorizado("No se encontró una sesión activa.")
 
     sesion = session.get(Sesion, id_sesion)
 
     if sesion is None:
-        raise NoAutorizado(
-            "La sesión no es válida."
-        )
+        raise NoAutorizado("La sesión no es válida.")
 
     if sesion.fecha_expiracion < datetime.now(timezone.utc):
         session.delete(sesion)
         session.commit()
-        raise NoAutorizado(
-            "La sesión ha expirado."
-        )
+        raise NoAutorizado("La sesión ha expirado.")
 
     return sesion
 
 
-def usuario_actual(
-    sesion: Sesion = Depends(sesion_actual)
-) -> Usuario:
+def usuario_actual(sesion: Sesion = Depends(sesion_actual)) -> Usuario:
 
     if sesion.usuario.requiere_cambio_password:
-        raise CambioPasswordRequerido(
-            "Debes cambiar tu contraseña antes de continuar."
-        )
+        raise CambioPasswordRequerido("Debes cambiar tu contraseña antes de continuar.")
 
     return sesion.usuario
+
 
 def requiere_rol(*roles: str):
     def dependencia(usuario: Usuario = Depends(usuario_actual)) -> Usuario:
         if usuario.rol.nombre not in roles:
-            raise PermisoDenegado(
-                "No tienes permiso para realizar esta acción."
-            )
+            raise PermisoDenegado("No tienes permiso para realizar esta acción.")
         return usuario
+
     return dependencia
+
 
 def graph_client() -> GraphClient:
 
     auth = GraphAuth(
-        GRAPH_TENANT_ID,
-        GRAPH_CLIENT_ID,
-        GRAPH_CLIENT_SECRET,
-        verify_ssl=False
+        GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, verify_ssl=False
     )
 
     return GraphClient(auth)
 
-def mail(
-    client: GraphClient = Depends(graph_client)
-) -> Mail:
+
+def mail(client: GraphClient = Depends(graph_client)) -> Mail:
 
     return Mail(client, GRAPH_MAILBOX)
 
-def mailbox(
-    client: GraphClient = Depends(graph_client)
-) -> Mailbox:
+
+def mailbox(client: GraphClient = Depends(graph_client)) -> Mailbox:
 
     return Mailbox(client, GRAPH_MAILBOX)

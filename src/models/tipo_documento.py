@@ -13,18 +13,10 @@ if TYPE_CHECKING:
 class TipoDocumento(AuditoriaMixin, Base):
     __tablename__ = "tipos_documento"
 
-    id: Mapped[int] = mapped_column(
-        "id_tipo_documento",
-        primary_key=True
-    )
+    id: Mapped[int] = mapped_column("id_tipo_documento", primary_key=True)
 
-    nombre: Mapped[str] = mapped_column(
-        String(50),
-        unique=True,
-        nullable=False
-    )
+    nombre: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
 
     documentos: Mapped[list["Documento"]] = relationship(
-        "Documento",
-        back_populates="tipo_documento"
+        "Documento", back_populates="tipo_documento"
     )

@@ -7,10 +7,10 @@ def test_crear_usuario_exitoso(
 
     print("1. Antes del login")
 
-    login = client.post("/auth/login", json={
-        "correo": usuario_administrador.correo,
-        "password": "PasswordAdmin123"
-    })
+    login = client.post(
+        "/auth/login",
+        json={"correo": usuario_administrador.correo, "password": "PasswordAdmin123"},
+    )
 
     print("2. Después del login")
 
@@ -18,12 +18,15 @@ def test_crear_usuario_exitoso(
 
     print("3. Antes de crear usuario")
 
-    resp = client.post("/usuarios", json={
-        "nombre": "Usuario Prueba Correo",
-        "correo": usuario_creado,
-        "id_rol": rol_cobranza.id,
-        "activo": True
-    })
+    resp = client.post(
+        "/usuarios",
+        json={
+            "nombre": "Usuario Prueba Correo",
+            "correo": usuario_creado,
+            "id_rol": rol_cobranza.id,
+            "activo": True,
+        },
+    )
 
     print("4. Después de crear usuario")
 

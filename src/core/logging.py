@@ -9,15 +9,13 @@ def configurar_logging() -> None:
 
     LOG_DIR.mkdir(exist_ok=True)
 
-    formato = logging.Formatter(
-        "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
-    )
+    formato = logging.Formatter("%(asctime)s | %(levelname)s | %(name)s | %(message)s")
 
     handler_archivo = RotatingFileHandler(
         LOG_DIR / "bitacora.log",
         maxBytes=5 * 1024 * 1024,
         backupCount=5,
-        encoding="utf-8"
+        encoding="utf-8",
     )
     handler_archivo.setFormatter(formato)
 

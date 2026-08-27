@@ -18,74 +18,43 @@ if TYPE_CHECKING:
 class Expediente(AuditoriaMixin, Base):
     __tablename__ = "expedientes"
 
-    id: Mapped[int] = mapped_column(
-        "id_expediente",
-        primary_key=True
-    )
+    id: Mapped[int] = mapped_column("id_expediente", primary_key=True)
 
     interlocutor: Mapped[str] = mapped_column(
-        ForeignKey(
-            "clientes.interlocutor",
-            onupdate="CASCADE",
-            ondelete="RESTRICT"
-        ),
-        nullable=False
+        ForeignKey("clientes.interlocutor", onupdate="CASCADE", ondelete="RESTRICT"),
+        nullable=False,
     )
 
-    fecha_incumplimiento: Mapped[date | None] = mapped_column(
-        Date
-    )
+    fecha_incumplimiento: Mapped[date | None] = mapped_column(Date)
 
-    monto_vencido: Mapped[float | None] = mapped_column(
-        Numeric(14, 2),
-        nullable=True
-    )
+    monto_vencido: Mapped[float | None] = mapped_column(Numeric(14, 2), nullable=True)
 
-    fecha_consolidacion: Mapped[date | None] = mapped_column(
-        Date
-    )
+    fecha_consolidacion: Mapped[date | None] = mapped_column(Date)
 
-    fecha_desfase: Mapped[date | None] = mapped_column(
-        Date
-    )
+    fecha_desfase: Mapped[date | None] = mapped_column(Date)
 
     dia_actual: Mapped[int] = mapped_column(
-        Integer,
-        nullable=False,
-        default=1,
-        server_default="1"
+        Integer, nullable=False, default=1, server_default="1"
     )
 
     id_usuario: Mapped[int | None] = mapped_column(
-        ForeignKey(
-            "usuarios.id_usuario",
-            onupdate="CASCADE",
-            ondelete="RESTRICT"
-        ),
-        nullable=True
+        ForeignKey("usuarios.id_usuario", onupdate="CASCADE", ondelete="RESTRICT"),
+        nullable=True,
     )
 
     estado: Mapped[bool] = mapped_column(
-        Boolean,
-        nullable=False,
-        default=True,
-        server_default="true"
+        Boolean, nullable=False, default=True, server_default="true"
     )
 
-    comentarios: Mapped[str | None] = mapped_column(
-        Text
-    )
+    comentarios: Mapped[str | None] = mapped_column(Text)
 
-    cliente: Mapped["Cliente"] = relationship(
-        "Cliente",
-        back_populates="expedientes"
-    )
+    cliente: Mapped["Cliente"] = relationship("Cliente", back_populates="expedientes")
 
     documentos: Mapped[list["Documento"]] = relationship(
         "Documento",
         back_populates="expediente",
         cascade="all, delete-orphan",
-        passive_deletes=True
+        passive_deletes=True,
     )
 
     cobranzas: Mapped[list["Cobranza"]] = relationship(
@@ -96,6 +65,5 @@ class Expediente(AuditoriaMixin, Base):
     )
 
     usuario: Mapped["Usuario | None"] = relationship(
-        "Usuario",
-        back_populates="expedientes_asignados"
+        "Usuario", back_populates="expedientes_asignados"
     )

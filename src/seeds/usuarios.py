@@ -5,9 +5,7 @@ from src.core.exceptions import OperacionInvalida
 
 ID_ROL_COBRANZA = 1
 
-USUARIOS_PRUEBA = [
-    {"nombre": "Administrador", "correo": "admin@admin.com"}
-]
+USUARIOS_PRUEBA = [{"nombre": "Administrador", "correo": "admin@admin.com"}]
 
 
 def seed_usuarios_prueba(session) -> None:
@@ -15,12 +13,11 @@ def seed_usuarios_prueba(session) -> None:
     service = UsuarioService(session)
 
     for datos in USUARIOS_PRUEBA:
-
         data = UsuarioCreate(
             nombre=datos["nombre"],
             correo=datos["correo"],
             id_rol=ID_ROL_COBRANZA,
-            activo=True
+            activo=True,
         )
 
         try:

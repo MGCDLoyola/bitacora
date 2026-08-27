@@ -12,27 +12,21 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .usuario import Usuario
 
+
 class Sesion(AuditoriaMixin, Base):
     __tablename__ = "sesiones"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        "id_sesion",
-        Uuid(as_uuid=True),
-        primary_key=True,
-        default=uuid.uuid4
+        "id_sesion", Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
 
     id_usuario: Mapped[int] = mapped_column(
         ForeignKey("usuarios.id_usuario", onupdate="CASCADE", ondelete="CASCADE"),
-        nullable=False
+        nullable=False,
     )
 
     fecha_expiracion: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        nullable=False
+        DateTime(timezone=True), nullable=False
     )
 
-    usuario: Mapped["Usuario"] = relationship(
-        "Usuario",
-        back_populates="sesiones"
-    )
+    usuario: Mapped["Usuario"] = relationship("Usuario", back_populates="sesiones")

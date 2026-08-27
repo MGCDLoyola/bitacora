@@ -9,28 +9,17 @@ from collections.abc import Sequence
 
 
 class ClienteService(BaseService):
-
     def listar(self) -> Sequence[Cliente]:
 
-        stmt = (
-            select(Cliente)
-            .order_by(Cliente.nombre)
-        )
+        stmt = select(Cliente).order_by(Cliente.nombre)
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        return self.session.execute(stmt).scalars().all()
 
     def obtener(self, interlocutor: str) -> Cliente:
         cliente = self.session.get(Cliente, interlocutor)
 
         if cliente is None:
-            raise NoEncontrado(
-                f"No se encontró el cliente {interlocutor}."
-            )
+            raise NoEncontrado(f"No se encontró el cliente {interlocutor}.")
 
         return cliente
 
@@ -40,7 +29,7 @@ class ClienteService(BaseService):
         central: str,
         nombre: str,
         correo: str | None,
-        contrato: str | None
+        contrato: str | None,
     ) -> Cliente:
 
         cliente = Cliente(
@@ -48,7 +37,7 @@ class ClienteService(BaseService):
             central=central,
             nombre=nombre,
             correo=correo,
-            contrato=contrato
+            contrato=contrato,
         )
 
         self.session.add(cliente)
@@ -57,12 +46,8 @@ class ClienteService(BaseService):
 
         return cliente
 
-
     def actualizar(
-        self,
-        interlocutor: str,
-        correo: str | None,
-        contrato: str | None
+        self, interlocutor: str, correo: str | None, contrato: str | None
     ) -> Cliente:
 
         cliente = self.obtener(interlocutor)
@@ -81,17 +66,9 @@ class ClienteService(BaseService):
         stmt = (
             select(Cliente)
             .where(
-                or_(
-                    Cliente.interlocutor.ilike(patron),
-                    Cliente.nombre.ilike(patron)
-                )
+                or_(Cliente.interlocutor.ilike(patron), Cliente.nombre.ilike(patron))
             )
             .order_by(Cliente.nombre)
         )
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        return self.session.execute(stmt).scalars().all()

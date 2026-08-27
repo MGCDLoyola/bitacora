@@ -8,17 +8,8 @@ from collections.abc import Sequence
 
 
 class TipoDocumentoService(BaseService):
-
     def listar(self) -> Sequence[TipoDocumento]:
 
-        stmt = (
-            select(TipoDocumento)
-            .order_by(TipoDocumento.id)
-        )
+        stmt = select(TipoDocumento).order_by(TipoDocumento.id)
 
-        return (
-            self.session
-            .execute(stmt)
-            .scalars()
-            .all()
-        )
+        return self.session.execute(stmt).scalars().all()

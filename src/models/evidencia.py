@@ -19,49 +19,26 @@ class Evidencia(AuditoriaMixin, Base):
         CheckConstraint("tipo IN ('AVISO', 'RESPUESTA')", name="chk_tipo_evidencia"),
     )
 
-    id: Mapped[int] = mapped_column(
-        "id_evidencia",
-        primary_key=True
-    )
+    id: Mapped[int] = mapped_column("id_evidencia", primary_key=True)
 
     id_cobranza: Mapped[int] = mapped_column(
-        ForeignKey("cobranzas.id_cobranza", ondelete="CASCADE"),
-        nullable=False
+        ForeignKey("cobranzas.id_cobranza", ondelete="CASCADE"), nullable=False
     )
 
-    tipo: Mapped[str] = mapped_column(
-        String(20),
-        nullable=False
-    )
+    tipo: Mapped[str] = mapped_column(String(20), nullable=False)
 
     id_usuario: Mapped[int] = mapped_column(
-        ForeignKey("usuarios.id_usuario", ondelete="RESTRICT"),
-        nullable=False
+        ForeignKey("usuarios.id_usuario", ondelete="RESTRICT"), nullable=False
     )
 
     uuid_archivo: Mapped[uuid.UUID] = mapped_column(
-        Uuid,
-        unique=True,
-        nullable=False,
-        default=uuid.uuid4
+        Uuid, unique=True, nullable=False, default=uuid.uuid4
     )
 
-    nombre_original: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False
-    )
+    nombre_original: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    ruta_archivo: Mapped[str] = mapped_column(
-        Text,
-        nullable=False
-    )
+    ruta_archivo: Mapped[str] = mapped_column(Text, nullable=False)
 
-    cobranza: Mapped["Cobranza"] = relationship(
-        "Cobranza",
-        back_populates="evidencias"
-    )
+    cobranza: Mapped["Cobranza"] = relationship("Cobranza", back_populates="evidencias")
 
-    usuario: Mapped["Usuario"] = relationship(
-        "Usuario",
-        back_populates="evidencias"
-    )
+    usuario: Mapped["Usuario"] = relationship("Usuario", back_populates="evidencias")

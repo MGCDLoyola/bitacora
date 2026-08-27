@@ -6,6 +6,7 @@ Correr desde la raíz del proyecto:
 
 No modifica nada, solo lee.
 """
+
 from datetime import timedelta
 
 from src.core.config import TABLA_V
@@ -106,14 +107,18 @@ def main():
             else fecha_mas_antigua_real
         )
 
-        print(f"\nPrimer registro real de '{interlocutor}' en {TABLA_V}: {fecha_mas_antigua_real}")
+        print(
+            f"\nPrimer registro real de '{interlocutor}' en {TABLA_V}: {fecha_mas_antigua_real}"
+        )
 
         print("\nProbando obtener_monto_vencido con distintas anclas:\n")
 
         casos = {
             "Ancla exacta al bloque más reciente": fecha_mas_reciente,
-            "Ancla un día después (ej. fin de semana)": fecha_mas_reciente + timedelta(days=1),
-            "Ancla un día antes del primer registro real (debe dar None)": fecha_mas_antigua_real - timedelta(days=1),
+            "Ancla un día después (ej. fin de semana)": fecha_mas_reciente
+            + timedelta(days=1),
+            "Ancla un día antes del primer registro real (debe dar None)": fecha_mas_antigua_real
+            - timedelta(days=1),
         }
 
         for etiqueta, fecha_ancla in casos.items():

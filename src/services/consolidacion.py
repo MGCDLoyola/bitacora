@@ -12,7 +12,6 @@ from src.services.expediente import ExpedienteService
 
 
 class ConsolidacionService(BaseService):
-
     def preconsolidar(self, id_expediente: int) -> dict:
 
         ExpedienteService(self.session).obtener(id_expediente)
@@ -24,16 +23,10 @@ class ConsolidacionService(BaseService):
             .order_by(Cobranza.dia, Cobranza.orden)
         )
 
-        cobranzas = (
-            self.session
-            .execute(stmt_cobranzas)
-            .scalars()
-            .all()
-        )
+        cobranzas = self.session.execute(stmt_cobranzas).scalars().all()
 
         tipo_edc = self.session.execute(
-            select(TipoDocumento)
-            .where(TipoDocumento.nombre == "Estado de Cuenta SAP")
+            select(TipoDocumento).where(TipoDocumento.nombre == "Estado de Cuenta SAP")
         ).scalar_one_or_none()
 
         if tipo_edc is None:
@@ -48,12 +41,7 @@ class ConsolidacionService(BaseService):
             .order_by(Documento.fecha_creacion)
         )
 
-        documentos_edc = (
-            self.session
-            .execute(stmt_edc)
-            .scalars()
-            .all()
-        )
+        documentos_edc = self.session.execute(stmt_edc).scalars().all()
 
         return {
             "id_expediente": id_expediente,
