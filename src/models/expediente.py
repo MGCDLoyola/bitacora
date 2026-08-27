@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import Boolean, Date, ForeignKey, Numeric, String, Text
+from sqlalchemy import Boolean, Date, ForeignKey, Integer, Numeric, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.base import Base
@@ -47,6 +47,13 @@ class Expediente(AuditoriaMixin, Base):
 
     fecha_desfase: Mapped[date | None] = mapped_column(
         Date
+    )
+
+    dia_actual: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False,
+        default=1,
+        server_default="1"
     )
 
     id_usuario: Mapped[int | None] = mapped_column(

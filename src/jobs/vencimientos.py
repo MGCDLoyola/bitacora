@@ -12,7 +12,7 @@ from src.core.almacenamiento import (
     crear_carpeta_cliente,
     crear_carpeta_expediente,
 )
-from src.core.config import TABLA_D, TABLA_V
+from src.core.config import MAX_DIAS, TABLA_D, TABLA_V
 from src.core.exceptions import ConflictoNegocio
 from src.core.respaldo import crear_respaldo
 from src.models.cliente import Cliente
@@ -105,6 +105,7 @@ def obtener_expedientes_activos(
                 Expediente.fecha_consolidacion,
                 Expediente.fecha_desfase,
                 Expediente.monto_vencido,
+                Expediente.dia_actual,
             )
         )
     )
@@ -284,6 +285,30 @@ def procesar_expedientes_en_revision(
                 expediente.id,
                 expediente.interlocutor
             )
+
+
+def incrementar_dia_actual(
+    expedientes: list[Expediente]
+) -> None:
+
+    for expediente in expedientes:
+
+        if (
+            expediente.fecha_consolidacion is not None
+            or expediente.fecha_desfase is not None
+        ):
+            continue
+
+        if expediente.dia_actual >= MAX_DIAS:
+            continue
+
+        expediente.dia_actual += 1
+
+        logger.info(
+            "Expediente %s avanza a día %d.",
+            expediente.id,
+            expediente.dia_actual
+        )
 
 
 def obtener_expedientes_por_interlocutor(
@@ -494,6 +519,10 @@ def procesar_vencimientos(
         vencimientos=vencimientos,
         expedientes=expedientes,
         hoy=hoy
+    )
+
+    incrementar_dia_actual(
+        expedientes=expedientes
     )
 
     crear_expedientes_nuevos(
