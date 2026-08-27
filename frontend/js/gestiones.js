@@ -2250,17 +2250,6 @@ function ocultarErrorModalAsignarExpedientes() {
    ELIMINACIÓN DE EXPEDIENTES
    ───────────────────────────────────────────── */
 
-/*
- * Este es el único punto de entrada para eliminar
- * uno o varios expedientes.
- *
- * Individual:
- *     abrirModalEliminarExpedientes([id])
- *
- * Masivo:
- *     abrirModalEliminarExpedientes([id1, id2, id3])
- */
-
 async function abrirModalEliminarExpedientes(
     ids
 ) {
