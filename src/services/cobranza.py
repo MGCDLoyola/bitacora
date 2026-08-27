@@ -55,6 +55,11 @@ class CobranzaService(BaseService):
             id_expediente
         )
 
+        if expediente.id_usuario != id_usuario:
+            raise OperacionInvalida(
+                "El expediente no está asignado al usuario actual."
+            )
+
         if expediente is None:
             raise NoEncontrado(
                 f"No existe un expediente con id '{id_expediente}'."
@@ -71,12 +76,22 @@ class CobranzaService(BaseService):
                 f"El día de gestión debe estar entre 1 y {MAX_DIAS}."
             )
 
+        if dia > expediente.dia_actual:
+            raise OperacionInvalida(
+                f"No se puede registrar una cobranza del día {dia}. "
+                f"El día actual del expediente es {expediente.dia_actual}."
+            )
+
         orden = self._orden(
             id_expediente=id_expediente,
             dia=dia
         )
 
-        self._validar_horario(orden, data.fecha)
+        if dia == expediente.dia_actual:
+            self._validar_horario(
+                orden,
+                data.fecha
+            )
 
         cobranza = Cobranza(
             id_expediente=id_expediente,
@@ -96,10 +111,16 @@ class CobranzaService(BaseService):
     def actualizar(
         self,
         id_cobranza: int,
+        id_usuario: int,
         data: CobranzaUpdate
     ) -> Cobranza:
 
         cobranza = self.obtener(id_cobranza)
+
+        if cobranza.expediente.id_usuario != id_usuario:
+            raise OperacionInvalida(
+                "El expediente no está asignado al usuario actual."
+            )
 
         cambios = data.model_dump(exclude_unset=True)
 
@@ -116,11 +137,23 @@ class CobranzaService(BaseService):
 
         return cobranza
 
-    def eliminar(self, id_cobranza: int) -> None:
+    def eliminar(
+        self,
+        id_cobranza: int,
+        id_usuario: int
+    ) -> None:
 
         cobranza = self.obtener(id_cobranza)
 
-        rutas = [Path(evidencia.ruta_archivo) for evidencia in cobranza.evidencias]
+        if cobranza.expediente.id_usuario != id_usuario:
+            raise OperacionInvalida(
+                "El expediente no está asignado al usuario actual."
+            )
+
+        rutas = [
+            Path(evidencia.ruta_archivo)
+            for evidencia in cobranza.evidencias
+        ]
 
         self.session.delete(cobranza)
 

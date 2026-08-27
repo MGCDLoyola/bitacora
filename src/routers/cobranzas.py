@@ -27,19 +27,38 @@ def actualizar_cobranza(
     id_cobranza: int,
     data: CobranzaUpdate,
     session: Session = Depends(get_session),
-    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor", "Cobranza")),
+    usuario_actual: Usuario = Depends(
+        requiere_rol(
+            "Administrador",
+            "Supervisor",
+            "Cobranza",
+        )
+    ),
 ):
     servicio = CobranzaService(session)
 
-    return servicio.actualizar(id_cobranza, data)
+    return servicio.actualizar(
+        id_cobranza=id_cobranza,
+        id_usuario=usuario_actual.id,
+        data=data,
+    )
 
 
 @router.delete("/{id_cobranza}", status_code=204)
 def eliminar_cobranza(
     id_cobranza: int,
     session: Session = Depends(get_session),
-    usuario_actual: Usuario = Depends(requiere_rol("Administrador", "Supervisor")),
+    usuario_actual: Usuario = Depends(
+        requiere_rol(
+            "Administrador",
+            "Supervisor",
+            "Cobranza",
+        )
+    ),
 ):
     servicio = CobranzaService(session)
 
-    servicio.eliminar(id_cobranza)
+    servicio.eliminar(
+        id_cobranza=id_cobranza,
+        id_usuario=usuario_actual.id,
+    )
