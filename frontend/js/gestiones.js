@@ -1393,6 +1393,20 @@ function renderizarTarjetas(
                     )
             )
             .join("");
+
+
+    contenedor
+        .querySelectorAll("[data-accion='abrir']")
+        .forEach(
+            (boton) => {
+
+                boton.addEventListener(
+                    "click",
+                    manejarAbrirExpediente
+                );
+
+            }
+        );
 }
 
 
@@ -1979,15 +1993,11 @@ function abrirExpediente(
     idExpediente
 ) {
 
-    /*
-     * La navegación al detalle del expediente
-     * la implementaremos cuando construyamos
-     * esa vista.
-     */
-
-    console.log(
-        "Abrir expediente:",
-        idExpediente
+    window.navegar(
+        "expediente",
+        {
+            idExpediente: idExpediente
+        }
     );
 }
 
