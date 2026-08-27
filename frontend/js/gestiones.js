@@ -1442,7 +1442,7 @@ function crearTarjetaExpediente(
                 <div class="gestion-card__id">
 
                     <span class="u-mono-sm">
-                        #${expediente.id}
+                        ${expediente.fecha_incumplimiento}
                     </span>
 
                     <div class="gestion-card__acciones">

@@ -30,6 +30,7 @@ class ExpedienteGestionRead(SchemaBase):
     interlocutor: str
     nombre_cliente: str
     contrato: str | None = None
+    fecha_incumplimiento: date
     monto_vencido: Decimal | None = None
     usuario: str | None = None
     dia: int | None = None
