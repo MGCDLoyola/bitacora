@@ -10,3 +10,4 @@ Pillow
 opencv-python
 Jinja2
 playwright
+uvicorn==0.34.0
