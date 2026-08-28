@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from sqlalchemy import select
@@ -37,11 +37,11 @@ class CobranzaService(BaseService):
 
         expediente = self.session.get(Expediente, id_expediente)
 
-        if expediente.id_usuario != id_usuario:
-            raise OperacionInvalida("El expediente no está asignado al usuario actual.")
-
         if expediente is None:
             raise NoEncontrado(f"No existe un expediente con id '{id_expediente}'.")
+
+        if expediente.id_usuario != id_usuario:
+            raise OperacionInvalida("El expediente no está asignado al usuario actual.")
 
         if not expediente.estado:
             raise ConflictoNegocio(
@@ -59,17 +59,26 @@ class CobranzaService(BaseService):
                 f"El día actual del expediente es {expediente.dia_actual}."
             )
 
-        orden = self._orden(id_expediente=id_expediente, dia=dia)
+        orden = self._orden(
+            id_expediente=id_expediente,
+            dia=dia,
+        )
+
+        fecha = self._construir_fecha(
+            expediente=expediente,
+            dia=dia,
+            hora=data.hora,
+        )
 
         if dia == expediente.dia_actual:
-            self._validar_horario(orden, data.fecha)
+            self._validar_horario(orden, fecha)
 
         cobranza = Cobranza(
             id_expediente=id_expediente,
             id_usuario=id_usuario,
             dia=dia,
             orden=orden,
-            fecha=data.fecha,
+            fecha=fecha,
             contacto=data.contacto,
             medio=data.medio,
             comentarios=data.comentarios,
@@ -116,6 +125,33 @@ class CobranzaService(BaseService):
         for ruta in rutas:
             if ruta.exists():
                 ruta.unlink()
+
+    def _construir_fecha(
+        self,
+        expediente: Expediente,
+        dia: int,
+        hora: str,
+    ) -> datetime:
+        fecha = expediente.fecha_creacion + timedelta(days=dia - 1)
+
+        try:
+            horas, minutos = map(int, hora.split(":"))
+        except (ValueError, AttributeError):
+            raise OperacionInvalida(
+                "La hora debe tener el formato HH:MM."
+            )
+
+        if not 0 <= horas <= 23 or not 0 <= minutos <= 59:
+            raise OperacionInvalida(
+                "La hora debe tener el formato HH:MM."
+            )
+
+        return fecha.replace(
+            hour=horas,
+            minute=minutos,
+            second=0,
+            microsecond=0,
+        )
 
     def _orden(self, id_expediente: int, dia: int) -> int:
 

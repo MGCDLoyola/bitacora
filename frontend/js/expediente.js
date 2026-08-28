@@ -4,10 +4,30 @@ let idExpedienteActual = null;
 let diaSeleccionado = null;
 let diaActualExpediente = null;
 
+let cobranzasExpediente = [];
+
 const HORA_INTENTO = {
     1: 9,
     2: 13,
     3: 16,
+};
+
+const RESULTADO_CONTACTO = {
+    si: [
+        { valor: "confirmo_pago", texto: "Contestó y confirmó pago" },
+        { valor: "prorroga", texto: "Contestó y solicitó prórroga" },
+        { valor: "no_reconoce", texto: "Contestó, no reconoce adeudo" },
+        {
+            valor: "otro_horario",
+            texto: "Cliente indica que llame en otro horario",
+        },
+        { valor: "otro", texto: "Otro (especificar en comentarios)" },
+    ],
+    no: [
+        { valor: "buzon", texto: "Buzón de voz" },
+        { valor: "numero_erroneo", texto: "Número inexistente / erróneo" },
+        { valor: "otro", texto: "Otro (especificar en comentarios)" },
+    ],
 };
 
 export async function iniciar({ usuario, contenedor, idExpediente }) {
@@ -24,6 +44,8 @@ export async function iniciar({ usuario, contenedor, idExpediente }) {
 
     try {
         const expediente = await obtenerExpediente(idExpedienteActual);
+
+        cobranzasExpediente = await obtenerCobranzas(idExpedienteActual);
 
         renderizarExpediente(contenedor, expediente);
 
@@ -44,6 +66,23 @@ export async function iniciar({ usuario, contenedor, idExpediente }) {
 
 async function obtenerExpediente(idExpediente) {
     const respuesta = await fetch(`/expedientes/${idExpediente}`, {
+        method: "GET",
+        credentials: "include",
+    });
+
+    if (!respuesta.ok) {
+        const error = new Error(await mensajeDeError(respuesta));
+
+        error.status = respuesta.status;
+
+        throw error;
+    }
+
+    return await respuesta.json();
+}
+
+async function obtenerCobranzas(idExpediente) {
+    const respuesta = await fetch(`/expedientes/${idExpediente}/cobranzas`, {
         method: "GET",
         credentials: "include",
     });
@@ -193,7 +232,11 @@ function renderizarIntentos(contenedor, dia) {
 }
 
 function crearTarjetaIntento(dia, orden) {
+    const cobranza = obtenerCobranza(dia, orden);
+
     const bloqueada = calcularBloqueo(dia, orden);
+
+    const realizada = Boolean(cobranza);
 
     const tarjeta = document.createElement("article");
 
@@ -201,28 +244,61 @@ function crearTarjetaIntento(dia, orden) {
 
     tarjeta.classList.toggle("intento-tarjeta--bloqueada", bloqueada);
 
+    tarjeta.classList.toggle("intento-tarjeta--realizada", realizada);
+
     const resumen = document.createElement("button");
 
     resumen.type = "button";
 
     resumen.className = "intento-tarjeta__resumen";
 
-    resumen.disabled = bloqueada;
+    resumen.disabled = bloqueada || realizada;
+
+    let textoEstado = "Pendiente";
+    let claseEstado = "intento-tarjeta__estado--pendiente";
+
+    if (bloqueada) {
+        textoEstado = "Bloqueado";
+        claseEstado = "intento-tarjeta__estado--bloqueado";
+    } else if (realizada) {
+        textoEstado = "Realizado";
+        claseEstado = "intento-tarjeta__estado--realizado";
+    }
 
     resumen.innerHTML = `
-        <span class="intento-tarjeta__orden">Intento ${orden}</span>
-        <span class="intento-tarjeta__hora u-texto-terciario">${HORA_INTENTO[orden]}:00 hrs</span>
-        <span class="intento-tarjeta__estado ${
-            bloqueada
-                ? "intento-tarjeta__estado--bloqueado"
-                : "intento-tarjeta__estado--pendiente"
-        }">
-            ${bloqueada ? "Bloqueado" : "Pendiente"}
-        </span>
-        <svg class="intento-tarjeta__chevron" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M5 7.5L10 12.5L15 7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-    `;
+    <span class="intento-tarjeta__orden">
+      Intento ${orden}
+    </span>
+
+    <span class="intento-tarjeta__hora u-texto-terciario">
+      ${HORA_INTENTO[orden]}:00 hrs
+    </span>
+
+    <span class="intento-tarjeta__estado ${claseEstado}">
+      ${textoEstado}
+    </span>
+
+    ${
+        !bloqueada && !realizada
+            ? `
+          <svg
+            class="intento-tarjeta__chevron"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 7.5L10 12.5L15 7.5"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        `
+            : ""
+    }
+  `;
 
     const cuerpo = document.createElement("div");
 
@@ -230,13 +306,9 @@ function crearTarjetaIntento(dia, orden) {
 
     cuerpo.hidden = true;
 
-    cuerpo.innerHTML = `
-        <p class="intento-tarjeta__aviso">
-            Formulario de captura — próximamente.
-        </p>
-    `;
+    if (!bloqueada && !realizada) {
+        cuerpo.innerHTML = plantillaFormularioIntento();
 
-    if (!bloqueada) {
         resumen.addEventListener("click", () => {
             const expandida = tarjeta.classList.toggle(
                 "intento-tarjeta--expandida"
@@ -244,29 +316,750 @@ function crearTarjetaIntento(dia, orden) {
 
             cuerpo.hidden = !expandida;
         });
+
+        inicializarFormularioIntento(cuerpo, tarjeta, dia, orden);
     }
 
     tarjeta.appendChild(resumen);
-    tarjeta.appendChild(cuerpo);
+
+    if (!bloqueada && !realizada) {
+        tarjeta.appendChild(cuerpo);
+    }
 
     return tarjeta;
 }
 
+/* ─────────────────────────────────────────────
+   COBRANZAS EXISTENTES
+   ───────────────────────────────────────────── */
+
+function obtenerCobranza(dia, orden) {
+    return cobranzasExpediente.find((cobranza) => {
+        const diaCobranza = Number(cobranza.dia);
+
+        const ordenCobranza = Number(cobranza.orden);
+
+        return diaCobranza === Number(dia) && ordenCobranza === Number(orden);
+    });
+}
+
+/* ─────────────────────────────────────────────
+   FORMULARIO
+   ───────────────────────────────────────────── */
+
+function plantillaFormularioIntento() {
+    return `
+    <form class="intento-form" novalidate>
+
+      <div class="intento-form__fila">
+
+        <div class="campo campo--intento">
+          <label class="u-etiqueta u-texto-terciario">
+            Hora real de contacto
+          </label>
+
+          <input
+            type="time"
+            class="intento-form__hora"
+            required
+          />
+        </div>
+
+        <div class="campo campo--intento">
+          <label class="u-etiqueta u-texto-terciario">
+            Medio utilizado
+          </label>
+
+          <select
+            class="intento-form__medio"
+            required
+          >
+            <option
+              value=""
+              disabled
+              selected
+            >
+              Selecciona…
+            </option>
+
+            <option value="llamada">
+              Llamada telefónica
+            </option>
+
+            <option value="whatsapp">
+              WhatsApp
+            </option>
+
+            <option value="correo">
+              Correo electrónico
+            </option>
+
+            <option value="otro">
+              Otro
+            </option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="campo campo--intento">
+
+        <span class="u-etiqueta u-texto-terciario">
+          ¿Contactó al cliente?
+        </span>
+
+        <div
+          class="alternar-contacto"
+          role="radiogroup"
+        >
+          <button
+            type="button"
+            class="alternar-contacto__opcion alternar-contacto__opcion--si"
+            data-valor="si"
+          >
+            Sí
+          </button>
+
+          <button
+            type="button"
+            class="alternar-contacto__opcion alternar-contacto__opcion--no"
+            data-valor="no"
+          >
+            No
+          </button>
+        </div>
+
+        <div
+          class="resultado-contacto"
+          hidden
+        >
+          <span class="u-etiqueta u-texto-terciario resultado-contacto__titulo">
+            Resultado
+          </span>
+
+          <div
+            class="resultado-contacto__opciones"
+            role="radiogroup"
+          ></div>
+        </div>
+
+      </div>
+
+      <div class="campo campo--intento">
+
+        <label class="u-etiqueta u-texto-terciario">
+          Comentarios / próximos pasos
+        </label>
+
+        <textarea
+          class="intento-form__comentarios"
+          rows="3"
+          placeholder="Escribe lo ocurrido y los próximos pasos…"
+        ></textarea>
+
+      </div>
+
+      <div class="campo campo--intento">
+
+        <span class="u-etiqueta u-texto-terciario">
+          Evidencias
+        </span>
+
+        <div class="evidencia-modulo">
+
+          <span class="u-etiqueta u-texto-terciario">
+            Evidencia de contacto
+          </span>
+
+          <label class="zona-evidencias">
+
+            <input
+              type="file"
+              class="zona-evidencias__input evidencia-contacto__input"
+              multiple
+              hidden
+              accept=".pdf,.jpg,.jpeg,.png,.eml,.msg"
+            />
+
+            <svg
+              class="zona-evidencias__icono"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10 3v10m0-10 4 4m-4-4-4 4M4 15v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+
+            <span class="zona-evidencias__texto">
+              Arrastra archivos aquí o haz clic para subir
+            </span>
+
+          </label>
+
+          <ul class="lista-evidencias evidencia-contacto__lista"></ul>
+
+        </div>
+
+        <div class="evidencia-modulo">
+
+          <span class="u-etiqueta u-texto-terciario">
+            Respuesta
+          </span>
+
+          <label class="zona-evidencias">
+
+            <input
+              type="file"
+              class="zona-evidencias__input evidencia-respuesta__input"
+              multiple
+              hidden
+              accept=".pdf,.jpg,.jpeg,.png,.eml,.msg"
+            />
+
+            <svg
+              class="zona-evidencias__icono"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M10 3v10m0-10 4 4m-4-4-4 4M4 15v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1"
+                stroke="currentColor"
+                stroke-width="1.4"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+
+            <span class="zona-evidencias__texto">
+              Arrastra archivos aquí o haz clic para subir
+            </span>
+
+          </label>
+
+          <ul class="lista-evidencias evidencia-respuesta__lista"></ul>
+
+        </div>
+
+      </div>
+
+      <div
+        class="intento-form__mensaje mensaje-error"
+        role="alert"
+        hidden
+      >
+        <span class="mensaje-error__sello">
+          Error
+        </span>
+
+        <span class="intento-form__mensaje-texto"></span>
+      </div>
+
+      <div class="intento-form__acciones">
+
+        <button
+          type="button"
+          class="boton-borrar"
+        >
+          Borrar todo
+        </button>
+
+        <button
+          type="submit"
+          class="boton intento-form__enviar"
+        >
+          Registrar intento
+        </button>
+
+      </div>
+
+    </form>
+  `;
+}
+
+function inicializarFormularioIntento(cuerpo, tarjeta, dia, orden) {
+    const formulario = cuerpo.querySelector(".intento-form");
+
+    const entradaHora = formulario.querySelector(".intento-form__hora");
+
+    const selectMedio = formulario.querySelector(".intento-form__medio");
+
+    const opcionesContacto = formulario.querySelectorAll(
+        ".alternar-contacto__opcion"
+    );
+
+    const contenedorResultado = formulario.querySelector(".resultado-contacto");
+
+    const opcionesResultadoContenedor = formulario.querySelector(
+        ".resultado-contacto__opciones"
+    );
+
+    const textareaComentarios = formulario.querySelector(
+        ".intento-form__comentarios"
+    );
+
+    const botonBorrar = formulario.querySelector(".boton-borrar");
+
+    const botonEnviar = formulario.querySelector(".intento-form__enviar");
+
+    const mensaje = formulario.querySelector(".intento-form__mensaje");
+
+    const mensajeTexto = formulario.querySelector(
+        ".intento-form__mensaje-texto"
+    );
+
+    const entradaEvidenciaContacto = formulario.querySelector(
+        ".evidencia-contacto__input"
+    );
+
+    const zonaEvidenciaContacto =
+        entradaEvidenciaContacto.closest(".zona-evidencias");
+
+    const listaEvidenciaContacto = formulario.querySelector(
+        ".evidencia-contacto__lista"
+    );
+
+    const entradaEvidenciaRespuesta = formulario.querySelector(
+        ".evidencia-respuesta__input"
+    );
+
+    const zonaEvidenciaRespuesta =
+        entradaEvidenciaRespuesta.closest(".zona-evidencias");
+
+    const listaEvidenciaRespuesta = formulario.querySelector(
+        ".evidencia-respuesta__lista"
+    );
+
+    let contactoSeleccionado = null;
+    let resultadoSeleccionado = null;
+
+    let archivosEvidenciaContacto = [];
+    let archivosEvidenciaRespuesta = [];
+
+    /* ─────────────────────────────────────────
+     CONTACTO
+     ───────────────────────────────────────── */
+
+    opcionesContacto.forEach((boton) => {
+        boton.addEventListener("click", () => {
+            contactoSeleccionado = boton.dataset.valor;
+
+            opcionesContacto.forEach((otro) => {
+                otro.classList.toggle(
+                    "alternar-contacto__opcion--activa",
+                    otro === boton
+                );
+            });
+
+            renderizarOpcionesResultado(contactoSeleccionado);
+        });
+    });
+
+    function renderizarOpcionesResultado(valor) {
+        resultadoSeleccionado = null;
+
+        opcionesResultadoContenedor.innerHTML = "";
+
+        RESULTADO_CONTACTO[valor].forEach((opcion) => {
+            const boton = document.createElement("button");
+
+            boton.type = "button";
+
+            boton.className = "resultado-contacto__opcion";
+
+            boton.dataset.valor = opcion.valor;
+
+            boton.textContent = opcion.texto;
+
+            boton.addEventListener("click", () => {
+                resultadoSeleccionado = opcion.valor;
+
+                opcionesResultadoContenedor
+                    .querySelectorAll(".resultado-contacto__opcion")
+                    .forEach((otro) => {
+                        otro.classList.toggle(
+                            "resultado-contacto__opcion--activa",
+                            otro === boton
+                        );
+                    });
+            });
+
+            opcionesResultadoContenedor.appendChild(boton);
+        });
+
+        contenedorResultado.hidden = false;
+    }
+
+    /* ─────────────────────────────────────────
+     EVIDENCIAS
+     ───────────────────────────────────────── */
+
+    configurarZonaEvidencia(
+        zonaEvidenciaContacto,
+        entradaEvidenciaContacto,
+        listaEvidenciaContacto,
+        (archivos) => {
+            archivosEvidenciaContacto = archivos;
+        },
+        () => archivosEvidenciaContacto
+    );
+
+    configurarZonaEvidencia(
+        zonaEvidenciaRespuesta,
+        entradaEvidenciaRespuesta,
+        listaEvidenciaRespuesta,
+        (archivos) => {
+            archivosEvidenciaRespuesta = archivos;
+        },
+        () => archivosEvidenciaRespuesta
+    );
+
+    /* ─────────────────────────────────────────
+     BORRAR
+     ───────────────────────────────────────── */
+
+    botonBorrar.addEventListener("click", () => {
+        formulario.reset();
+
+        contactoSeleccionado = null;
+        resultadoSeleccionado = null;
+
+        archivosEvidenciaContacto = [];
+        archivosEvidenciaRespuesta = [];
+
+        opcionesContacto.forEach((boton) => {
+            boton.classList.remove("alternar-contacto__opcion--activa");
+        });
+
+        contenedorResultado.hidden = true;
+
+        opcionesResultadoContenedor.innerHTML = "";
+
+        listaEvidenciaContacto.innerHTML = "";
+
+        listaEvidenciaRespuesta.innerHTML = "";
+
+        ocultarMensajeFormulario();
+    });
+
+    /* ─────────────────────────────────────────
+     REGISTRAR
+     ───────────────────────────────────────── */
+
+    formulario.addEventListener("submit", async (evento) => {
+        evento.preventDefault();
+
+        ocultarMensajeFormulario();
+
+        if (
+            !entradaHora.value ||
+            !selectMedio.value ||
+            !contactoSeleccionado ||
+            !resultadoSeleccionado
+        ) {
+            mostrarMensajeFormulario(
+                "Completa hora, medio, si hubo contacto y el resultado antes de registrar."
+            );
+
+            return;
+        }
+
+        /*
+         * Evitar doble registro desde el frontend.
+         */
+        if (obtenerCobranza(dia, orden)) {
+            mostrarMensajeFormulario("Este intento ya fue registrado.");
+
+            return;
+        }
+
+        const datos = {
+            hora: entradaHora.value,
+            medio: selectMedio.value,
+            contacto: contactoSeleccionado === "si",
+            comentarios: construirComentarios(
+                resultadoSeleccionado,
+                textareaComentarios.value
+            ),
+        };
+
+        botonEnviar.disabled = true;
+        botonEnviar.textContent = "Registrando…";
+
+        try {
+            const respuesta = await fetch(
+                `/expedientes/${idExpedienteActual}/cobranzas/${dia}`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(datos),
+                }
+            );
+
+            if (!respuesta.ok) {
+                throw new Error(await mensajeDeError(respuesta));
+            }
+
+            const cobranza = await respuesta.json();
+
+            cobranzasExpediente.push(cobranza);
+
+            for (const archivo of archivosEvidenciaContacto) {
+                await subirEvidencia(cobranza.id, archivo, "AVISO");
+            }
+
+            for (const archivo of archivosEvidenciaRespuesta) {
+                await subirEvidencia(cobranza.id, archivo, "RESPUESTA");
+            }
+
+            marcarIntentoRealizado(tarjeta);
+        } catch (error) {
+            mostrarMensajeFormulario(
+                error.message || "No se pudo registrar el intento."
+            );
+        } finally {
+            botonEnviar.disabled = false;
+            botonEnviar.textContent = "Registrar intento";
+        }
+
+        function mostrarMensajeFormulario(texto) {
+            mensajeTexto.textContent = texto;
+
+            mensaje.hidden = false;
+        }
+
+        function ocultarMensajeFormulario() {
+            mensaje.hidden = true;
+        }
+
+        async function subirEvidencia(idCobranza, archivo, tipo) {
+            const datos = new FormData();
+
+            datos.append("tipo", tipo);
+
+            datos.append("archivo", archivo);
+
+            const respuesta = await fetch(
+                `/cobranzas/${idCobranza}/evidencias`,
+                {
+                    method: "POST",
+                    credentials: "include",
+                    body: datos,
+                }
+            );
+
+            if (!respuesta.ok) {
+                throw new Error(await mensajeDeError(respuesta));
+            }
+        }
+    });
+}
+
+/* ─────────────────────────────────────────────
+   EVIDENCIAS
+   ───────────────────────────────────────────── */
+
+function configurarZonaEvidencia(
+    zona,
+    entrada,
+    lista,
+    guardarArchivos,
+    obtenerArchivos
+) {
+    zona.addEventListener("dragover", (evento) => {
+        evento.preventDefault();
+
+        zona.classList.add("zona-evidencias--activa");
+    });
+
+    zona.addEventListener("dragleave", () => {
+        zona.classList.remove("zona-evidencias--activa");
+    });
+
+    zona.addEventListener("drop", (evento) => {
+        evento.preventDefault();
+
+        zona.classList.remove("zona-evidencias--activa");
+
+        agregarArchivos(evento.dataTransfer.files);
+    });
+
+    entrada.addEventListener("change", () => {
+        agregarArchivos(entrada.files);
+
+        entrada.value = "";
+    });
+
+    function agregarArchivos(listaArchivos) {
+        const archivos = obtenerArchivos();
+
+        Array.from(listaArchivos).forEach((archivo) => {
+            archivos.push(archivo);
+        });
+
+        guardarArchivos(archivos);
+
+        renderizarArchivos();
+    }
+
+    function renderizarArchivos() {
+        lista.innerHTML = "";
+
+        obtenerArchivos().forEach((archivo, indice) => {
+            const item = document.createElement("li");
+
+            item.className = "lista-evidencias__item";
+
+            item.innerHTML = `
+        <span class="lista-evidencias__nombre">
+          ${archivo.name}
+        </span>
+
+        <span class="lista-evidencias__peso">
+          ${formatearPeso(archivo.size)}
+        </span>
+
+        <button
+          type="button"
+          class="lista-evidencias__quitar"
+          aria-label="Quitar archivo"
+        >
+          &times;
+        </button>
+      `;
+
+            item.querySelector(".lista-evidencias__quitar").addEventListener(
+                "click",
+                () => {
+                    const archivos = obtenerArchivos();
+
+                    archivos.splice(indice, 1);
+
+                    guardarArchivos(archivos);
+
+                    renderizarArchivos();
+                }
+            );
+
+            lista.appendChild(item);
+        });
+    }
+}
+
+/* ─────────────────────────────────────────────
+   COMENTARIOS
+   ───────────────────────────────────────────── */
+
+function construirComentarios(resultado, comentarios) {
+    const textoComentarios = comentarios.trim();
+
+    if (resultado === "otro") {
+        return textoComentarios;
+    }
+
+    const opcion = Object.values(RESULTADO_CONTACTO)
+        .flat()
+        .find((item) => item.valor === resultado);
+
+    if (!opcion) {
+        return textoComentarios;
+    }
+
+    if (!textoComentarios) {
+        return `${opcion.texto}:`;
+    }
+
+    return `${opcion.texto}:\n\n${textoComentarios}`;
+}
+
+/* ─────────────────────────────────────────────
+   ESTADO DE TARJETA
+   ───────────────────────────────────────────── */
+
+function marcarIntentoRealizado(tarjeta) {
+    const estado = tarjeta.querySelector(".intento-tarjeta__estado");
+
+    estado.textContent = "Realizado";
+
+    estado.className =
+        "intento-tarjeta__estado intento-tarjeta__estado--realizado";
+
+    tarjeta.classList.remove("intento-tarjeta--expandida");
+
+    tarjeta.classList.add("intento-tarjeta--realizada");
+
+    const cuerpo = tarjeta.querySelector(".intento-tarjeta__cuerpo");
+
+    if (cuerpo) {
+        cuerpo.hidden = true;
+    }
+
+    const resumen = tarjeta.querySelector(".intento-tarjeta__resumen");
+
+    if (resumen) {
+        resumen.disabled = true;
+    }
+
+    const chevron = tarjeta.querySelector(".intento-tarjeta__chevron");
+
+    if (chevron) {
+        chevron.remove();
+    }
+}
+
+/* ─────────────────────────────────────────────
+   BLOQUEO
+   ───────────────────────────────────────────── */
+
 function calcularBloqueo(dia, orden) {
+    /*
+     * Días anteriores:
+     * los intentos están disponibles para consulta.
+     */
     if (dia < diaActualExpediente) {
         return false;
     }
 
+    /*
+     * Días futuros:
+     * completamente bloqueados.
+     */
     if (dia > diaActualExpediente) {
         return true;
     }
 
+    /*
+     * Día actual:
+     * se habilita cada intento a partir
+     * de su hora correspondiente.
+     */
     return new Date().getHours() < HORA_INTENTO[orden];
 }
 
 /* ─────────────────────────────────────────────
    FORMATO
    ───────────────────────────────────────────── */
+
+function formatearPeso(bytes) {
+    if (bytes < 1024) {
+        return `${bytes} B`;
+    }
+
+    if (bytes < 1024 * 1024) {
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 function formatearFecha(fecha) {
     if (!fecha) {
@@ -291,7 +1084,7 @@ function formatearMonto(monto) {
 }
 
 /* ─────────────────────────────────────────────
-   ESTADO
+   ESTADO DE CARGA
    ───────────────────────────────────────────── */
 
 function mostrarCarga(contenedor) {
@@ -325,6 +1118,10 @@ async function mensajeDeError(respuesta) {
 
     if (respuesta.status === 404) {
         return "No se encontró el expediente solicitado.";
+    }
+
+    if (respuesta.status === 422) {
+        return "Los datos enviados no son válidos.";
     }
 
     return "No se pudo completar la solicitud.";

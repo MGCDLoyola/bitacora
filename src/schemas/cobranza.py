@@ -5,15 +5,22 @@ from src.schemas.usuario import UsuarioRead
 
 
 class CobranzaBase(SchemaBase):
+
     fecha: datetime
+
     contacto: bool
+
     medio: str | None = None
+
     comentarios: str | None = None
 
 
-class CobranzaCreate(CobranzaBase):
-    pass
+class CobranzaCreate(SchemaBase):
 
+    hora: str
+    contacto: bool
+    medio: str | None = None
+    comentarios: str | None = None
 
 class CobranzaUpdate(SchemaBase):
     fecha: datetime | None = None

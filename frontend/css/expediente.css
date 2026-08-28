@@ -431,6 +431,357 @@
 }
 
 /* ─────────────────────────────────────────────
+   FORMULARIO DE INTENTO
+   ───────────────────────────────────────────── */
+
+.intento-form {
+    padding-top: 6px;
+}
+
+.intento-form__fila {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 20px;
+}
+
+.campo--intento {
+    margin-bottom: 18px;
+}
+
+.campo--intento .u-etiqueta {
+    display: block;
+    margin-bottom: 7px;
+}
+
+.campo--intento input[type="time"],
+.campo--intento select,
+.campo--intento textarea {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--ink-700);
+    color: var(--text-100);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    padding: 6px 2px 9px;
+    outline: none;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.campo--intento select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%238c93a6' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 2px center;
+    background-size: 14px;
+    padding-right: 20px;
+}
+
+.campo--intento select option {
+    background: var(--ink-900);
+    color: var(--text-100);
+}
+
+.campo--intento textarea {
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.campo--intento input:focus,
+.campo--intento select:focus,
+.campo--intento textarea:focus {
+    border-bottom-color: var(--gold-500);
+    box-shadow: 0 1px 0 0 var(--gold-500);
+}
+
+/* ---------- Alternar contacto ---------- */
+
+.alternar-contacto {
+    display: flex;
+    gap: 8px;
+}
+
+.alternar-contacto__opcion {
+    flex: 1;
+    background: var(--ink-850);
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-tab);
+    padding: 8px 0;
+    color: var(--text-300);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.alternar-contacto__opcion:hover {
+    border-color: var(--gold-700);
+}
+
+.alternar-contacto__opcion--si.alternar-contacto__opcion--activa {
+    background: rgba(47, 108, 79, 0.16);
+    border-color: var(--forest-600);
+    color: var(--forest-600);
+}
+
+.alternar-contacto__opcion--no.alternar-contacto__opcion--activa {
+    background: rgba(178, 76, 76, 0.14);
+    border-color: var(--rose-500);
+    color: var(--rose-500);
+}
+
+/* ---------- Resultado de contacto ---------- */
+
+.resultado-contacto {
+    margin-top: 12px;
+}
+
+.resultado-contacto__titulo {
+    display: block;
+    margin-bottom: 7px;
+}
+
+.resultado-contacto__opciones {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.resultado-contacto__opcion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 9px 12px;
+
+    background: var(--ink-850);
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-tab);
+
+    color: var(--text-300);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.15s ease,
+        color 0.15s ease,
+        background 0.15s ease;
+}
+
+.resultado-contacto__opcion::before {
+    content: "";
+    flex-shrink: 0;
+
+    width: 12px;
+    height: 12px;
+
+    border: 1px solid var(--text-500);
+    border-radius: 50%;
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
+}
+
+.resultado-contacto__opcion:hover {
+    border-color: var(--gold-700);
+    color: var(--text-100);
+}
+
+.resultado-contacto__opcion--activa {
+    background: rgba(201, 162, 39, 0.08);
+    border-color: var(--gold-500);
+    color: var(--text-100);
+}
+
+.resultado-contacto__opcion--activa::before {
+    border-color: var(--gold-500);
+    background: var(--gold-500);
+    box-shadow: inset 0 0 0 2px var(--ink-850);
+}
+
+/* ---------- Módulos de evidencias ---------- */
+
+.evidencia-modulo {
+    margin-top: 14px;
+}
+
+.evidencia-modulo + .evidencia-modulo {
+    margin-top: 18px;
+}
+
+/* ---------- Zona de evidencias ---------- */
+
+.zona-evidencias {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    padding: 18px 12px;
+
+    background: var(--ink-850);
+    border: 1px dashed var(--ink-700);
+    border-radius: var(--radius-tab);
+
+    color: var(--text-500);
+    text-align: center;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
+}
+
+.zona-evidencias:hover,
+.zona-evidencias--activa {
+    border-color: var(--gold-500);
+    background: rgba(201, 162, 39, 0.06);
+}
+
+.zona-evidencias__icono {
+    width: 18px;
+    height: 18px;
+}
+
+.zona-evidencias__texto {
+    font-size: 12px;
+}
+
+.lista-evidencias {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.lista-evidencias__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 6px 10px;
+
+    background: var(--ink-850);
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-tab);
+
+    font-size: 12px;
+}
+
+.lista-evidencias__nombre {
+    flex: 1;
+    min-width: 0;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    color: var(--text-100);
+}
+
+.lista-evidencias__peso {
+    color: var(--text-500);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    flex-shrink: 0;
+}
+
+.lista-evidencias__quitar {
+    flex-shrink: 0;
+
+    background: none;
+    border: none;
+
+    color: var(--text-500);
+    font-size: 16px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.lista-evidencias__quitar:hover {
+    color: var(--rose-500);
+}
+
+/* ---------- Mensaje de error del formulario ---------- */
+
+.intento-form__mensaje {
+    margin: 4px 0 14px;
+}
+
+/* ---------- Acciones ---------- */
+
+.intento-form__acciones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+
+    margin-top: 6px;
+}
+
+.boton-borrar {
+    background: none;
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-tab);
+    padding: 11px 18px;
+
+    color: var(--text-500);
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.boton-borrar:hover {
+    border-color: var(--rose-500);
+    color: var(--rose-500);
+}
+
+.intento-form__enviar {
+    width: auto;
+    margin-top: 0;
+    padding: 11px 22px;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 520px) {
+    .intento-form__fila {
+        grid-template-columns: 1fr;
+    }
+
+    .intento-form__acciones {
+        flex-direction: column-reverse;
+    }
+
+    .boton-borrar,
+    .intento-form__enviar {
+        width: 100%;
+    }
+}
+
+/* ─────────────────────────────────────────────
    ESTADO
    ───────────────────────────────────────────── */
 
