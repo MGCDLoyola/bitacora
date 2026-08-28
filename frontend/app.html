@@ -21,6 +21,7 @@
         <link rel="stylesheet" href="/static/css/usuarios.css" />
         <link rel="stylesheet" href="/static/css/gestiones.css" />
         <link rel="stylesheet" href="/static/css/expediente.css" />
+        <link rel="stylesheet" href="/static/css/perfil.css" />
 
         <script defer src="/static/js/app.js"></script>
     </head>
@@ -36,7 +37,11 @@
                     </div>
                 </div>
 
-                <div class="barra-lateral__usuario">
+                <button
+                    id="boton-perfil"
+                    type="button"
+                    class="barra-lateral__usuario"
+                >
                     <div class="barra-lateral__identidad">
                         <span
                             id="usuario-nombre"
@@ -48,7 +53,7 @@
                             class="barra-lateral__usuario-rol"
                         ></span>
                     </div>
-                </div>
+                </button>
 
                 <nav
                     id="navegacion"

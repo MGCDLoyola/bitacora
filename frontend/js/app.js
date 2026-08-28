@@ -6,6 +6,8 @@ const navegacion = document.getElementById("navegacion");
 const usuarioNombre = document.getElementById("usuario-nombre");
 const usuarioRol = document.getElementById("usuario-rol");
 
+const botonPerfil = document.getElementById("boton-perfil");
+
 const contenidoPrincipal = document.getElementById("contenido-principal");
 const botonCerrarSesion = document.getElementById("boton-cerrar-sesion");
 
@@ -13,6 +15,10 @@ const mensajeAplicacion = document.getElementById("mensaje-aplicacion");
 const textoMensajeAplicacion = document.getElementById(
     "texto-mensaje-aplicacion"
 );
+
+/* ─────────────────────────────────────────────
+   NAVEGACIÓN POR ROL
+   ───────────────────────────────────────────── */
 
 const navegacionPorRol = {
     Administrador: [
@@ -52,14 +58,27 @@ const navegacionPorRol = {
     ],
 };
 
+/* ─────────────────────────────────────────────
+   VISTAS DISPONIBLES
+   ───────────────────────────────────────────── */
+
 const vistas = {
     gestiones: {},
     usuarios: {},
     expediente: {},
+    perfil: {},
 };
+
+/* ─────────────────────────────────────────────
+   ESTADO DE LA APLICACIÓN
+   ───────────────────────────────────────────── */
 
 let usuarioActual = null;
 let vistaActual = null;
+
+/* ─────────────────────────────────────────────
+   INICIALIZACIÓN
+   ───────────────────────────────────────────── */
 
 iniciar();
 
@@ -68,6 +87,7 @@ async function iniciar() {
         usuarioActual = await obtenerUsuarioActual();
 
         configurarUsuario(usuarioActual);
+
         configurarNavegacion(usuarioActual.rol.nombre);
 
         const vistaInicial = obtenerVistaInicial(usuarioActual.rol.nombre);
@@ -99,6 +119,10 @@ async function iniciar() {
     }
 }
 
+/* ─────────────────────────────────────────────
+   USUARIO AUTENTICADO
+   ───────────────────────────────────────────── */
+
 async function obtenerUsuarioActual() {
     const respuesta = await fetch("/auth/me", {
         method: "GET",
@@ -121,6 +145,10 @@ function configurarUsuario(usuario) {
     usuarioRol.textContent = usuario.rol.nombre;
 }
 
+/* ─────────────────────────────────────────────
+   NAVEGACIÓN PRINCIPAL
+   ───────────────────────────────────────────── */
+
 function configurarNavegacion(rol) {
     navegacion.innerHTML = "";
 
@@ -134,10 +162,10 @@ function configurarNavegacion(rol) {
         elemento.dataset.vista = opcion.id;
 
         elemento.innerHTML = `
-            <span class="navegacion__texto">
-                ${opcion.texto}
-            </span>
-        `;
+      <span class="navegacion__texto">
+        ${opcion.texto}
+      </span>
+    `;
 
         elemento.addEventListener("click", () => {
             navegar(opcion.id);
@@ -156,6 +184,10 @@ function obtenerVistaInicial(rol) {
 
     return opciones[0].id;
 }
+
+/* ─────────────────────────────────────────────
+   NAVEGACIÓN ENTRE VISTAS
+   ───────────────────────────────────────────── */
 
 async function navegar(idVista, datos = {}) {
     const vista = vistas[idVista];
@@ -184,6 +216,10 @@ async function navegar(idVista, datos = {}) {
 }
 
 window.navegar = navegar;
+
+/* ─────────────────────────────────────────────
+   HISTORIAL DEL NAVEGADOR
+   ───────────────────────────────────────────── */
 
 window.addEventListener("popstate", async (event) => {
     const estado = event.state;
@@ -218,6 +254,10 @@ function actualizarNavegacionActiva(idVista) {
     });
 }
 
+/* ─────────────────────────────────────────────
+   CARGA DE VISTAS
+   ───────────────────────────────────────────── */
+
 async function cargarVista(idVista, datos = {}) {
     contenidoPrincipal.innerHTML = "";
 
@@ -246,6 +286,10 @@ async function cargarVista(idVista, datos = {}) {
     }
 }
 
+/* ─────────────────────────────────────────────
+   MÓDULOS DE LAS VISTAS
+   ───────────────────────────────────────────── */
+
 async function obtenerModuloVista(idVista) {
     switch (idVista) {
         case "gestiones":
@@ -257,10 +301,17 @@ async function obtenerModuloVista(idVista) {
         case "expediente":
             return await import("./expediente.js");
 
+        case "perfil":
+            return await import("./perfil.js");
+
         default:
             return null;
     }
 }
+
+/* ─────────────────────────────────────────────
+   CIERRE DE SESIÓN
+   ───────────────────────────────────────────── */
 
 async function cerrarSesion() {
     botonCerrarSesion.disabled = true;
@@ -284,7 +335,15 @@ async function cerrarSesion() {
     window.location.replace("/login");
 }
 
+botonPerfil.addEventListener("click", () => {
+    navegar("perfil");
+});
+
 botonCerrarSesion.addEventListener("click", cerrarSesion);
+
+/* ─────────────────────────────────────────────
+   MANEJO DE ERRORES HTTP
+   ───────────────────────────────────────────── */
 
 async function mensajeDeError(respuesta) {
     try {
@@ -293,9 +352,7 @@ async function mensajeDeError(respuesta) {
         if (cuerpo.detail) {
             return cuerpo.detail;
         }
-    } catch {
-        // La respuesta no contiene JSON.
-    }
+    } catch {}
 
     if (respuesta.status === 401) {
         return "La sesión no es válida.";
@@ -311,6 +368,10 @@ async function mensajeDeError(respuesta) {
 
     return "No se pudo completar la solicitud.";
 }
+
+/* ─────────────────────────────────────────────
+   MENSAJES DE LA APLICACIÓN
+   ───────────────────────────────────────────── */
 
 function mostrarError(mensaje) {
     textoMensajeAplicacion.textContent = mensaje;

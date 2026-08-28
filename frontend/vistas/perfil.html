@@ -1,0 +1,270 @@
+<div class="perfil">
+    <header class="perfil__encabezado">
+        <div>
+            <div class="u-etiqueta u-texto-terciario">Cuenta</div>
+            <h1 class="u-titulo u-texto-primario">Mi perfil</h1>
+            <p class="u-subtitulo u-texto-secundario">
+                Administra tu firma y contraseña.
+            </p>
+        </div>
+    </header>
+
+    <section class="perfil__tarjeta perfil__seccion perfil__seccion--identidad">
+        <div class="perfil__identidad">
+            <h2 id="perfil-nombre" class="perfil__nombre"></h2>
+            <span id="perfil-rol" class="perfil__insignia"></span>
+        </div>
+
+        <div class="perfil__identidad-pie">
+            <span class="u-etiqueta u-texto-terciario">Correo</span>
+            <span
+                id="perfil-correo"
+                class="perfil__correo u-texto-primario"
+            ></span>
+        </div>
+    </section>
+
+    <section class="perfil__tarjeta perfil__seccion">
+        <div class="perfil__seccion-encabezado">
+            <div>
+                <div class="u-etiqueta u-texto-terciario">Firma</div>
+                <h2 class="perfil__titulo">Firma digital</h2>
+                <p class="perfil__seccion-nota u-texto-secundario">
+                    Se estampa en los documentos y consolidaciones que generes.
+                </p>
+            </div>
+        </div>
+
+        <div id="perfil-firma" class="perfil__firma" data-modo="dibujar">
+            <div class="perfil__firma-caja">
+                <div class="perfil__firma-tabs" role="tablist">
+                    <button
+                        type="button"
+                        class="perfil__firma-tab"
+                        data-modo-boton="dibujar"
+                        aria-pressed="true"
+                    >
+                        Dibujar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="perfil__firma-tab"
+                        data-modo-boton="subir"
+                        aria-pressed="false"
+                    >
+                        Subir imagen
+                    </button>
+                </div>
+
+                <div class="perfil__firma-lienzo">
+                    <canvas
+                        id="perfil-firma-canvas"
+                        class="perfil__firma-canvas"
+                    ></canvas>
+                    <div class="perfil__firma-linea" aria-hidden="true"></div>
+
+                    <label
+                        id="perfil-firma-vista"
+                        for="perfil-firma-archivo"
+                        class="perfil__firma-dropzone"
+                    >
+                        <div
+                            id="perfil-firma-vacia"
+                            class="perfil__firma-vacia"
+                        >
+                            <span class="perfil__firma-vacia-titulo">
+                                Sin firma registrada
+                            </span>
+                            <span class="perfil__firma-vacia-nota">
+                                Arrastra una imagen aquí o haz clic para
+                                seleccionarla
+                            </span>
+                        </div>
+
+                        <img
+                            id="perfil-firma-imagen"
+                            class="perfil__firma-imagen"
+                            src=""
+                            alt="Firma registrada"
+                            hidden
+                        />
+                    </label>
+                </div>
+            </div>
+
+            <div class="perfil__firma-panel">
+                <div class="perfil__firma-panel-dibujar">
+                    <button
+                        type="button"
+                        id="perfil-firma-borrar"
+                        class="boton boton--secundario"
+                    >
+                        Borrar trazo
+                    </button>
+                </div>
+
+                <div class="perfil__firma-panel-subir">
+                    <div class="perfil__firma-archivo">
+                        <span class="u-etiqueta u-texto-terciario"
+                            >Archivo</span
+                        >
+                        <span
+                            id="perfil-firma-nombre"
+                            class="u-mono-sm u-texto-secundario"
+                        >
+                            Ningún archivo seleccionado.
+                        </span>
+                    </div>
+
+                    <label
+                        for="perfil-firma-archivo"
+                        class="boton boton--secundario"
+                    >
+                        Elegir archivo
+                    </label>
+
+                    <p
+                        class="perfil__firma-formatos u-mono-sm u-texto-terciario"
+                    >
+                        PNG, JPG o WEBP
+                    </p>
+                </div>
+
+                <input
+                    id="perfil-firma-archivo"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    hidden
+                />
+
+                <button
+                    id="perfil-firma-guardar"
+                    type="button"
+                    class="boton perfil__firma-guardar"
+                    disabled
+                >
+                    Guardar firma
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="perfil__tarjeta perfil__seccion">
+        <div class="perfil__seccion-encabezado">
+            <div>
+                <div class="u-etiqueta u-texto-terciario">Seguridad</div>
+                <h2 class="perfil__titulo">Cambiar contraseña</h2>
+            </div>
+        </div>
+
+        <form id="perfil-password-form" class="perfil__password-form">
+            <div class="campo">
+                <label
+                    for="perfil-password-actual"
+                    class="u-etiqueta u-texto-secundario"
+                >
+                    Contraseña actual
+                </label>
+
+                <div class="campo__envoltura">
+                    <input
+                        id="perfil-password-actual"
+                        type="password"
+                        autocomplete="current-password"
+                        required
+                    />
+
+                    <button
+                        type="button"
+                        class="campo__alternar"
+                        data-password-target="perfil-password-actual"
+                        aria-label="Mostrar contraseña"
+                    >
+                        Ver
+                    </button>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label
+                    for="perfil-password-nueva"
+                    class="u-etiqueta u-texto-secundario"
+                >
+                    Nueva contraseña
+                </label>
+
+                <div class="campo__envoltura">
+                    <input
+                        id="perfil-password-nueva"
+                        type="password"
+                        autocomplete="new-password"
+                        required
+                    />
+
+                    <button
+                        type="button"
+                        class="campo__alternar"
+                        data-password-target="perfil-password-nueva"
+                        aria-label="Mostrar contraseña"
+                    >
+                        Ver
+                    </button>
+                </div>
+            </div>
+
+            <div class="campo">
+                <label
+                    for="perfil-password-confirmacion"
+                    class="u-etiqueta u-texto-secundario"
+                >
+                    Confirmar nueva contraseña
+                </label>
+
+                <div class="campo__envoltura">
+                    <input
+                        id="perfil-password-confirmacion"
+                        type="password"
+                        autocomplete="new-password"
+                        required
+                    />
+
+                    <button
+                        type="button"
+                        class="campo__alternar"
+                        data-password-target="perfil-password-confirmacion"
+                        aria-label="Mostrar contraseña"
+                    >
+                        Ver
+                    </button>
+                </div>
+
+                <div
+                    id="perfil-password-coincidencia"
+                    class="perfil__coincidencia"
+                    hidden
+                >
+                    <span
+                        id="perfil-password-coincidencia-punto"
+                        class="perfil__coincidencia-punto"
+                    ></span>
+                    <span id="perfil-password-coincidencia-texto"></span>
+                </div>
+            </div>
+
+            <p class="ayuda-password">
+                Después de cambiar la contraseña tendrás que iniciar sesión
+                nuevamente.
+            </p>
+
+            <button id="perfil-password-guardar" type="submit" class="boton">
+                Cambiar contraseña
+            </button>
+        </form>
+
+        <div id="perfil-mensaje" class="mensaje-error" role="alert" hidden>
+            <span class="mensaje-error__sello">Error</span>
+            <span id="perfil-mensaje-texto"></span>
+        </div>
+    </section>
+</div>

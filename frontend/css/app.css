@@ -78,8 +78,19 @@ textarea {
 /* Usuario */
 
 .barra-lateral__usuario {
+    width: 100%;
     padding: 18px 22px;
+    border: 0;
     border-bottom: 1px solid var(--ink-700);
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.barra-lateral__usuario:hover {
+    background: var(--ink-850);
 }
 
 .barra-lateral__identidad {

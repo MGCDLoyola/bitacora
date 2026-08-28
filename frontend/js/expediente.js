@@ -50,7 +50,11 @@ export async function iniciar({ usuario, contenedor, idExpediente }) {
 
         renderizarExpediente(contenedor, expediente);
 
-        renderizarDias(contenedor, expediente.dia_actual, expediente.modo_gestion);
+        renderizarDias(
+            contenedor,
+            expediente.dia_actual,
+            expediente.modo_gestion
+        );
     } catch (error) {
         mostrarError(
             contenedor,
@@ -173,18 +177,12 @@ function renderizarDias(contenedor, diaActual, modoGestion) {
     navegacion.innerHTML = "";
 
     for (let numero = 1; numero <= dia; numero++) {
-        navegacion.appendChild(
-            crearBotonDia(contenedor, numero, modoGestion)
-        );
+        navegacion.appendChild(crearBotonDia(contenedor, numero, modoGestion));
     }
 
     contenido.innerHTML = "";
 
-    renderizarIntentos(
-        contenedor,
-        diaSeleccionado,
-        modoGestion
-    );
+    renderizarIntentos(contenedor, diaSeleccionado, modoGestion);
 }
 
 function crearBotonDia(contenedor, numero) {

@@ -1,0 +1,331 @@
+.perfil {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.perfil__encabezado {
+    margin-bottom: 34px;
+}
+
+.perfil__encabezado .u-titulo {
+    margin: 5px 0 6px;
+}
+
+.perfil__tarjeta {
+    background: var(--ink-900);
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-card);
+}
+
+.perfil__seccion {
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+.perfil__seccion-encabezado {
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--ink-700);
+}
+
+.perfil__titulo {
+    margin: 5px 0 0;
+    color: var(--text-100);
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 600;
+}
+
+.perfil__seccion-nota {
+    margin: 6px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    max-width: 46ch;
+}
+
+/* ─────────────────────────────────────────────
+   IDENTIDAD
+   ───────────────────────────────────────────── */
+
+.perfil__identidad {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.perfil__nombre {
+    margin: 0;
+    color: var(--text-100);
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.perfil__insignia {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    background: rgba(201, 162, 39, 0.08);
+    border: 1px solid var(--gold-700);
+    border-radius: 999px;
+    color: var(--gold-300);
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+}
+
+.perfil__identidad-pie {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--ink-700);
+}
+
+.perfil__correo {
+    font-family: var(--font-sans);
+    font-size: 14.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ─────────────────────────────────────────────
+   FIRMA
+   ───────────────────────────────────────────── */
+
+.perfil__firma {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 240px;
+    gap: 24px;
+    align-items: start;
+}
+
+.perfil__firma-tabs {
+    display: inline-flex;
+    gap: 3px;
+    padding: 3px;
+    margin-bottom: 12px;
+    background: var(--ink-950);
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-tab);
+}
+
+.perfil__firma-tab {
+    padding: 6px 13px;
+    background: transparent;
+    border: none;
+    border-radius: 2px;
+    color: var(--text-500);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition:
+        color 0.15s ease,
+        background 0.15s ease;
+}
+
+.perfil__firma-tab:hover {
+    color: var(--text-100);
+}
+
+.perfil__firma-tab[aria-pressed="true"] {
+    background: rgba(201, 162, 39, 0.1);
+    color: var(--gold-300);
+}
+
+.perfil__firma-lienzo {
+    position: relative;
+    min-height: 200px;
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+}
+
+.perfil__firma-canvas {
+    display: block;
+    width: 100%;
+    height: 200px;
+    background: var(--paper-100);
+    touch-action: none;
+    cursor: crosshair;
+}
+
+.perfil__firma-linea {
+    position: absolute;
+    left: 26px;
+    right: 26px;
+    bottom: 46px;
+    border-bottom: 1px dashed var(--gold-700);
+    pointer-events: none;
+}
+
+.perfil__firma[data-modo="subir"] .perfil__firma-canvas,
+.perfil__firma[data-modo="subir"] .perfil__firma-linea {
+    display: none;
+}
+
+.perfil__firma-dropzone {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    height: 100%;
+    padding: 24px;
+    background: var(--ink-950);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.perfil__firma[data-modo="subir"] .perfil__firma-dropzone {
+    display: flex;
+}
+
+.perfil__firma-dropzone--activa {
+    background: rgba(201, 162, 39, 0.06);
+}
+
+.perfil__firma-dropzone--llena {
+    background: var(--paper-100);
+}
+
+.perfil__firma-vacia {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+}
+
+.perfil__firma-vacia-titulo {
+    color: var(--text-300);
+    font-family: var(--font-sans);
+    font-size: 13.5px;
+    font-weight: 500;
+}
+
+.perfil__firma-vacia-nota {
+    color: var(--text-500);
+    font-family: var(--font-mono);
+    font-size: 11px;
+}
+
+.perfil__firma-imagen {
+    display: block;
+    max-width: 100%;
+    max-height: 150px;
+    object-fit: contain;
+}
+
+.perfil__firma-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.perfil__firma-panel-dibujar,
+.perfil__firma-panel-subir {
+    display: none;
+}
+
+.perfil__firma[data-modo="dibujar"] .perfil__firma-panel-dibujar {
+    display: block;
+}
+
+.perfil__firma[data-modo="subir"] .perfil__firma-panel-subir {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.perfil__firma-archivo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.perfil__firma-archivo .u-mono-sm {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.perfil .boton--secundario {
+    background: transparent;
+    border: 1px solid var(--ink-700);
+    color: var(--text-300);
+    text-decoration: none;
+    text-align: center;
+    margin-top: 0;
+}
+
+.perfil .boton--secundario:hover {
+    background: var(--ink-850);
+    color: var(--text-100);
+}
+
+.perfil__firma-formatos {
+    margin: 0;
+    text-align: center;
+}
+
+.perfil__firma-guardar {
+    margin-top: 18px;
+}
+
+/* ─────────────────────────────────────────────
+   CONTRASEÑA
+   ───────────────────────────────────────────── */
+
+.perfil__password-form {
+    max-width: 520px;
+}
+
+.perfil__coincidencia {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 9px;
+    font-family: var(--font-mono);
+    font-size: 11.5px;
+}
+
+.perfil__coincidencia-punto {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-500);
+}
+
+.perfil__coincidencia--ok {
+    color: var(--forest-600);
+}
+
+.perfil__coincidencia--ok .perfil__coincidencia-punto {
+    background: var(--forest-600);
+}
+
+.perfil__coincidencia--error {
+    color: var(--rose-500);
+}
+
+.perfil__coincidencia--error .perfil__coincidencia-punto {
+    background: var(--rose-500);
+}
+
+#perfil-mensaje {
+    display: flex;
+}
+
+@media (max-width: 720px) {
+    .perfil__firma {
+        grid-template-columns: 1fr;
+    }
+}
