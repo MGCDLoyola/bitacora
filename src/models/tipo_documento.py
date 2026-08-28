@@ -1,10 +1,10 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.core.base import Base
 from src.core.mixins import AuditoriaMixin
-
-from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .documento import Documento

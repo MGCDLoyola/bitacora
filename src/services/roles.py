@@ -1,10 +1,9 @@
+from collections.abc import Sequence
+
 from sqlalchemy import select
 
 from src.models.rol import Rol
-
 from src.services.base import BaseService
-
-from collections.abc import Sequence
 
 
 class RolService(BaseService):

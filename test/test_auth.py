@@ -1,7 +1,6 @@
 from src.core.config import NOMBRE_COOKIE_SESION
 from src.core.deps import requiere_rol
 
-
 # --- Login ---
 
 

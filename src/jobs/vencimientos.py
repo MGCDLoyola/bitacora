@@ -1,12 +1,10 @@
 import logging
-
 from datetime import date, datetime
 from decimal import Decimal
 
+from mdb import PostgreSQL
 from sqlalchemy import select
 from sqlalchemy.orm import Session, load_only
-
-from mdb import PostgreSQL
 
 from src.core.almacenamiento import (
     crear_carpeta_cliente,
@@ -21,7 +19,6 @@ from src.models.expediente import Expediente
 from src.models.tipo_documento import TipoDocumento
 from src.services.cliente import ClienteService
 from src.services.expediente import ExpedienteService
-
 
 logger = logging.getLogger(__name__)
 

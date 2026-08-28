@@ -2,11 +2,9 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from src.core.exceptions import ConflictoNegocio
-
 from src.models.cobranza import Cobranza
 from src.models.documento import Documento
 from src.models.tipo_documento import TipoDocumento
-
 from src.services.base import BaseService
 from src.services.expediente import ExpedienteService
 

@@ -1,16 +1,20 @@
-from src.jobs.vencimientos import procesar_clientes
-from src.core.database import SessionLocal
 from mdb import PostgreSQL
-from src.core.config import PSQL_DATA_DB, PSQL_DATA_HOST, PSQL_DATA_PW, PSQL_DATA_USR
-from src.jobs.informacion import procesar_informacion
+from mgc_graph import GraphAuth, GraphClient, Mailbox
+
 from src.core.config import (
-    GRAPH_TENANT_ID,
     GRAPH_CLIENT_ID,
     GRAPH_CLIENT_SECRET,
     GRAPH_MAILBOX,
+    GRAPH_TENANT_ID,
+    PSQL_DATA_DB,
+    PSQL_DATA_HOST,
+    PSQL_DATA_PW,
+    PSQL_DATA_USR,
 )
-from mgc_graph import GraphAuth, GraphClient, Mailbox
+from src.core.database import SessionLocal
 from src.jobs.asignacion import asignar_expedientes
+from src.jobs.informacion import procesar_informacion
+from src.jobs.vencimientos import procesar_clientes
 
 
 def main():

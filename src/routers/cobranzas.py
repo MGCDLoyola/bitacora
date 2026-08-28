@@ -7,7 +7,6 @@ from src.models.usuario import Usuario
 from src.schemas.cobranza import CobranzaRead, CobranzaUpdate
 from src.services.cobranza import CobranzaService
 
-
 router = APIRouter(prefix="/cobranzas", tags=["Cobranzas"])
 
 

@@ -5,7 +5,6 @@ from PIL import Image
 
 from src.services.firma import FirmaService
 
-
 ENTRADA = Path("test/fixtures/firma_original.jpg")
 SALIDA = Path("test/fixtures/firma_procesada.png")
 

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -7,14 +8,12 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from src.core.base import Base
 from src.core.mixins import AuditoriaMixin
 
-from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
-    from .rol import Rol
-    from .documento import Documento
     from .cobranza import Cobranza
+    from .documento import Documento
     from .evidencia import Evidencia
     from .expediente import Expediente
+    from .rol import Rol
     from .sesion import Sesion
 
 

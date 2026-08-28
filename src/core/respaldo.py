@@ -6,7 +6,6 @@ from urllib.parse import urlparse
 
 from src.core.config import DATABASE_URL, PG_DUMP_PATH
 
-
 CARPETA_RESPALDOS = Path("backups") / "postgresql"
 
 

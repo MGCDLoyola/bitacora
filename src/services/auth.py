@@ -1,9 +1,8 @@
 import logging
 import secrets
-
 from datetime import datetime, timedelta, timezone
 
-from mgc_graph import Mail, Mailbox, MailError, MailboxError
+from mgc_graph import Mail, Mailbox, MailboxError, MailError
 from sqlalchemy import select
 
 from src.core.config import (
@@ -18,9 +17,7 @@ from src.core.exceptions import (
 from src.core.plantillas import correo_recuperacion_password
 from src.models.sesion import Sesion
 from src.models.usuario import Usuario
-
 from src.services.base import BaseService
-
 
 logger = logging.getLogger("bitacora")
 

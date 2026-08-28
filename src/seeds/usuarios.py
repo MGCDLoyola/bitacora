@@ -1,7 +1,7 @@
 from src.core.database import SessionLocal
+from src.core.exceptions import OperacionInvalida
 from src.schemas.usuario import UsuarioCreate
 from src.services.usuario import UsuarioService
-from src.core.exceptions import OperacionInvalida
 
 ID_ROL_COBRANZA = 1
 

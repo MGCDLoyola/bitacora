@@ -7,7 +7,6 @@ from src.models.usuario import Usuario
 from src.schemas.documento import DocumentoRead
 from src.services.documento import DocumentoService
 
-
 router = APIRouter(prefix="/expedientes", tags=["Documentos"])
 
 

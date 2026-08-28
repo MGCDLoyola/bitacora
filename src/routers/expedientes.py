@@ -20,7 +20,6 @@ from src.services.expediente import ExpedienteService
 from src.services.pdf_cobranza import PDFCobranzaService
 from src.services.pdf_consolidacion import PDFConsolidacionService
 
-
 router = APIRouter(
     prefix="/expedientes",
     tags=["Expedientes"],

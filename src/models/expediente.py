@@ -1,4 +1,5 @@
 from datetime import date
+from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, Date, ForeignKey, Integer, Numeric, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -6,12 +7,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.core.base import Base
 from src.core.mixins import AuditoriaMixin
 
-from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from .cliente import Cliente
-    from .documento import Documento
     from .cobranza import Cobranza
+    from .documento import Documento
     from .usuario import Usuario
 
 

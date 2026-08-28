@@ -4,14 +4,11 @@ from pathlib import Path
 
 from sqlalchemy import select
 
-from src.core.exceptions import ConflictoNegocio, NoEncontrado, OperacionInvalida
 from src.core.config import HORARIOS_GESTION, MAX_DIAS, MAX_GESTIONES_DIA
-
+from src.core.exceptions import ConflictoNegocio, NoEncontrado, OperacionInvalida
 from src.models.cobranza import Cobranza
 from src.models.expediente import Expediente
-
 from src.schemas.cobranza import CobranzaCreate, CobranzaUpdate
-
 from src.services.base import BaseService
 
 

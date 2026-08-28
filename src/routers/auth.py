@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, Response
-from sqlalchemy.orm import Session
-
 from mgc_graph import Mail, Mailbox
+from sqlalchemy.orm import Session
 
 from src.core.config import (
     COOKIE_SECURE,
@@ -11,6 +10,7 @@ from src.core.config import (
 from src.core.database import get_session
 from src.core.deps import mail, mailbox, sesion_actual, usuario_actual
 from src.models.sesion import Sesion
+from src.models.usuario import Usuario
 from src.schemas.auth import (
     CambiarPasswordRequest,
     ConfirmarRecuperacionRequest,
@@ -19,7 +19,6 @@ from src.schemas.auth import (
 )
 from src.schemas.usuario import UsuarioRead
 from src.services.auth import AuthService
-from src.models.usuario import Usuario
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

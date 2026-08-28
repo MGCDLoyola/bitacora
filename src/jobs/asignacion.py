@@ -5,9 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from src.models.expediente import Expediente
-from src.models.usuario import Usuario
 from src.models.rol import Rol
-
+from src.models.usuario import Usuario
 
 logger = logging.getLogger(__name__)
 

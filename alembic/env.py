@@ -1,22 +1,20 @@
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-
-from src.core.config import DATABASE_URL
 from src.core.base import Base
+from src.core.config import DATABASE_URL
 from src.models import (
-    Rol,
-    Usuario,
     Cliente,
-    Expediente,
-    TipoDocumento,
-    Documento,
     Cobranza,
+    Documento,
     Evidencia,
+    Expediente,
+    Rol,
     Sesion,
+    TipoDocumento,
+    Usuario,
 )
 
 config = context.config

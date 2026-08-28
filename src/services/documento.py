@@ -1,18 +1,16 @@
 import shutil
 import uuid
+from collections.abc import Sequence
 from pathlib import Path
 
 from fastapi import UploadFile
 from sqlalchemy import select
 
 from src.core.almacenamiento import carpeta_vencimiento
-from src.models.documento import Documento
 from src.core.exceptions import NoEncontrado
-
-from src.services.expediente import ExpedienteService
+from src.models.documento import Documento
 from src.services.base import BaseService
-
-from collections.abc import Sequence
+from src.services.expediente import ExpedienteService
 
 
 class DocumentoService(BaseService):

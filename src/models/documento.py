@@ -1,4 +1,5 @@
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy import ForeignKey, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -6,12 +7,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from src.core.base import Base
 from src.core.mixins import AuditoriaMixin
 
-from typing import TYPE_CHECKING
-
 if TYPE_CHECKING:
     from .expediente import Expediente
-    from .usuario import Usuario
     from .tipo_documento import TipoDocumento
+    from .usuario import Usuario
 
 
 class Documento(AuditoriaMixin, Base):

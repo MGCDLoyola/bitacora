@@ -7,7 +7,6 @@ from src.models.usuario import Usuario
 from src.schemas.evidencia import EvidenciaRead
 from src.services.evidencia import EvidenciaService
 
-
 router = APIRouter(prefix="/cobranzas", tags=["Evidencias"])
 
 

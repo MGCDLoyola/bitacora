@@ -1,11 +1,10 @@
+from collections.abc import Sequence
+
 from sqlalchemy import or_, select
 
-from src.models.cliente import Cliente
 from src.core.exceptions import NoEncontrado
-
+from src.models.cliente import Cliente
 from src.services.base import BaseService
-
-from collections.abc import Sequence
 
 
 class ClienteService(BaseService):

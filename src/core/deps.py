@@ -2,21 +2,20 @@ import uuid
 from datetime import datetime, timezone
 
 from fastapi import Cookie, Depends
+from mgc_graph import GraphAuth, GraphClient, Mail, Mailbox
 from sqlalchemy.orm import Session
 
-from src.core.config import NOMBRE_COOKIE_SESION
+from src.core.config import (
+    GRAPH_CLIENT_ID,
+    GRAPH_CLIENT_SECRET,
+    GRAPH_MAILBOX,
+    GRAPH_TENANT_ID,
+    NOMBRE_COOKIE_SESION,
+)
 from src.core.database import get_session
 from src.core.exceptions import CambioPasswordRequerido, NoAutorizado, PermisoDenegado
 from src.models.sesion import Sesion
 from src.models.usuario import Usuario
-
-from src.core.config import (
-    GRAPH_TENANT_ID,
-    GRAPH_CLIENT_ID,
-    GRAPH_CLIENT_SECRET,
-    GRAPH_MAILBOX,
-)
-from mgc_graph import GraphAuth, GraphClient, Mail, Mailbox
 
 
 def sesion_actual(

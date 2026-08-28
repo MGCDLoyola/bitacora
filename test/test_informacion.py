@@ -1,12 +1,13 @@
-from src.jobs.informacion import procesar_informacion
-from src.core.database import SessionLocal
+from mgc_graph import GraphAuth, GraphClient, Mailbox
+
 from src.core.config import (
-    GRAPH_TENANT_ID,
     GRAPH_CLIENT_ID,
     GRAPH_CLIENT_SECRET,
     GRAPH_MAILBOX,
+    GRAPH_TENANT_ID,
 )
-from mgc_graph import GraphAuth, GraphClient, Mailbox
+from src.core.database import SessionLocal
+from src.jobs.informacion import procesar_informacion
 
 
 def main():

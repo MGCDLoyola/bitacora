@@ -1,8 +1,8 @@
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.orm import Session, DeclarativeBase
-
 from collections.abc import Callable
 from pathlib import Path
+
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import DeclarativeBase, Session
 
 
 class BaseService:

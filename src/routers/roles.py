@@ -8,7 +8,6 @@ from src.models.rol import Rol
 from src.models.usuario import Usuario
 from src.schemas.rol import RolRead
 
-
 router = APIRouter(prefix="/roles", tags=["Roles"])
 
 

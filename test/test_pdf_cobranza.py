@@ -4,7 +4,6 @@ from src.core.database import SessionLocal
 from src.schemas.cobranza import CobranzaCreate
 from src.services.cobranza import CobranzaService
 
-
 ID_EXPEDIENTE = 30
 ID_USUARIO = 1
 

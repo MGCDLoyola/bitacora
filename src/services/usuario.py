@@ -1,20 +1,16 @@
 import secrets
-
-from sqlalchemy import select
+from collections.abc import Sequence
 from pathlib import Path
 
-from src.models.usuario import Usuario
-from src.models.rol import Rol
+from sqlalchemy import select
 
-from src.schemas.usuario import UsuarioCreate, UsuarioUpdate, UsuarioUpdateSupervisor
+from src.core.almacenamiento import carpeta_firmas, crear_carpeta_firmas
 from src.core.exceptions import NoEncontrado, OperacionInvalida
-from src.core.almacenamiento import crear_carpeta_firmas, carpeta_firmas
-
+from src.models.rol import Rol
+from src.models.usuario import Usuario
+from src.schemas.usuario import UsuarioCreate, UsuarioUpdate, UsuarioUpdateSupervisor
 from src.services.base import BaseService
 from src.services.firma import FirmaService
-
-from collections.abc import Sequence
-
 
 NOMBRE_FIRMA = "firma.png"
 

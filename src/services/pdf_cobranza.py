@@ -12,16 +12,12 @@ from src.core.config import HORARIOS_GESTION
 from src.core.exceptions import ConflictoNegocio, NoEncontrado
 from src.core.monto import obtener_monto_vencido
 from src.core.pdf import imagen_base64, renderizar_pdf
-
 from src.models.cobranza import Cobranza
 from src.models.documento import Documento
 from src.models.tipo_documento import TipoDocumento
-
 from src.services.base import BaseService
 from src.services.expediente import ExpedienteService
-
 from src.utils.money import money
-
 
 TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
 LOGO_PATH = TEMPLATES_DIR / "assets" / "mgc_logo.png"

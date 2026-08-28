@@ -1,5 +1,4 @@
 from src.core.database import SessionLocal
-
 from src.seeds.roles import seed_roles
 from src.seeds.tipos_documento import seed_tipos_documento
 

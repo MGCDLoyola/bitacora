@@ -9,7 +9,6 @@ from .config import (
     PSQL_DATA_USR,
 )
 
-
 pg = PostgreSQL(
     PSQL_DATA_HOST,
     PSQL_DATA_DB,
