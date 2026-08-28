@@ -2,8 +2,6 @@ from datetime import date
 from decimal import Decimal
 
 from src.schemas.base import SchemaBase
-from src.schemas.cliente import ClienteRead
-from src.schemas.usuario import UsuarioRead
 
 
 class ExpedienteBase(SchemaBase):

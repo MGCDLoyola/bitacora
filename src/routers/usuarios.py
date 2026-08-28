@@ -6,8 +6,8 @@ from mgc_graph import Mail, Mailbox, MailboxError, MailError
 from sqlalchemy.orm import Session
 
 from src.core.database import get_session
-from src.core.deps import mail, mailbox, requiere_rol, usuario_actual
-from src.core.exceptions import ErrorEnvioCredenciales, OperacionInvalida
+from src.core.deps import mail, mailbox, requiere_rol
+from src.core.exceptions import ErrorEnvioCredenciales
 from src.core.plantillas import correo_alta_usuario
 from src.models.usuario import Usuario
 from src.schemas.usuario import (
@@ -18,7 +18,6 @@ from src.schemas.usuario import (
     UsuarioUpdate,
     UsuarioUpdateSupervisor,
 )
-from src.services.firma import FirmaService
 from src.services.usuario import UsuarioService
 
 logger = logging.getLogger("bitacora")
