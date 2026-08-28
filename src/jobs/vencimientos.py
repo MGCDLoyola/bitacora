@@ -198,6 +198,7 @@ def procesar_expedientes_en_revision(
             and expediente.fecha_creacion.date() == fecha_bloque_mas_antiguo
         ):
             expediente.fecha_consolidacion = hoy
+            expediente.dia_actual += 1
 
             logger.info(
                 "Expediente %s entra en consolidación: "

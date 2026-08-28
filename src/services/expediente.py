@@ -6,7 +6,7 @@ from sqlalchemy import exists, func, select
 from sqlalchemy.orm import joinedload
 
 from src.core.almacenamiento import carpeta_expediente
-from src.core.exceptions import NoEncontrado, OperacionInvalida
+from src.core.exceptions import NoEncontrado, OperacionInvalida, ConflictoNegocio
 from src.models.cobranza import Cobranza
 from src.models.documento import Documento
 from src.models.expediente import Expediente
@@ -71,6 +71,8 @@ class ExpedienteService(BaseService):
 
         expediente, ultimo_comentario_cobranza = resultado
 
+        modo_gestion = self._obtener_gestion(expediente)
+
         comentarios = (
             ultimo_comentario_cobranza
             if expediente.estado
@@ -91,7 +93,47 @@ class ExpedienteService(BaseService):
                 else None
             ),
             comentarios=comentarios,
+            modo_gestion=modo_gestion,
         )
+
+    def _obtener_gestion(self, expediente: Expediente) -> str:
+
+        if not expediente.estado:
+            return "cerrado"
+
+        if expediente.fecha_desfase is not None:
+            return "desfasado"
+
+        if expediente.fecha_consolidacion is not None:
+
+            tipo_consolidacion = self.session.execute(
+                select(TipoDocumento.id).where(
+                    TipoDocumento.nombre == "Consolidación"
+                )
+            ).scalar_one_or_none()
+
+            if tipo_consolidacion is None:
+                raise ConflictoNegocio(
+                    "No existe el tipo de documento 'Consolidación'."
+                )
+
+            tiene_documento = self.session.scalar(
+                select(
+                    exists(
+                        select(Documento.id).where(
+                            Documento.id_tipo_documento == tipo_consolidacion,
+                            Documento.id_expediente == expediente.id,
+                        )
+                    )
+                )
+            )
+
+            if not tiene_documento:
+                return "consolidacion"
+
+            return "cerrado"
+
+        return "del_dia"
 
     def crear(
         self,
@@ -320,7 +362,6 @@ class ExpedienteService(BaseService):
                 ),
                 dia=dia,
                 intentos=intentos,
-                comentarios=None,
             )
             for expediente, dia, intentos in resultados
         ]

@@ -3,6 +3,7 @@ let idExpedienteActual = null;
 
 let diaSeleccionado = null;
 let diaActualExpediente = null;
+let modoGestionExpediente = null;
 
 let cobranzasExpediente = [];
 
@@ -49,7 +50,7 @@ export async function iniciar({ usuario, contenedor, idExpediente }) {
 
         renderizarExpediente(contenedor, expediente);
 
-        renderizarDias(contenedor, expediente.dia_actual);
+        renderizarDias(contenedor, expediente.dia_actual, expediente.modo_gestion);
     } catch (error) {
         mostrarError(
             contenedor,
@@ -158,7 +159,7 @@ function renderizarExpediente(contenedor, expediente) {
    DÍAS DE GESTIÓN
    ───────────────────────────────────────────── */
 
-function renderizarDias(contenedor, diaActual) {
+function renderizarDias(contenedor, diaActual, modoGestion) {
     const navegacion = contenedor.querySelector("#expediente-dias-navegacion");
 
     const contenido = contenedor.querySelector("#expediente-dias-contenido");
@@ -167,16 +168,23 @@ function renderizarDias(contenedor, diaActual) {
 
     diaActualExpediente = dia;
     diaSeleccionado = dia;
+    modoGestionExpediente = modoGestion;
 
     navegacion.innerHTML = "";
 
     for (let numero = 1; numero <= dia; numero++) {
-        navegacion.appendChild(crearBotonDia(contenedor, numero));
+        navegacion.appendChild(
+            crearBotonDia(contenedor, numero, modoGestion)
+        );
     }
 
     contenido.innerHTML = "";
 
-    renderizarIntentos(contenedor, diaSeleccionado);
+    renderizarIntentos(
+        contenedor,
+        diaSeleccionado,
+        modoGestion
+    );
 }
 
 function crearBotonDia(contenedor, numero) {
@@ -1040,8 +1048,16 @@ function calcularBloqueo(dia, orden) {
     }
 
     /*
-     * Día actual:
-     * se habilita cada intento a partir
+     * El bloqueo por hora solamente aplica
+     * a la gestión del día.
+     */
+    if (modoGestionExpediente !== "del_dia") {
+        return false;
+    }
+
+    /*
+     * Día actual de gestión:
+     * cada intento se habilita a partir
      * de su hora correspondiente.
      */
     return new Date().getHours() < HORA_INTENTO[orden];
