@@ -271,12 +271,11 @@ def listar_cobranzas(
 
 
 @router.post(
-    "/{id_expediente}/cobranzas/{dia}",
+    "/{id_expediente}/cobranzas",
     response_model=CobranzaRead,
 )
 def crear_cobranza(
     id_expediente: int,
-    dia: int,
     data: CobranzaCreate,
     session: Session = Depends(get_session),
     usuario_actual: Usuario = Depends(
@@ -290,7 +289,6 @@ def crear_cobranza(
     return CobranzaService(session).crear(
         id_expediente=id_expediente,
         id_usuario=usuario_actual.id,
-        dia=dia,
         data=data,
     )
 

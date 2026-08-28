@@ -780,6 +780,8 @@ function inicializarFormularioIntento(cuerpo, tarjeta, dia, orden) {
         }
 
         const datos = {
+            dia,
+            orden,
             hora: entradaHora.value,
             medio: selectMedio.value,
             contacto: contactoSeleccionado === "si",
@@ -794,7 +796,7 @@ function inicializarFormularioIntento(cuerpo, tarjeta, dia, orden) {
 
         try {
             const respuesta = await fetch(
-                `/expedientes/${idExpedienteActual}/cobranzas/${dia}`,
+                `/expedientes/${idExpedienteActual}/cobranzas`,
                 {
                     method: "POST",
                     credentials: "include",

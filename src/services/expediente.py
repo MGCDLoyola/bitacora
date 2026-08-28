@@ -40,29 +40,57 @@ class ExpedienteService(BaseService):
 
     def obtener_read(self, id_expediente: int) -> ExpedienteRead:
 
+        ultimo_comentario_cobranza = (
+            select(Cobranza.comentarios)
+            .where(
+                Cobranza.id_expediente == Expediente.id,
+                Cobranza.comentarios.is_not(None),
+                func.trim(Cobranza.comentarios) != "",
+            )
+            .order_by(Cobranza.fecha.desc(), Cobranza.id.desc())
+            .limit(1)
+            .scalar_subquery()
+        )
+
         stmt = (
-            select(Expediente)
-            .options(joinedload(Expediente.cliente), joinedload(Expediente.usuario))
+            select(
+                Expediente,
+                ultimo_comentario_cobranza.label("ultimo_comentario_cobranza"),
+            )
+            .options(
+                joinedload(Expediente.cliente),
+                joinedload(Expediente.usuario),
+            )
             .where(Expediente.id == id_expediente)
         )
 
-        resultado = self.session.execute(stmt).unique().scalar_one_or_none()
+        resultado = self.session.execute(stmt).unique().one_or_none()
 
         if resultado is None:
             raise NoEncontrado(f"No existe un expediente con id '{id_expediente}'.")
 
+        expediente, ultimo_comentario_cobranza = resultado
+
+        comentarios = (
+            ultimo_comentario_cobranza
+            if expediente.estado
+            else expediente.comentarios
+        )
+
         return ExpedienteRead(
-            id=resultado.id,
-            interlocutor=resultado.interlocutor,
-            nombre_cliente=resultado.cliente.nombre,
-            contrato=resultado.cliente.contrato,
-            fecha_incumplimiento=resultado.fecha_incumplimiento,
-            dia_actual=resultado.dia_actual,
-            monto_vencido=resultado.monto_vencido,
+            id=expediente.id,
+            interlocutor=expediente.interlocutor,
+            nombre_cliente=expediente.cliente.nombre,
+            contrato=expediente.cliente.contrato,
+            fecha_incumplimiento=expediente.fecha_incumplimiento,
+            dia_actual=expediente.dia_actual,
+            monto_vencido=expediente.monto_vencido,
             usuario=(
-                resultado.usuario.nombre if resultado.usuario is not None else None
+                expediente.usuario.nombre
+                if expediente.usuario is not None
+                else None
             ),
-            comentarios=resultado.comentarios,
+            comentarios=comentarios,
         )
 
     def crear(

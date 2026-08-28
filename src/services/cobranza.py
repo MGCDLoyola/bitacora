@@ -32,7 +32,7 @@ class CobranzaService(BaseService):
         return cobranza
 
     def crear(
-        self, id_expediente: int, id_usuario: int, dia: int, data: CobranzaCreate
+        self, id_expediente: int, id_usuario: int, data: CobranzaCreate
     ) -> Cobranza:
 
         expediente = self.session.get(Expediente, id_expediente)
@@ -48,36 +48,49 @@ class CobranzaService(BaseService):
                 "No se puede registrar una cobranza en un expediente cerrado."
             )
 
-        if not 1 <= dia <= MAX_DIAS:
+        if not 1 <= data.dia <= MAX_DIAS:
             raise OperacionInvalida(
                 f"El día de gestión debe estar entre 1 y {MAX_DIAS}."
             )
 
-        if dia > expediente.dia_actual:
+        if data.dia > expediente.dia_actual:
             raise OperacionInvalida(
-                f"No se puede registrar una cobranza del día {dia}. "
+                f"No se puede registrar una cobranza del día {data.dia}. "
                 f"El día actual del expediente es {expediente.dia_actual}."
             )
 
-        orden = self._orden(
-            id_expediente=id_expediente,
-            dia=dia,
+        if not 1 <= data.orden <= MAX_GESTIONES_DIA:
+            raise OperacionInvalida(
+                f"El intento debe estar entre 1 y {MAX_GESTIONES_DIA}."
+            )
+
+        existe = self.session.scalar(
+            select(Cobranza.id)
+            .where(Cobranza.id_expediente == id_expediente)
+            .where(Cobranza.dia == data.dia)
+            .where(Cobranza.orden == data.orden)
         )
+
+        if existe is not None:
+            raise ConflictoNegocio(
+                f"El intento {data.orden} del día {data.dia} "
+                "ya fue registrado."
+            )
 
         fecha = self._construir_fecha(
             expediente=expediente,
-            dia=dia,
+            dia=data.dia,
             hora=data.hora,
         )
 
-        if dia == expediente.dia_actual:
-            self._validar_horario(orden, fecha)
+        if data.dia == expediente.dia_actual:
+            self._validar_horario(data.orden, fecha)
 
         cobranza = Cobranza(
             id_expediente=id_expediente,
             id_usuario=id_usuario,
-            dia=dia,
-            orden=orden,
+            dia=data.dia,
+            orden=data.orden,
             fecha=fecha,
             contacto=data.contacto,
             medio=data.medio,
@@ -132,6 +145,7 @@ class CobranzaService(BaseService):
         dia: int,
         hora: str,
     ) -> datetime:
+
         fecha = expediente.fecha_creacion + timedelta(days=dia - 1)
 
         try:
@@ -153,26 +167,8 @@ class CobranzaService(BaseService):
             microsecond=0,
         )
 
-    def _orden(self, id_expediente: int, dia: int) -> int:
-
-        ordenes = self.session.scalars(
-            select(Cobranza.orden)
-            .where(Cobranza.id_expediente == id_expediente)
-            .where(Cobranza.dia == dia)
-        ).all()
-
-        orden = next(
-            (i for i in range(1, MAX_GESTIONES_DIA + 1) if i not in ordenes), None
-        )
-
-        if orden is None:
-            raise ConflictoNegocio(
-                f"El expediente ya tiene las {MAX_GESTIONES_DIA} gestiones del día {dia}."
-            )
-
-        return orden
-
     def _validar_horario(self, orden: int, fecha: datetime) -> None:
+
         inicio = HORARIOS_GESTION[orden]
         ahora = datetime.now()
 

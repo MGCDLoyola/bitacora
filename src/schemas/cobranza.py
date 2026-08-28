@@ -17,19 +17,25 @@ class CobranzaBase(SchemaBase):
 
 class CobranzaCreate(SchemaBase):
 
+    dia: int
+    orden: int
     hora: str
     contacto: bool
     medio: str | None = None
     comentarios: str | None = None
 
+
 class CobranzaUpdate(SchemaBase):
+
     fecha: datetime | None = None
-    contacto: bool = None
+    contacto: bool | None = None
     medio: str | None = None
     comentarios: str | None = None
 
 
 class CobranzaRead(CobranzaBase):
+
     id: int
+    dia: int
     orden: int
     usuario: UsuarioRead
