@@ -1,4 +1,3 @@
-
 from datetime import date
 from decimal import Decimal
 from typing import Literal
@@ -7,17 +6,14 @@ from src.schemas.base import SchemaBase
 
 
 class ExpedienteBase(SchemaBase):
-
     fecha_incumplimiento: date | None = None
 
 
 class ExpedienteUpdate(SchemaBase):
-
     comentarios: str | None = None
 
 
 class ExpedienteRead(ExpedienteBase):
-
     id: int
 
     interlocutor: str
@@ -28,12 +24,7 @@ class ExpedienteRead(ExpedienteBase):
 
     dia_actual: int
 
-    modo_gestion: Literal[
-        "del_dia",
-        "desfasado",
-        "consolidacion",
-        "cerrado"
-    ]
+    modo_gestion: Literal["del_dia", "desfasado", "consolidacion", "cerrado"]
 
     monto_vencido: Decimal | None = None
 
@@ -43,7 +34,6 @@ class ExpedienteRead(ExpedienteBase):
 
 
 class ExpedienteGestionRead(SchemaBase):
-
     id: int
 
     interlocutor: str
@@ -66,7 +56,6 @@ class ExpedienteGestionRead(SchemaBase):
 
 
 class GestionesResumenRead(SchemaBase):
-
     del_dia: int
 
     desfasados: int
@@ -77,15 +66,12 @@ class GestionesResumenRead(SchemaBase):
 
 
 class ExpedienteAsignacionMasiva(SchemaBase):
-
     ids: list[int]
 
     id_usuario: int | None = None
 
 
 class ExpedienteResumenEliminacion(SchemaBase):
-
     cobranzas: int
 
     documentos: int
-

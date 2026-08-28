@@ -73,8 +73,7 @@ class CobranzaService(BaseService):
 
         if existe is not None:
             raise ConflictoNegocio(
-                f"El intento {data.orden} del día {data.dia} "
-                "ya fue registrado."
+                f"El intento {data.orden} del día {data.dia} ya fue registrado."
             )
 
         fecha = self._construir_fecha(
@@ -151,14 +150,10 @@ class CobranzaService(BaseService):
         try:
             horas, minutos = map(int, hora.split(":"))
         except (ValueError, AttributeError):
-            raise OperacionInvalida(
-                "La hora debe tener el formato HH:MM."
-            )
+            raise OperacionInvalida("La hora debe tener el formato HH:MM.")
 
         if not 0 <= horas <= 23 or not 0 <= minutos <= 59:
-            raise OperacionInvalida(
-                "La hora debe tener el formato HH:MM."
-            )
+            raise OperacionInvalida("La hora debe tener el formato HH:MM.")
 
         return fecha.replace(
             hour=horas,

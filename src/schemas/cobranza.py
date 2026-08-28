@@ -5,7 +5,6 @@ from src.schemas.usuario import UsuarioRead
 
 
 class CobranzaBase(SchemaBase):
-
     fecha: datetime
 
     contacto: bool
@@ -16,7 +15,6 @@ class CobranzaBase(SchemaBase):
 
 
 class CobranzaCreate(SchemaBase):
-
     dia: int
     orden: int
     hora: str
@@ -26,7 +24,6 @@ class CobranzaCreate(SchemaBase):
 
 
 class CobranzaUpdate(SchemaBase):
-
     fecha: datetime | None = None
     contacto: bool | None = None
     medio: str | None = None
@@ -34,7 +31,6 @@ class CobranzaUpdate(SchemaBase):
 
 
 class CobranzaRead(CobranzaBase):
-
     id: int
     dia: int
     orden: int

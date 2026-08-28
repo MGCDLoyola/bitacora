@@ -6,7 +6,7 @@ from sqlalchemy import exists, func, select
 from sqlalchemy.orm import joinedload
 
 from src.core.almacenamiento import carpeta_expediente
-from src.core.exceptions import NoEncontrado, OperacionInvalida, ConflictoNegocio
+from src.core.exceptions import ConflictoNegocio, NoEncontrado, OperacionInvalida
 from src.models.cobranza import Cobranza
 from src.models.documento import Documento
 from src.models.expediente import Expediente
@@ -74,9 +74,7 @@ class ExpedienteService(BaseService):
         modo_gestion = self._obtener_gestion(expediente)
 
         comentarios = (
-            ultimo_comentario_cobranza
-            if expediente.estado
-            else expediente.comentarios
+            ultimo_comentario_cobranza if expediente.estado else expediente.comentarios
         )
 
         return ExpedienteRead(
@@ -88,9 +86,7 @@ class ExpedienteService(BaseService):
             dia_actual=expediente.dia_actual,
             monto_vencido=expediente.monto_vencido,
             usuario=(
-                expediente.usuario.nombre
-                if expediente.usuario is not None
-                else None
+                expediente.usuario.nombre if expediente.usuario is not None else None
             ),
             comentarios=comentarios,
             modo_gestion=modo_gestion,
@@ -105,11 +101,8 @@ class ExpedienteService(BaseService):
             return "desfasado"
 
         if expediente.fecha_consolidacion is not None:
-
             tipo_consolidacion = self.session.execute(
-                select(TipoDocumento.id).where(
-                    TipoDocumento.nombre == "Consolidación"
-                )
+                select(TipoDocumento.id).where(TipoDocumento.nombre == "Consolidación")
             ).scalar_one_or_none()
 
             if tipo_consolidacion is None:
