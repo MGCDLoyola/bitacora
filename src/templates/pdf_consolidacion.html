@@ -1,627 +1,615 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-<style>
-    @page {
-        size: Letter;
-        margin: 96px 44px 40px 44px;
-
-        @top-center {
-            content: element(header);
-            width: 100%;
-        }
-    }
-
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
-        color: #26282B;
-        font-size: 11px;
-        margin: 0;
-        padding: 0;
-        line-height: 1.4;
-    }
-
-    .pdf-header {
-        position: running(header);
-    }
-
-    .encabezado {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 14px;
-    }
-
-    .encabezado img {
-        height: 34px;
-    }
-
-    .encabezado .empresa {
-        text-align: right;
-    }
-
-    .encabezado .empresa .razon {
-        font-family: "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
-        font-weight: 700;
-        color: #1F3864;
-        font-size: 12.5px;
-        letter-spacing: 0.6px;
-    }
-
-    .encabezado .empresa .area {
-        color: #8A8F98;
-        font-size: 9.5px;
-        letter-spacing: 0.2px;
-        margin-top: 1px;
-    }
-
-    .linea-acento {
-        height: 3px;
-        border-radius: 3px;
-        background: linear-gradient(90deg, #1F3864 0%, #9C7A2E 100%);
-    }
-
-    .titulo-bloque {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-bottom: 26px;
-    }
-
-    h1 {
-        font-family: "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
-        font-weight: 700;
-        font-size: 22px;
-        color: #1F3864;
-        margin: 0 0 6px 0;
-        letter-spacing: -0.2px;
-    }
-
-    .badge-dia {
-        display: inline-block;
-        background: #FBF6EC;
-        color: #9C7A2E;
-        border: 1px solid #EAD9AF;
-        border-radius: 20px;
-        padding: 4px 14px;
-        font-size: 10px;
-        font-weight: bold;
-        letter-spacing: 0.2px;
-        white-space: nowrap;
-    }
-
-    .seccion-label {
-        font-family: "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
-        font-weight: 700;
-        font-size: 10px;
-        color: #8A8F98;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin: 0 0 10px 0;
-        padding-bottom: 4px;
-        border-bottom: 1px solid #EFF1F3;
-    }
-
-    .grid-datos {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 28px;
-    }
-
-    .grid-datos td {
-        padding: 0 0 12px 0;
-        vertical-align: top;
-    }
-
-    .grid-datos tr:last-child td {
-        padding-bottom: 0;
-    }
-
-    .grid-datos td.col-izq {
-        width: 50%;
-        padding-right: 6px;
-    }
-
-    .grid-datos td.col-der {
-        width: 50%;
-        padding-left: 6px;
-    }
-
-    .dato-card {
-        background: #F7F8FA;
-        border-radius: 8px;
-        padding: 10px 15px;
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-
-    .dato-card .etiqueta {
-        font-size: 9px;
-        color: #8A8F98;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 3px;
-    }
-
-    .dato-card .valor {
-        font-family: "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
-        font-size: 12.5px;
-        color: #1F2733;
-        font-weight: 600;
-    }
-
-    .dia-bloque {
-        margin-bottom: 30px;
-    }
-
-    .dia-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 12px;
-    }
-
-    .dia-header .titulo {
-        font-family: "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
-        font-weight: 700;
-        color: #1F3864;
-        font-size: 14px;
-    }
-
-    .intento-card {
-        border: 1px solid #E7E9EC;
-        border-left: 4px solid #1F3864;
-        border-radius: 10px;
-        margin-bottom: 16px;
-        overflow: hidden;
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-
-    .intento-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 11px 17px;
-        background: #F7F8FA;
-    }
-
-    .intento-header .titulo {
-        font-family: "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
-        font-weight: 700;
-        color: #1F3864;
-        font-size: 12.5px;
-        letter-spacing: 0.2px;
-    }
-
-    .intento-header .horario {
-        color: #8A8F98;
-        font-size: 9.5px;
-    }
-
-    .intento-body {
-        padding: 15px 17px 4px 17px;
-    }
-
-    .intento-fila {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 12px;
-        margin-bottom: 14px;
-    }
-
-    .campo .etiqueta {
-        font-size: 9px;
-        color: #8A8F98;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 4px;
-    }
-
-    .campo .valor {
-        font-size: 11.5px;
-        font-weight: 600;
-        color: #1F2733;
-    }
-
-    .pill {
-        display: inline-block;
-        border-radius: 20px;
-        padding: 3px 12px;
-        font-size: 10px;
-        font-weight: bold;
-    }
-
-    .pill.si {
-        background: #E7F6EC;
-        color: #1E8E4B;
-    }
-
-    .pill.no {
-        background: #FBEAEA;
-        color: #C23B3B;
-    }
-
-    .comentario-intento {
-        border-top: 1px solid #EFF1F3;
-        padding: 11px 0 13px 0;
-    }
-
-    .comentario-intento .etiqueta {
-        font-size: 9px;
-        color: #8A8F98;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 5px;
-    }
-
-    .comentario-intento .texto {
-        font-size: 10.5px;
-        color: #444B54;
-        font-style: italic;
-        line-height: 1.5;
-    }
-
-    .evidencias-grupo {
-        border-top: 1px solid #EFF1F3;
-        padding: 11px 0 13px 0;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-
-    .evidencias-grupo .etiqueta {
-        font-size: 9px;
-        color: #8A8F98;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 6px;
-    }
-
-    .evidencias-grupo ul {
-        margin: 0;
-        padding-left: 18px;
-    }
-
-    .evidencias-grupo li {
-        font-size: 10px;
-        color: #444B54;
-        margin-bottom: 3px;
-    }
-
-    .sin-evidencias {
-        font-size: 10px;
-        color: #8A8F98;
-        font-style: italic;
-    }
-
-    .tabla-edc {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 24px;
-    }
-
-    .tabla-edc th {
-        text-align: left;
-        font-size: 9px;
-        color: #8A8F98;
-        font-weight: bold;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        padding: 0 0 8px 0;
-        border-bottom: 1px solid #EFF1F3;
-    }
-
-    .tabla-edc td {
-        font-size: 10.5px;
-        color: #1F2733;
-        padding: 10px 0;
-        border-bottom: 1px solid #EFF1F3;
-    }
-
-    .card-comentarios {
-        background: #F7F8FA;
-        border-radius: 10px;
-        padding: 15px 17px;
-        margin-top: 24px;
-        margin-bottom: 22px;
-        break-inside: avoid;
-        page-break-inside: avoid;
-    }
-
-    .card-comentarios .texto {
-        font-size: 10.5px;
-        color: #444B54;
-        font-style: italic;
-        line-height: 1.6;
-    }
-
-    .pie {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-end;
-        margin-top: 34px;
-        padding-top: 16px;
-        border-top: 1px solid #EFF1F3;
-    }
-
-    .elabora {
-        font-size: 10.5px;
-        color: #444B54;
-        line-height: 1.5;
-    }
-
-    .elabora b {
-        font-family: "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
-        font-weight: 700;
-        color: #1F3864;
-    }
-
-    .firma-bloque {
-        text-align: center;
-        width: 260px;
-    }
-
-    .firma-bloque img {
-        max-width: 240px;
-        max-height: 100px;
-        display: block;
-        margin: 0 auto;
-    }
-
-    .firma-linea {
-        border-top: 1px solid #C7CBD1;
-        margin-top: 6px;
-        padding-top: 4px;
-        font-size: 9.5px;
-        color: #8A8F98;
-    }
-</style>
-</head>
-
-<body>
-
-    <div class="pdf-header">
-        <div class="encabezado">
-            <img src="{{ logo_base64 }}" alt="MGC">
-
-            <div class="empresa">
-                <div class="razon">MGC MÉXICO</div>
-                <div class="area">Supervisión de Cobranza Extrajudicial</div>
-            </div>
-        </div>
-
-        <div class="linea-acento"></div>
-    </div>
-
-    <div class="titulo-bloque">
-        <h1>Consolidación de Expediente</h1>
-
-        <span class="badge-dia">
-            Cierre de gestión
-        </span>
-    </div>
-
-    <div class="seccion-label">Datos generales</div>
-
-    <table class="grid-datos">
-
-        <tr>
-            <td colspan="2">
-                <div class="dato-card">
-                    <div class="etiqueta">Cliente</div>
-                    <div class="valor">
-                        {{ cliente.nombre }} ({{ cliente.interlocutor }})
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            @page {
+                size: Letter;
+                margin: 96px 44px 40px 44px;
+
+                @top-center {
+                    content: element(header);
+                    width: 100%;
+                }
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family:
+                    "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
+                color: #26282b;
+                font-size: 11px;
+                margin: 0;
+                padding: 0;
+                line-height: 1.4;
+            }
+
+            .pdf-header {
+                position: running(header);
+            }
+
+            .encabezado {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-bottom: 14px;
+            }
+
+            .encabezado img {
+                height: 34px;
+            }
+
+            .encabezado .empresa {
+                text-align: right;
+            }
+
+            .encabezado .empresa .razon {
+                font-family:
+                    "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
+                font-weight: 700;
+                color: #1f3864;
+                font-size: 12.5px;
+                letter-spacing: 0.6px;
+            }
+
+            .encabezado .empresa .area {
+                color: #8a8f98;
+                font-size: 9.5px;
+                letter-spacing: 0.2px;
+                margin-top: 1px;
+            }
+
+            .linea-acento {
+                height: 3px;
+                border-radius: 3px;
+                background: linear-gradient(90deg, #1f3864 0%, #9c7a2e 100%);
+            }
+
+            .titulo-bloque {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                margin-bottom: 26px;
+            }
+
+            h1 {
+                font-family:
+                    "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
+                font-weight: 700;
+                font-size: 22px;
+                color: #1f3864;
+                margin: 0 0 6px 0;
+                letter-spacing: -0.2px;
+            }
+
+            .badge-dia {
+                display: inline-block;
+                background: #fbf6ec;
+                color: #9c7a2e;
+                border: 1px solid #ead9af;
+                border-radius: 20px;
+                padding: 4px 14px;
+                font-size: 10px;
+                font-weight: bold;
+                letter-spacing: 0.2px;
+                white-space: nowrap;
+            }
+
+            .seccion-label {
+                font-family:
+                    "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
+                font-weight: 700;
+                font-size: 10px;
+                color: #8a8f98;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                margin: 0 0 10px 0;
+                padding-bottom: 4px;
+                border-bottom: 1px solid #eff1f3;
+            }
+
+            .grid-datos {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 28px;
+            }
+
+            .grid-datos td {
+                padding: 0 0 12px 0;
+                vertical-align: top;
+            }
+
+            .grid-datos tr:last-child td {
+                padding-bottom: 0;
+            }
+
+            .grid-datos td.col-izq {
+                width: 50%;
+                padding-right: 6px;
+            }
+
+            .grid-datos td.col-der {
+                width: 50%;
+                padding-left: 6px;
+            }
+
+            .dato-card {
+                background: #f7f8fa;
+                border-radius: 8px;
+                padding: 10px 15px;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .dato-card .etiqueta {
+                font-size: 9px;
+                color: #8a8f98;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 3px;
+            }
+
+            .dato-card .valor {
+                font-family:
+                    "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
+                font-size: 12.5px;
+                color: #1f2733;
+                font-weight: 600;
+            }
+
+            .dia-bloque {
+                margin-bottom: 30px;
+            }
+
+            .dia-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+            }
+
+            .dia-header .titulo {
+                font-family:
+                    "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
+                font-weight: 700;
+                color: #1f3864;
+                font-size: 14px;
+            }
+
+            .intento-card {
+                border: 1px solid #e7e9ec;
+                border-left: 4px solid #1f3864;
+                border-radius: 10px;
+                margin-bottom: 16px;
+                overflow: hidden;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .intento-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 11px 17px;
+                background: #f7f8fa;
+            }
+
+            .intento-header .titulo {
+                font-family:
+                    "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
+                font-weight: 700;
+                color: #1f3864;
+                font-size: 12.5px;
+                letter-spacing: 0.2px;
+            }
+
+            .intento-header .horario {
+                color: #8a8f98;
+                font-size: 9.5px;
+            }
+
+            .intento-body {
+                padding: 15px 17px 4px 17px;
+            }
+
+            .intento-fila {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                margin-bottom: 14px;
+            }
+
+            .campo .etiqueta {
+                font-size: 9px;
+                color: #8a8f98;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+            }
+
+            .campo .valor {
+                font-size: 11.5px;
+                font-weight: 600;
+                color: #1f2733;
+            }
+
+            .pill {
+                display: inline-block;
+                border-radius: 20px;
+                padding: 3px 12px;
+                font-size: 10px;
+                font-weight: bold;
+            }
+
+            .pill.si {
+                background: #e7f6ec;
+                color: #1e8e4b;
+            }
+
+            .pill.no {
+                background: #fbeaea;
+                color: #c23b3b;
+            }
+
+            .comentario-intento {
+                border-top: 1px solid #eff1f3;
+                padding: 11px 0 13px 0;
+            }
+
+            .comentario-intento .etiqueta {
+                font-size: 9px;
+                color: #8a8f98;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 5px;
+            }
+
+            .comentario-intento .texto {
+                font-size: 10.5px;
+                color: #444b54;
+                font-style: italic;
+                line-height: 1.5;
+            }
+
+            .evidencias-grupo {
+                border-top: 1px solid #eff1f3;
+                padding: 11px 0 13px 0;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .evidencias-grupo .etiqueta {
+                font-size: 9px;
+                color: #8a8f98;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 6px;
+            }
+
+            .evidencias-grupo ul {
+                margin: 0;
+                padding-left: 18px;
+            }
+
+            .evidencias-grupo li {
+                font-size: 10px;
+                color: #444b54;
+                margin-bottom: 3px;
+            }
+
+            .sin-evidencias {
+                font-size: 10px;
+                color: #8a8f98;
+                font-style: italic;
+            }
+
+            .tabla-edc {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 24px;
+            }
+
+            .tabla-edc th {
+                text-align: left;
+                font-size: 9px;
+                color: #8a8f98;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                padding: 0 0 8px 0;
+                border-bottom: 1px solid #eff1f3;
+            }
+
+            .tabla-edc td {
+                font-size: 10.5px;
+                color: #1f2733;
+                padding: 10px 0;
+                border-bottom: 1px solid #eff1f3;
+            }
+
+            .card-comentarios {
+                background: #f7f8fa;
+                border-radius: 10px;
+                padding: 15px 17px;
+                margin-top: 24px;
+                margin-bottom: 22px;
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .card-comentarios .texto {
+                font-size: 10.5px;
+                color: #444b54;
+                font-style: italic;
+                line-height: 1.6;
+            }
+
+            .pie {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                margin-top: 34px;
+                padding-top: 16px;
+                border-top: 1px solid #eff1f3;
+            }
+
+            .elabora {
+                font-size: 10.5px;
+                color: #444b54;
+                line-height: 1.5;
+            }
+
+            .elabora b {
+                font-family:
+                    "Google Sans", Calibri, "Segoe UI", Arial, sans-serif;
+                font-weight: 700;
+                color: #1f3864;
+            }
+
+            .firma-bloque {
+                text-align: center;
+                width: 260px;
+            }
+
+            .firma-bloque img {
+                max-width: 240px;
+                max-height: 100px;
+                display: block;
+                margin: 0 auto;
+            }
+
+            .firma-linea {
+                border-top: 1px solid #c7cbd1;
+                margin-top: 6px;
+                padding-top: 4px;
+                font-size: 9.5px;
+                color: #8a8f98;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="pdf-header">
+            <div class="encabezado">
+                <img src="{{ logo_base64 }}" alt="MGC" />
+
+                <div class="empresa">
+                    <div class="razon">MGC MÉXICO</div>
+                    <div class="area">
+                        Supervisión de Cobranza Extrajudicial
                     </div>
                 </div>
-            </td>
-        </tr>
-
-        <tr>
-            <td class="col-izq">
-                <div class="dato-card">
-                    <div class="etiqueta">Fecha de registro</div>
-                    <div class="valor">
-                        {{ fecha_registro }}
-                    </div>
-                </div>
-            </td>
-            <td class="col-der">
-                <div class="dato-card">
-                    <div class="etiqueta">Responsable de cobranza</div>
-                    <div class="valor">
-                        {{ responsable.nombre }}
-                    </div>
-                </div>
-            </td>
-        </tr>
-
-    </table>
-
-    <div class="seccion-label">Historial de gestión (4 días)</div>
-
-    {% for dia in dias %}
-
-    <div class="dia-bloque">
-
-        <div class="dia-header">
-            <span class="titulo">Día {{ dia.dia }} &middot; {{ dia.fecha_dia }}</span>
-            <span class="badge-dia">Monto vencido: {{ dia.monto_vencido or "N/D" }}</span>
-        </div>
-
-        {% for intento in dia.intentos %}
-
-        <div class="intento-card">
-
-            <div class="intento-header">
-
-                <span class="titulo">
-                    Intento de llamada {{ intento.orden }}
-                </span>
-
-                <span class="horario">
-                    Horario programado:
-                    a partir de las {{ intento.horario_programado }} hrs.
-                </span>
-
             </div>
 
-            <div class="intento-body">
+            <div class="linea-acento"></div>
+        </div>
 
-                <div class="intento-fila">
+        <div class="titulo-bloque">
+            <h1>Consolidación de Expediente</h1>
 
-                    <div class="campo">
-                        <div class="etiqueta">Hora real de contacto</div>
+            <span class="badge-dia"> Cierre de gestión </span>
+        </div>
 
+        <div class="seccion-label">Datos generales</div>
+
+        <table class="grid-datos">
+            <tr>
+                <td colspan="2">
+                    <div class="dato-card">
+                        <div class="etiqueta">Cliente</div>
                         <div class="valor">
-                            {{ intento.hora }} hrs.
+                            {{ cliente.nombre }} ({{ cliente.interlocutor }})
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td class="col-izq">
+                    <div class="dato-card">
+                        <div class="etiqueta">Fecha de registro</div>
+                        <div class="valor">{{ fecha_registro }}</div>
+                    </div>
+                </td>
+                <td class="col-der">
+                    <div class="dato-card">
+                        <div class="etiqueta">Responsable de cobranza</div>
+                        <div class="valor">{{ responsable.nombre }}</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="seccion-label">Historial de gestión (4 días)</div>
+
+        {% for dia in dias %}
+
+        <div class="dia-bloque">
+            <div class="dia-header">
+                <span class="titulo"
+                    >Día {{ dia.dia }} &middot; {{ dia.fecha_dia }}</span
+                >
+                <span class="badge-dia"
+                    >Monto vencido: {{ dia.monto_vencido or "N/D" }}</span
+                >
+            </div>
+
+            {% for intento in dia.intentos %}
+
+            <div class="intento-card">
+                <div class="intento-header">
+                    <span class="titulo">
+                        Intento de llamada {{ intento.orden }}
+                    </span>
+
+                    <span class="horario">
+                        Horario programado: a partir de las {{
+                        intento.horario_programado }} hrs.
+                    </span>
+                </div>
+
+                <div class="intento-body">
+                    <div class="intento-fila">
+                        <div class="campo">
+                            <div class="etiqueta">Hora real de contacto</div>
+
+                            <div class="valor">{{ intento.hora }} hrs.</div>
+                        </div>
+
+                        <div class="campo">
+                            <div class="etiqueta">Medio utilizado</div>
+
+                            <div class="valor">
+                                {{ intento.medio or "N/D" }}
+                            </div>
+                        </div>
+
+                        <div class="campo">
+                            <div class="etiqueta">¿Contactó al cliente?</div>
+
+                            <span
+                                class="pill {{ 'si' if intento.contacto else 'no' }}"
+                            >
+                                {{ "Sí" if intento.contacto else "No" }}
+                            </span>
                         </div>
                     </div>
 
-                    <div class="campo">
-                        <div class="etiqueta">Medio utilizado</div>
+                    <div class="comentario-intento">
+                        <div class="etiqueta">Comentarios / próximos pasos</div>
 
-                        <div class="valor">
-                            {{ intento.medio or "N/D" }}
+                        <div class="texto">
+                            {{ intento.comentarios or "Sin comentarios
+                            registrados." }}
                         </div>
                     </div>
 
-                    <div class="campo">
-                        <div class="etiqueta">¿Contactó al cliente?</div>
+                    <div class="evidencias-grupo">
+                        <div>
+                            <div class="etiqueta">Avisos enviados</div>
 
-                        <span class="pill {{ 'si' if intento.contacto else 'no' }}">
-                            {{ "Sí" if intento.contacto else "No" }}
-                        </span>
-                    </div>
-
-                </div>
-
-                <div class="comentario-intento">
-
-                    <div class="etiqueta">
-                        Comentarios / próximos pasos
-                    </div>
-
-                    <div class="texto">
-                        {{ intento.comentarios or "Sin comentarios registrados." }}
-                    </div>
-
-                </div>
-
-                <div class="evidencias-grupo">
-
-                    <div>
-                        <div class="etiqueta">Avisos enviados</div>
-
-                        {% if intento.avisos %}
+                            {% if intento.avisos %}
                             <ul>
                                 {% for archivo in intento.avisos %}
-                                    <li>{{ archivo }}</li>
+                                <li>{{ archivo }}</li>
                                 {% endfor %}
                             </ul>
-                        {% else %}
-                            <div class="sin-evidencias">Sin avisos registrados.</div>
-                        {% endif %}
-                    </div>
+                            {% else %}
+                            <div class="sin-evidencias">
+                                Sin avisos registrados.
+                            </div>
+                            {% endif %}
+                        </div>
 
-                    <div>
-                        <div class="etiqueta">Respuestas del cliente</div>
+                        <div>
+                            <div class="etiqueta">Respuestas del cliente</div>
 
-                        {% if intento.respuestas %}
+                            {% if intento.respuestas %}
                             <ul>
                                 {% for archivo in intento.respuestas %}
-                                    <li>{{ archivo }}</li>
+                                <li>{{ archivo }}</li>
                                 {% endfor %}
                             </ul>
-                        {% else %}
-                            <div class="sin-evidencias">Sin respuestas registradas.</div>
-                        {% endif %}
+                            {% else %}
+                            <div class="sin-evidencias">
+                                Sin respuestas registradas.
+                            </div>
+                            {% endif %}
+                        </div>
                     </div>
-
                 </div>
-
             </div>
 
+            {% endfor %}
         </div>
 
         {% endfor %}
 
-    </div>
+        <div class="seccion-label">Estado de cuenta SAP</div>
 
-    {% endfor %}
+        {% if documentos_edc %}
 
-    <div class="seccion-label">Estado de cuenta SAP</div>
+        <table class="tabla-edc">
+            <tr>
+                <th>Archivo</th>
+                <th>Fecha de subida</th>
+                <th>Subido por</th>
+            </tr>
 
-    {% if documentos_edc %}
+            {% for documento in documentos_edc %}
+            <tr>
+                <td>{{ documento.nombre_original }}</td>
+                <td>{{ documento.fecha_subida }}</td>
+                <td>{{ documento.usuario }}</td>
+            </tr>
+            {% endfor %}
+        </table>
 
-    <table class="tabla-edc">
-        <tr>
-            <th>Archivo</th>
-            <th>Fecha de subida</th>
-            <th>Subido por</th>
-        </tr>
+        {% else %}
 
-        {% for documento in documentos_edc %}
-        <tr>
-            <td>{{ documento.nombre_original }}</td>
-            <td>{{ documento.fecha_subida }}</td>
-            <td>{{ documento.usuario }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-
-    {% else %}
-
-    <div class="sin-evidencias" style="margin-bottom: 24px;">
-        Sin estado de cuenta SAP registrado.
-    </div>
-
-    {% endif %}
-
-    <div class="seccion-label">
-        Conclusión y siguiente acción
-    </div>
-
-    <div class="card-comentarios">
-        <div class="texto">
-            {{ comentarios_expediente or "Sin comentarios registrados." }}
-        </div>
-    </div>
-
-    <div class="pie">
-
-        <div class="elabora">
-            Elabora: <b>{{ responsable.nombre }}</b><br>
-            Analista de Cobranza Extrajudicial
-        </div>
-
-        {% if firma_base64 %}
-
-        <div class="firma-bloque">
-
-            <img src="{{ firma_base64 }}" alt="Firma">
-
-            <div class="firma-linea">
-                Firma de {{ responsable.nombre }}
-            </div>
-
+        <div class="sin-evidencias" style="margin-bottom: 24px">
+            Sin estado de cuenta SAP registrado.
         </div>
 
         {% endif %}
 
-    </div>
+        <div class="seccion-label">Conclusión y siguiente acción</div>
 
-</body>
+        <div class="card-comentarios">
+            <div class="texto">
+                {{ comentarios_expediente or "Sin comentarios registrados." }}
+            </div>
+        </div>
+
+        <div class="pie">
+            <div class="elabora">
+                Elabora: <b>{{ responsable.nombre }}</b><br />
+                Analista de Cobranza Extrajudicial
+            </div>
+
+            {% if firma_base64 %}
+
+            <div class="firma-bloque">
+                <img src="{{ firma_base64 }}" alt="Firma" />
+
+                <div class="firma-linea">Firma de {{ responsable.nombre }}</div>
+            </div>
+
+            {% endif %}
+        </div>
+    </body>
 </html>
