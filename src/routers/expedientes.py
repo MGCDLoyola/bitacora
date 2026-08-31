@@ -1,7 +1,7 @@
 from datetime import date
 
 from fastapi import APIRouter, Depends
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from sqlalchemy.orm import Session
 
 from src.core.database import get_session
@@ -17,6 +17,7 @@ from src.schemas.expediente import (
     ExpedienteUpdate,
 )
 from src.services.cobranza import CobranzaService
+from src.services.documento import DocumentoService
 from src.services.expediente import ExpedienteService
 from src.services.pdf_cobranza import PDFCobranzaService
 from src.services.pdf_consolidacion import PDFConsolidacionService
@@ -394,6 +395,27 @@ def confirmar_cierre_expediente(
     )
 
     return ExpedienteService(session).obtener_read(id_expediente)
+
+
+@router.get("/{id_expediente}/bitacoras/zip")
+def descargar_bitacoras(
+    id_expediente: int,
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(usuario_actual),
+):
+    servicio = DocumentoService(session)
+
+    buffer = servicio.zip_bitacoras(id_expediente)
+
+    return Response(
+        content=buffer.getvalue(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": (
+                f'attachment; filename="Bitacoras_Expediente_{id_expediente}.zip"'
+            )
+        },
+    )
 
 
 @router.patch(

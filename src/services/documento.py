@@ -1,5 +1,7 @@
+import io
 import shutil
 import uuid
+import zipfile
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -7,8 +9,9 @@ from fastapi import UploadFile
 from sqlalchemy import select
 
 from src.core.almacenamiento import carpeta_vencimiento
-from src.core.exceptions import NoEncontrado
+from src.core.exceptions import ConflictoNegocio, NoEncontrado
 from src.models.documento import Documento
+from src.models.tipo_documento import TipoDocumento
 from src.services.base import BaseService
 from src.services.expediente import ExpedienteService
 
@@ -75,3 +78,35 @@ class DocumentoService(BaseService):
         ruta = Path(documento.ruta_archivo)
 
         self._eliminar_archivo(documento, ruta)
+
+    def zip_bitacoras(self, id_expediente: int) -> io.BytesIO:
+
+        ExpedienteService(self.session).obtener(id_expediente)
+
+        stmt = (
+            select(Documento)
+            .join(TipoDocumento, Documento.id_tipo_documento == TipoDocumento.id)
+            .where(
+                Documento.id_expediente == id_expediente,
+                TipoDocumento.nombre.like("Bitácora %"),
+            )
+            .order_by(TipoDocumento.nombre)
+        )
+
+        documentos = self.session.execute(stmt).scalars().all()
+
+        if not documentos:
+            raise ConflictoNegocio("El expediente no tiene bitácoras generadas.")
+
+        buffer = io.BytesIO()
+
+        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archivo_zip:
+            for documento in documentos:
+                ruta = Path(documento.ruta_archivo)
+
+                if ruta.exists():
+                    archivo_zip.write(ruta, arcname=documento.nombre_original)
+
+        buffer.seek(0)
+
+        return buffer

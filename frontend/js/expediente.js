@@ -151,6 +151,26 @@ async function confirmarCierreExpediente(idExpediente) {
     return await respuesta.json();
 }
 
+async function descargarBitacorasZip(idExpediente) {
+    const respuesta = await fetch(
+        `/expedientes/${idExpediente}/bitacoras/zip`,
+        {
+            method: "GET",
+            credentials: "include",
+        }
+    );
+
+    if (!respuesta.ok) {
+        const error = new Error(await mensajeDeError(respuesta));
+
+        error.status = respuesta.status;
+
+        throw error;
+    }
+
+    return await respuesta.blob();
+}
+
 /* ─────────────────────────────────────────────
    INFORMACIÓN DEL EXPEDIENTE
    ───────────────────────────────────────────── */
@@ -216,8 +236,10 @@ function configurarAcciones(contenedor, expediente) {
         "#boton-descargar-bitacoras"
     );
 
+    botonDescargarBitacoras.hidden = expediente.modo_gestion !== "cerrado";
+
     botonDescargarBitacoras.addEventListener("click", () => {
-        descargarBitacoras();
+        descargarBitacoras(contenedor);
     });
 
     const botonCerrarExpediente = contenedor.querySelector(
@@ -246,9 +268,37 @@ function configurarAcciones(contenedor, expediente) {
     configurarModalCerrar(contenedor);
 }
 
-function descargarBitacoras() {
-    // TODO: sin back todavía. Cuando exista el endpoint,
-    // pegarle aquí y descargar el .zip que regrese.
+async function descargarBitacoras(contenedor) {
+    const boton = contenedor.querySelector("#boton-descargar-bitacoras");
+
+    const textoOriginal = boton.textContent;
+
+    boton.disabled = true;
+    boton.textContent = "Descargando…";
+
+    try {
+        const blob = await descargarBitacorasZip(idExpedienteActual);
+
+        const url = URL.createObjectURL(blob);
+
+        const enlace = document.createElement("a");
+        enlace.href = url;
+        enlace.download = `Bitacoras_Expediente_${idExpedienteActual}.zip`;
+
+        document.body.appendChild(enlace);
+        enlace.click();
+        enlace.remove();
+
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        mostrarError(
+            contenedor,
+            error.message || "No se pudieron descargar las bitácoras."
+        );
+    } finally {
+        boton.disabled = false;
+        boton.textContent = textoOriginal;
+    }
 }
 
 /* ─────────────────────────────────────────────
@@ -537,8 +587,9 @@ function deshabilitarConfirmarCierre(contenedor, deshabilitado) {
 }
 
 function mostrarErrorPrevia(contenedor, mensaje) {
-    contenedor.querySelector("#modal-cerrar-error-previa-texto").textContent =
-        mensaje;
+    contenedor.querySelector(
+        "#modal-cerrar-error-previa-texto"
+    ).textContent = mensaje;
 
     contenedor.querySelector("#modal-cerrar-error-previa").hidden = false;
 }
@@ -644,7 +695,10 @@ function crearTarjetaIntento(dia, orden) {
 
     const bloqueada =
         !realizada &&
-        (!puedeGestionarExpediente() || calcularBloqueo(dia, orden));
+        (
+            !puedeGestionarExpediente() ||
+            calcularBloqueo(dia, orden)
+        );
 
     const tarjeta = document.createElement("article");
 
