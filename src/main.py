@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from slowapi.errors import RateLimitExceeded
 
 mimetypes.add_type("text/css", ".css")
 mimetypes.add_type("application/javascript", ".js")
@@ -22,6 +23,7 @@ from src.core.exceptions import (
 )
 from src.core.logging import configurar_logging
 from src.core.pg import pg
+from src.core.rate_limit import limiter
 from src.models.usuario import Usuario
 from src.routers.auth import router as auth_router
 from src.routers.cobranzas import router as cobranzas_router
@@ -47,6 +49,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+app.state.limiter = limiter
 
 app.mount("/static", StaticFiles(directory="frontend"), name="static")
 
@@ -119,6 +123,20 @@ def handle_conflicto(request: Request, exc: ConflictoNegocio):
 @app.exception_handler(OperacionInvalida)
 def handle_operacion_invalida(request: Request, exc: OperacionInvalida):
     return JSONResponse(status_code=400, content={"detail": exc.mensaje})
+
+
+@app.exception_handler(RateLimitExceeded)
+def handle_rate_limit_excedido(request: Request, exc: RateLimitExceeded):
+    logger.warning(
+        "Límite de solicitudes excedido en %s desde %s",
+        request.url.path,
+        request.headers.get("CF-Connecting-IP", request.client.host),
+    )
+
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Demasiados intentos. Intenta de nuevo más tarde."},
+    )
 
 
 @app.exception_handler(BitacoraError)

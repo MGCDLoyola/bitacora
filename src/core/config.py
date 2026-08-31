@@ -38,3 +38,5 @@ COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"
 NOMBRE_COOKIE_SESION = "id_sesion"
 
 RECUPERACION_DURACION_MINUTOS = int(os.getenv("RECUPERACION_DURACION_MINUTOS", "15"))
+
+LOGIN_RATE_LIMIT = os.getenv("LOGIN_RATE_LIMIT", "5/minute")

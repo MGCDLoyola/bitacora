@@ -1,14 +1,16 @@
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Request, Response
 from mgc_graph import Mail, Mailbox
 from sqlalchemy.orm import Session
 
 from src.core.config import (
     COOKIE_SECURE,
+    LOGIN_RATE_LIMIT,
     NOMBRE_COOKIE_SESION,
     SESION_DURACION_HORAS,
 )
 from src.core.database import get_session
 from src.core.deps import mail, mailbox, sesion_actual, usuario_actual
+from src.core.rate_limit import limiter
 from src.models.sesion import Sesion
 from src.models.usuario import Usuario
 from src.schemas.auth import (
@@ -24,8 +26,12 @@ router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
 @router.post("/login", response_model=UsuarioRead)
+@limiter.limit(LOGIN_RATE_LIMIT)
 def login(
-    data: LoginRequest, response: Response, session: Session = Depends(get_session)
+    request: Request,
+    data: LoginRequest,
+    response: Response,
+    session: Session = Depends(get_session),
 ):
     servicio = AuthService(session)
     usuario, sesion = servicio.login(data.correo, data.password)
