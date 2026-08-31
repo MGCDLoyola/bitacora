@@ -74,7 +74,7 @@ class ExpedienteAsignacionMasiva(SchemaBase):
 class ExpedienteBitacoraPreview(SchemaBase):
     dia: int
 
-    imagen_base64: str
+    pdf_base64: str
 
 
 class ExpedienteResumenEliminacion(SchemaBase):

@@ -376,7 +376,7 @@ async function cargarVistaPreviaCierre(contenedor) {
 function renderizarSlideCarrusel(contenedor) {
     const titulo = contenedor.querySelector("#carrusel-bitacoras-titulo");
 
-    const imagen = contenedor.querySelector("#carrusel-bitacoras-imagen");
+    const visorPdf = contenedor.querySelector("#carrusel-bitacoras-pdf");
 
     const flechaAnterior = contenedor.querySelector(
         "#carrusel-bitacoras-anterior"
@@ -390,7 +390,7 @@ function renderizarSlideCarrusel(contenedor) {
 
     titulo.textContent = `Bitácora ${bitacora.dia}`;
 
-    imagen.src = bitacora.imagen_base64;
+    visorPdf.src = bitacora.pdf_base64;
 
     const haySoloUna = bitacorasCierre.length <= 1;
 
@@ -537,9 +537,8 @@ function deshabilitarConfirmarCierre(contenedor, deshabilitado) {
 }
 
 function mostrarErrorPrevia(contenedor, mensaje) {
-    contenedor.querySelector(
-        "#modal-cerrar-error-previa-texto"
-    ).textContent = mensaje;
+    contenedor.querySelector("#modal-cerrar-error-previa-texto").textContent =
+        mensaje;
 
     contenedor.querySelector("#modal-cerrar-error-previa").hidden = false;
 }
@@ -645,10 +644,7 @@ function crearTarjetaIntento(dia, orden) {
 
     const bloqueada =
         !realizada &&
-        (
-            !puedeGestionarExpediente() ||
-            calcularBloqueo(dia, orden)
-        );
+        (!puedeGestionarExpediente() || calcularBloqueo(dia, orden));
 
     const tarjeta = document.createElement("article");
 

@@ -34,18 +34,3 @@ def renderizar_pdf(html: str) -> bytes:
             )
         finally:
             navegador.close()
-
-
-def renderizar_imagen(html: str) -> bytes:
-
-    with sync_playwright() as playwright:
-        navegador = playwright.chromium.launch()
-
-        try:
-            pagina = navegador.new_page()
-
-            pagina.set_content(html, wait_until="load")
-
-            return pagina.screenshot(full_page=True, type="png")
-        finally:
-            navegador.close()

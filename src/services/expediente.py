@@ -332,7 +332,7 @@ class ExpedienteService(BaseService):
         ultima_cobranza_dia = (
             select(Cobranza.dia)
             .where(Cobranza.id_expediente == Expediente.id)
-            .order_by(Cobranza.fecha.desc(), Cobranza.id.desc())
+            .order_by(Cobranza.dia.desc(), Cobranza.orden.desc())
             .limit(1)
             .scalar_subquery()
         )
@@ -340,7 +340,7 @@ class ExpedienteService(BaseService):
         ultima_cobranza_intentos = (
             select(Cobranza.orden)
             .where(Cobranza.id_expediente == Expediente.id)
-            .order_by(Cobranza.fecha.desc(), Cobranza.id.desc())
+            .order_by(Cobranza.dia.desc(), Cobranza.orden.desc())
             .limit(1)
             .scalar_subquery()
         )

@@ -14,7 +14,6 @@ from src.core.monto import obtener_monto_vencido
 from src.core.pdf import (
     codificar_base64,
     imagen_base64,
-    renderizar_imagen,
     renderizar_pdf,
 )
 from src.models.cobranza import Cobranza
@@ -56,7 +55,7 @@ class PDFCobranzaService(BaseService):
         return [
             {
                 "dia": dia,
-                "imagen_base64": self._previsualizar_dia(expediente.id, dia),
+                "pdf_base64": self._previsualizar_dia(expediente.id, dia),
             }
             for dia in dias
         ]
@@ -199,9 +198,9 @@ class PDFCobranzaService(BaseService):
     def _previsualizar_dia(self, id_expediente: int, dia: int) -> str:
         _, _, html = self._construir_html(id_expediente, dia)
 
-        imagen_bytes = renderizar_imagen(html)
+        pdf_bytes = renderizar_pdf(html)
 
-        return codificar_base64(imagen_bytes, mime="image/png")
+        return codificar_base64(pdf_bytes, mime="application/pdf")
 
     def _generar_documento(
         self, id_expediente: int, dia: int
