@@ -1,5 +1,6 @@
 let usuarioSesion = null;
 let idExpedienteActual = null;
+let usuarioAsignadoExpediente = null;
 
 let diaSeleccionado = null;
 let diaActualExpediente = null;
@@ -49,6 +50,8 @@ export async function iniciar({ usuario, contenedor, idExpediente }) {
         cobranzasExpediente = await obtenerCobranzas(idExpedienteActual);
 
         renderizarExpediente(contenedor, expediente);
+
+        usuarioAsignadoExpediente = expediente.usuario;
 
         renderizarDias(
             contenedor,
@@ -177,12 +180,12 @@ function renderizarDias(contenedor, diaActual, modoGestion) {
     navegacion.innerHTML = "";
 
     for (let numero = 1; numero <= dia; numero++) {
-        navegacion.appendChild(crearBotonDia(contenedor, numero, modoGestion));
+        navegacion.appendChild(crearBotonDia(contenedor, numero));
     }
 
     contenido.innerHTML = "";
 
-    renderizarIntentos(contenedor, diaSeleccionado, modoGestion);
+    renderizarIntentos(contenedor, diaSeleccionado);
 }
 
 function crearBotonDia(contenedor, numero) {
@@ -240,9 +243,14 @@ function renderizarIntentos(contenedor, dia) {
 function crearTarjetaIntento(dia, orden) {
     const cobranza = obtenerCobranza(dia, orden);
 
-    const bloqueada = calcularBloqueo(dia, orden);
-
     const realizada = Boolean(cobranza);
+
+    const bloqueada =
+        !realizada &&
+        (
+            !puedeGestionarExpediente() ||
+            calcularBloqueo(dia, orden)
+        );
 
     const tarjeta = document.createElement("article");
 
@@ -258,7 +266,7 @@ function crearTarjetaIntento(dia, orden) {
 
     resumen.className = "intento-tarjeta__resumen";
 
-    resumen.disabled = bloqueada || realizada;
+    resumen.disabled = bloqueada;
 
     let textoEstado = "Pendiente";
     let claseEstado = "intento-tarjeta__estado--pendiente";
@@ -285,7 +293,7 @@ function crearTarjetaIntento(dia, orden) {
     </span>
 
     ${
-        !bloqueada && !realizada
+        !bloqueada
             ? `
           <svg
             class="intento-tarjeta__chevron"
@@ -312,8 +320,16 @@ function crearTarjetaIntento(dia, orden) {
 
     cuerpo.hidden = true;
 
-    if (!bloqueada && !realizada) {
-        cuerpo.innerHTML = plantillaFormularioIntento();
+    if (!bloqueada) {
+        if (realizada) {
+            cuerpo.innerHTML = plantillaVistaIntento();
+
+            inicializarVistaIntento(cuerpo, tarjeta, cobranza, dia, orden);
+        } else {
+            cuerpo.innerHTML = plantillaFormularioIntento();
+
+            inicializarFormularioIntento(cuerpo, tarjeta, dia, orden);
+        }
 
         resumen.addEventListener("click", () => {
             const expandida = tarjeta.classList.toggle(
@@ -322,17 +338,194 @@ function crearTarjetaIntento(dia, orden) {
 
             cuerpo.hidden = !expandida;
         });
-
-        inicializarFormularioIntento(cuerpo, tarjeta, dia, orden);
     }
 
     tarjeta.appendChild(resumen);
 
-    if (!bloqueada && !realizada) {
+    if (!bloqueada) {
         tarjeta.appendChild(cuerpo);
     }
 
     return tarjeta;
+}
+
+/* ─────────────────────────────────────────────
+   VISTA DE INTENTO REALIZADO
+   ───────────────────────────────────────────── */
+
+const MEDIO_TEXTO = {
+    llamada: "Llamada telefónica",
+    whatsapp: "WhatsApp",
+    correo: "Correo electrónico",
+    otro: "Otro",
+};
+
+function plantillaVistaIntento() {
+    return `
+    <div class="intento-vista">
+
+      <div class="intento-form__fila">
+
+        <div class="campo campo--intento">
+          <span class="u-etiqueta u-texto-terciario">
+            Hora real de contacto
+          </span>
+
+          <span class="intento-vista__hora"></span>
+        </div>
+
+        <div class="campo campo--intento">
+          <span class="u-etiqueta u-texto-terciario">
+            Medio utilizado
+          </span>
+
+          <span class="intento-vista__medio"></span>
+        </div>
+
+      </div>
+
+      <div class="campo campo--intento">
+        <span class="u-etiqueta u-texto-terciario">
+          ¿Contactó al cliente?
+        </span>
+
+        <span class="intento-vista__contacto"></span>
+      </div>
+
+      <div class="campo campo--intento">
+        <span class="u-etiqueta u-texto-terciario">
+          Comentarios / próximos pasos
+        </span>
+
+        <p class="intento-vista__comentarios"></p>
+      </div>
+
+      <div class="campo campo--intento">
+        <span class="u-etiqueta u-texto-terciario">
+          Evidencias
+        </span>
+
+        <ul class="lista-evidencias intento-vista__evidencias"></ul>
+      </div>
+
+      <div class="intento-vista__acciones"></div>
+
+    </div>
+  `;
+}
+
+function inicializarVistaIntento(cuerpo, tarjeta, cobranza, dia, orden) {
+    const vista = cuerpo.querySelector(".intento-vista");
+
+    vista.querySelector(".intento-vista__hora").textContent = formatearHora(
+        cobranza.fecha
+    );
+
+    vista.querySelector(".intento-vista__medio").textContent =
+        MEDIO_TEXTO[cobranza.medio] || cobranza.medio || "—";
+
+    vista.querySelector(".intento-vista__contacto").textContent =
+        cobranza.contacto ? "Sí" : "No";
+
+    vista.querySelector(".intento-vista__comentarios").textContent =
+        cobranza.comentarios || "—";
+
+    cargarEvidenciasVista(vista, cobranza.id);
+
+    const acciones = vista.querySelector(".intento-vista__acciones");
+
+    if (usuarioAsignadoExpediente === usuarioSesion.nombre) {
+        const botonEditar = document.createElement("button");
+
+        botonEditar.type = "button";
+
+        botonEditar.className = "boton intento-vista__editar";
+
+        botonEditar.textContent = "Editar";
+
+        botonEditar.addEventListener("click", () => {
+            cuerpo.innerHTML = plantillaFormularioIntento();
+
+            inicializarFormularioIntento(cuerpo, tarjeta, dia, orden, {
+                modo: "editar",
+                cobranza,
+                alCancelar: () => {
+                    cuerpo.innerHTML = plantillaVistaIntento();
+
+                    inicializarVistaIntento(
+                        cuerpo,
+                        tarjeta,
+                        cobranza,
+                        dia,
+                        orden
+                    );
+                },
+            });
+        });
+
+        acciones.appendChild(botonEditar);
+    }
+}
+
+async function cargarEvidenciasVista(vista, idCobranza) {
+    const lista = vista.querySelector(".intento-vista__evidencias");
+
+    try {
+        const respuesta = await fetch(`/cobranzas/${idCobranza}/evidencias`, {
+            method: "GET",
+            credentials: "include",
+        });
+
+        if (!respuesta.ok) {
+            throw new Error(await mensajeDeError(respuesta));
+        }
+
+        const evidencias = await respuesta.json();
+
+        if (evidencias.length === 0) {
+            lista.innerHTML = `
+        <li class="lista-evidencias__item u-texto-terciario">
+          Sin evidencias
+        </li>
+      `;
+
+            return;
+        }
+
+        lista.innerHTML = "";
+
+        evidencias.forEach((evidencia) => {
+            const item = document.createElement("li");
+
+            item.className = "lista-evidencias__item";
+
+            item.innerHTML = `
+        <span class="lista-evidencias__nombre">
+          ${evidencia.nombre_original}
+        </span>
+
+        <span class="u-texto-terciario">
+          ${evidencia.tipo === "AVISO" ? "Evidencia de contacto" : "Respuesta"}
+        </span>
+      `;
+
+            lista.appendChild(item);
+        });
+    } catch (error) {
+        lista.innerHTML = `
+      <li class="lista-evidencias__item u-texto-terciario">
+        No se pudieron cargar las evidencias.
+      </li>
+    `;
+    }
+}
+
+function formatearHora(fecha) {
+    return new Date(fecha).toLocaleTimeString("es-MX", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    });
 }
 
 /* ─────────────────────────────────────────────
@@ -589,7 +782,15 @@ function plantillaFormularioIntento() {
   `;
 }
 
-function inicializarFormularioIntento(cuerpo, tarjeta, dia, orden) {
+function inicializarFormularioIntento(
+    cuerpo,
+    tarjeta,
+    dia,
+    orden,
+    opciones = {}
+) {
+    const { modo = "crear", cobranza = null, alCancelar = null } = opciones;
+
     const formulario = cuerpo.querySelector(".intento-form");
 
     const entradaHora = formulario.querySelector(".intento-form__hora");
@@ -613,6 +814,26 @@ function inicializarFormularioIntento(cuerpo, tarjeta, dia, orden) {
     const botonBorrar = formulario.querySelector(".boton-borrar");
 
     const botonEnviar = formulario.querySelector(".intento-form__enviar");
+
+    if (modo === "editar") {
+        botonEnviar.textContent = "Guardar cambios";
+
+        const botonCancelar = document.createElement("button");
+
+        botonCancelar.type = "button";
+
+        botonCancelar.className = "boton-borrar";
+
+        botonCancelar.textContent = "Cancelar";
+
+        botonCancelar.addEventListener("click", () => {
+            if (alCancelar) alCancelar();
+        });
+
+        formulario
+            .querySelector(".intento-form__acciones")
+            .prepend(botonCancelar);
+    }
 
     const mensaje = formulario.querySelector(".intento-form__mensaje");
 
@@ -727,6 +948,29 @@ function inicializarFormularioIntento(cuerpo, tarjeta, dia, orden) {
     );
 
     /* ─────────────────────────────────────────
+     PRECARGA (MODO EDITAR)
+     ───────────────────────────────────────── */
+
+    if (modo === "editar" && cobranza) {
+        entradaHora.value = formatearHora(cobranza.fecha);
+
+        selectMedio.value = cobranza.medio || "";
+
+        contactoSeleccionado = cobranza.contacto ? "si" : "no";
+
+        opcionesContacto.forEach((boton) => {
+            boton.classList.toggle(
+                "alternar-contacto__opcion--activa",
+                boton.dataset.valor === contactoSeleccionado
+            );
+        });
+
+        renderizarOpcionesResultado(contactoSeleccionado);
+
+        textareaComentarios.value = cobranza.comentarios || "";
+    }
+
+    /* ─────────────────────────────────────────
      BORRAR
      ───────────────────────────────────────── */
 
@@ -763,24 +1007,20 @@ function inicializarFormularioIntento(cuerpo, tarjeta, dia, orden) {
 
         ocultarMensajeFormulario();
 
-        if (
-            !entradaHora.value ||
-            !selectMedio.value ||
-            !contactoSeleccionado ||
-            !resultadoSeleccionado
-        ) {
-            mostrarMensajeFormulario(
-                "Completa hora, medio, si hubo contacto y el resultado antes de registrar."
-            );
+        if (modo === "crear" && obtenerCobranza(dia, orden)) {
+            mostrarMensajeFormulario("Este intento ya fue registrado.");
 
             return;
         }
 
-        /*
-         * Evitar doble registro desde el frontend.
-         */
-        if (obtenerCobranza(dia, orden)) {
-            mostrarMensajeFormulario("Este intento ya fue registrado.");
+        if (!contactoSeleccionado) {
+            mostrarMensajeFormulario("Indica si se contactó al cliente.");
+
+            return;
+        }
+
+        if (!resultadoSeleccionado) {
+            mostrarMensajeFormulario("Selecciona un resultado.");
 
             return;
         }
@@ -798,78 +1038,83 @@ function inicializarFormularioIntento(cuerpo, tarjeta, dia, orden) {
         };
 
         botonEnviar.disabled = true;
-        botonEnviar.textContent = "Registrando…";
+        botonEnviar.textContent =
+            modo === "editar" ? "Guardando…" : "Registrando…";
 
         try {
-            const respuesta = await fetch(
-                `/expedientes/${idExpedienteActual}/cobranzas`,
-                {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(datos),
-                }
-            );
+            const url =
+                modo === "editar"
+                    ? `/cobranzas/${cobranza.id}`
+                    : `/expedientes/${idExpedienteActual}/cobranzas`;
+
+            const respuesta = await fetch(url, {
+                method: modo === "editar" ? "PATCH" : "POST",
+                credentials: "include",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(datos),
+            });
 
             if (!respuesta.ok) {
                 throw new Error(await mensajeDeError(respuesta));
             }
 
-            const cobranza = await respuesta.json();
+            const cobranzaGuardada = await respuesta.json();
 
-            cobranzasExpediente.push(cobranza);
+            if (modo === "editar") {
+                const indice = cobranzasExpediente.findIndex(
+                    (item) => item.id === cobranzaGuardada.id
+                );
+
+                if (indice !== -1) {
+                    cobranzasExpediente[indice] = cobranzaGuardada;
+                }
+            } else {
+                cobranzasExpediente.push(cobranzaGuardada);
+            }
 
             for (const archivo of archivosEvidenciaContacto) {
-                await subirEvidencia(cobranza.id, archivo, "AVISO");
+                await subirEvidencia(cobranzaGuardada.id, archivo, "AVISO");
             }
 
             for (const archivo of archivosEvidenciaRespuesta) {
-                await subirEvidencia(cobranza.id, archivo, "RESPUESTA");
+                await subirEvidencia(cobranzaGuardada.id, archivo, "RESPUESTA");
             }
 
-            marcarIntentoRealizado(tarjeta);
+            if (modo === "editar") {
+                cuerpo.innerHTML = plantillaVistaIntento();
+
+                inicializarVistaIntento(
+                    cuerpo,
+                    tarjeta,
+                    cobranzaGuardada,
+                    dia,
+                    orden
+                );
+            } else {
+                marcarIntentoRealizado(tarjeta);
+            }
         } catch (error) {
             mostrarMensajeFormulario(
-                error.message || "No se pudo registrar el intento."
+                error.message || "No se pudo completar la operación."
             );
         } finally {
             botonEnviar.disabled = false;
-            botonEnviar.textContent = "Registrar intento";
-        }
-
-        function mostrarMensajeFormulario(texto) {
-            mensajeTexto.textContent = texto;
-
-            mensaje.hidden = false;
-        }
-
-        function ocultarMensajeFormulario() {
-            mensaje.hidden = true;
-        }
-
-        async function subirEvidencia(idCobranza, archivo, tipo) {
-            const datos = new FormData();
-
-            datos.append("tipo", tipo);
-
-            datos.append("archivo", archivo);
-
-            const respuesta = await fetch(
-                `/cobranzas/${idCobranza}/evidencias`,
-                {
-                    method: "POST",
-                    credentials: "include",
-                    body: datos,
-                }
-            );
-
-            if (!respuesta.ok) {
-                throw new Error(await mensajeDeError(respuesta));
-            }
+            botonEnviar.textContent =
+                modo === "editar" ? "Guardar cambios" : "Registrar intento";
         }
     });
+
+    function mostrarMensajeFormulario(texto) {
+        mensajeTexto.textContent = texto;
+
+        mensaje.hidden = false;
+    }
+
+    function ocultarMensajeFormulario() {
+        mensaje.hidden = true;
+    }
 }
 
 /* ─────────────────────────────────────────────
@@ -1059,6 +1304,10 @@ function calcularBloqueo(dia, orden) {
      * de su hora correspondiente.
      */
     return new Date().getHours() < HORA_INTENTO[orden];
+}
+
+function puedeGestionarExpediente() {
+    return usuarioAsignadoExpediente === usuarioSesion.nombre;
 }
 
 /* ─────────────────────────────────────────────

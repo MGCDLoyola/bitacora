@@ -23,13 +23,6 @@ class CobranzaCreate(SchemaBase):
     comentarios: str | None = None
 
 
-class CobranzaUpdate(SchemaBase):
-    fecha: datetime | None = None
-    contacto: bool | None = None
-    medio: str | None = None
-    comentarios: str | None = None
-
-
 class CobranzaRead(CobranzaBase):
     id: int
     dia: int

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from src.core.database import get_session
 from src.core.deps import requiere_rol, usuario_actual
 from src.models.usuario import Usuario
-from src.schemas.cobranza import CobranzaRead, CobranzaUpdate
+from src.schemas.cobranza import CobranzaCreate, CobranzaRead
 from src.services.cobranza import CobranzaService
 
 router = APIRouter(prefix="/cobranzas", tags=["Cobranzas"])
@@ -24,7 +24,7 @@ def obtener_cobranza(
 @router.patch("/{id_cobranza}", response_model=CobranzaRead)
 def actualizar_cobranza(
     id_cobranza: int,
-    data: CobranzaUpdate,
+    data: CobranzaCreate,
     session: Session = Depends(get_session),
     usuario_actual: Usuario = Depends(
         requiere_rol(

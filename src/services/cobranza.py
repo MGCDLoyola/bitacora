@@ -8,7 +8,7 @@ from src.core.config import HORARIOS_GESTION, MAX_DIAS, MAX_GESTIONES_DIA
 from src.core.exceptions import ConflictoNegocio, NoEncontrado, OperacionInvalida
 from src.models.cobranza import Cobranza
 from src.models.expediente import Expediente
-from src.schemas.cobranza import CobranzaCreate, CobranzaUpdate
+from src.schemas.cobranza import CobranzaCreate
 from src.services.base import BaseService
 
 
@@ -101,7 +101,7 @@ class CobranzaService(BaseService):
         return cobranza
 
     def actualizar(
-        self, id_cobranza: int, id_usuario: int, data: CobranzaUpdate
+        self, id_cobranza: int, id_usuario: int, data: CobranzaCreate
     ) -> Cobranza:
 
         cobranza = self.obtener(id_cobranza)
@@ -109,13 +109,16 @@ class CobranzaService(BaseService):
         if cobranza.expediente.id_usuario != id_usuario:
             raise OperacionInvalida("El expediente no está asignado al usuario actual.")
 
-        cambios = data.model_dump(exclude_unset=True)
+        fecha = self._construir_fecha(
+            expediente=cobranza.expediente,
+            dia=cobranza.dia,
+            hora=data.hora,
+        )
 
-        for campo, valor in cambios.items():
-            if valor is None and campo in ("fecha", "contacto"):
-                raise OperacionInvalida(f"El campo '{campo}' no puede ser nulo.")
-
-            setattr(cobranza, campo, valor)
+        cobranza.fecha = fecha
+        cobranza.contacto = data.contacto
+        cobranza.medio = data.medio
+        cobranza.comentarios = data.comentarios
 
         self._guardar(cobranza)
 
