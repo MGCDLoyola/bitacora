@@ -184,6 +184,25 @@ class ExpedienteService(BaseService):
 
         return expediente
 
+    def cerrar(
+        self,
+        id_expediente: int,
+        usuario_actual: Usuario,
+    ) -> Expediente:
+
+        expediente = self.obtener(id_expediente)
+
+        if expediente.id_usuario != usuario_actual.id:
+            raise OperacionInvalida(
+                "No puedes cerrar un expediente que no tienes asignado."
+            )
+
+        expediente.estado = False
+
+        self._guardar(expediente)
+
+        return expediente
+
     def asignar(
         self, ids: list[int], id_usuario: int | None, usuario_actual: Usuario
     ) -> None:
@@ -431,3 +450,5 @@ class ExpedienteService(BaseService):
             raise OperacionInvalida(
                 f"No se pudieron eliminar todos los expedientes: {'; '.join(errores)}."
             )
+
+        

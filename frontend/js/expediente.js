@@ -53,6 +53,8 @@ export async function iniciar({ usuario, contenedor, idExpediente }) {
 
         usuarioAsignadoExpediente = expediente.usuario;
 
+        configurarAcciones(contenedor, expediente);
+
         renderizarDias(
             contenedor,
             expediente.dia_actual,
@@ -160,6 +162,106 @@ function renderizarExpediente(contenedor, expediente) {
     if (tieneComentarios) {
         comentarios.textContent = expediente.comentarios;
     }
+}
+
+/* ─────────────────────────────────────────────
+   ACCIONES DEL EXPEDIENTE
+   ───────────────────────────────────────────── */
+
+function configurarAcciones(contenedor, expediente) {
+    const botonDescargarBitacoras = contenedor.querySelector(
+        "#boton-descargar-bitacoras"
+    );
+
+    botonDescargarBitacoras.addEventListener("click", () => {
+        descargarBitacoras();
+    });
+
+    const botonCerrarExpediente = contenedor.querySelector(
+        "#boton-cerrar-expediente"
+    );
+
+    const modalCerrar = contenedor.querySelector("#modal-cerrar-expediente");
+
+    const puedeCerrar =
+        puedeGestionarExpediente() && expediente.modo_gestion !== "cerrado";
+
+    if (!puedeCerrar) {
+        // El modal solo existe en el DOM cuando el usuario en
+        // sesión es el asignado al expediente (y este sigue abierto).
+        modalCerrar.remove();
+
+        return;
+    }
+
+    botonCerrarExpediente.hidden = false;
+
+    botonCerrarExpediente.addEventListener("click", () => {
+        abrirModalCerrar(contenedor);
+    });
+
+    configurarModalCerrar(contenedor);
+}
+
+function descargarBitacoras() {
+    // TODO: sin back todavía. Cuando exista el endpoint,
+    // pegarle aquí y descargar el .zip que regrese.
+}
+
+/* ─────────────────────────────────────────────
+   MODAL: CERRAR Y FIRMAR
+   ───────────────────────────────────────────── */
+
+function configurarModalCerrar(contenedor) {
+    const modal = contenedor.querySelector("#modal-cerrar-expediente");
+
+    const botonIrAPerfil = contenedor.querySelector("#boton-ir-a-perfil");
+
+    const botonConfirmarCierre = contenedor.querySelector(
+        "#boton-confirmar-cierre"
+    );
+
+    modal.querySelectorAll("[data-cerrar-modal-cierre]").forEach((elemento) => {
+        elemento.addEventListener("click", () => {
+            cerrarModalCerrar(contenedor);
+        });
+    });
+
+    botonIrAPerfil.addEventListener("click", () => {
+        window.navegar("perfil");
+    });
+
+    botonConfirmarCierre.addEventListener("click", () => {
+        // TODO: sin back todavía. Cuando exista el endpoint,
+        // pegarle aquí para confirmar el cierre/firma.
+    });
+}
+
+function abrirModalCerrar(contenedor) {
+    const modal = contenedor.querySelector("#modal-cerrar-expediente");
+
+    const bloqueSinFirma = contenedor.querySelector("#modal-cerrar-sin-firma");
+
+    const bloqueConFirma = contenedor.querySelector("#modal-cerrar-con-firma");
+
+    const tieneFirma = Boolean(usuarioSesion.firma);
+
+    bloqueSinFirma.hidden = tieneFirma;
+    bloqueConFirma.hidden = !tieneFirma;
+
+    modal.hidden = false;
+
+    const botonPrincipal = tieneFirma
+        ? contenedor.querySelector("#boton-confirmar-cierre")
+        : contenedor.querySelector("#boton-ir-a-perfil");
+
+    botonPrincipal.focus();
+}
+
+function cerrarModalCerrar(contenedor) {
+    const modal = contenedor.querySelector("#modal-cerrar-expediente");
+
+    modal.hidden = true;
 }
 
 /* ─────────────────────────────────────────────

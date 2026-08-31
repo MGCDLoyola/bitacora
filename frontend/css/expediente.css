@@ -86,6 +86,15 @@
    FOLIO
    ───────────────────────────────────────────── */
 
+.vista-expediente__derecha {
+    display: flex;
+    align-items: center;
+
+    gap: 20px;
+
+    padding-top: 7px;
+}
+
 .vista-expediente__folio {
     display: flex;
     flex-direction: column;
@@ -93,9 +102,27 @@
 
     gap: 5px;
 
-    padding-top: 7px;
-
     text-align: right;
+
+    white-space: nowrap;
+}
+
+/* ─────────────────────────────────────────────
+   ACCIONES DEL EXPEDIENTE
+   ───────────────────────────────────────────── */
+
+.vista-expediente__acciones {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.vista-expediente__acciones .boton {
+    width: auto;
+    margin-top: 0;
+
+    padding: 10px 16px;
 
     white-space: nowrap;
 }
@@ -217,6 +244,37 @@
 
     white-space: pre-wrap;
     overflow-wrap: anywhere;
+}
+
+/* ─────────────────────────────────────────────
+   MODAL: CERRAR Y FIRMAR
+   El resto del patrón (.modal, .modal__*,
+   .boton--secundario) vive en usuarios.css y se
+   reutiliza tal cual — esto es solo lo específico
+   de esta vista.
+   ───────────────────────────────────────────── */
+
+.modal-cerrar__lista {
+    margin: 14px 0 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.modal-cerrar__lista li {
+    padding: 10px 12px;
+
+    background: var(--ink-850);
+
+    border: 1px solid var(--ink-700);
+    border-radius: var(--radius-tab);
+
+    font-size: 13.5px;
+    color: var(--text-300);
+}
+
+.modal-cerrar__lista li + li {
+    margin-top: 8px;
 }
 
 /* ─────────────────────────────────────────────
@@ -457,14 +515,21 @@
 .campo--intento select,
 .campo--intento textarea {
     width: 100%;
+
     background: transparent;
+
     border: none;
     border-bottom: 1px solid var(--ink-700);
+
     color: var(--text-100);
+
     font-family: var(--font-sans);
     font-size: 14px;
+
     padding: 6px 2px 9px;
+
     outline: none;
+
     transition:
         border-color 0.15s ease,
         box-shadow 0.15s ease;
@@ -472,10 +537,13 @@
 
 .campo--intento select {
     appearance: none;
+
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%238c93a6' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
     background-repeat: no-repeat;
     background-position: right 2px center;
     background-size: 14px;
+
     padding-right: 20px;
 }
 
@@ -505,17 +573,25 @@
 
 .alternar-contacto__opcion {
     flex: 1;
+
     background: var(--ink-850);
+
     border: 1px solid var(--ink-700);
     border-radius: var(--radius-tab);
+
     padding: 8px 0;
+
     color: var(--text-300);
+
     font-family: var(--font-mono);
     font-size: 12px;
     font-weight: 500;
+
     text-transform: uppercase;
     letter-spacing: 0.05em;
+
     cursor: pointer;
+
     transition:
         background 0.15s ease,
         color 0.15s ease,
@@ -558,17 +634,21 @@
 .resultado-contacto__opcion {
     display: flex;
     align-items: center;
+
     gap: 10px;
 
     padding: 9px 12px;
 
     background: var(--ink-850);
+
     border: 1px solid var(--ink-700);
     border-radius: var(--radius-tab);
 
     color: var(--text-300);
+
     font-family: var(--font-sans);
     font-size: 13px;
+
     text-align: left;
 
     cursor: pointer;
@@ -581,6 +661,7 @@
 
 .resultado-contacto__opcion::before {
     content: "";
+
     flex-shrink: 0;
 
     width: 12px;
@@ -601,13 +682,17 @@
 
 .resultado-contacto__opcion--activa {
     background: rgba(201, 162, 39, 0.08);
+
     border-color: var(--gold-500);
+
     color: var(--text-100);
 }
 
 .resultado-contacto__opcion--activa::before {
     border-color: var(--gold-500);
+
     background: var(--gold-500);
+
     box-shadow: inset 0 0 0 2px var(--ink-850);
 }
 
@@ -627,15 +712,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+
     gap: 6px;
 
     padding: 18px 12px;
 
     background: var(--ink-850);
+
     border: 1px dashed var(--ink-700);
     border-radius: var(--radius-tab);
 
     color: var(--text-500);
+
     text-align: center;
 
     cursor: pointer;
@@ -648,6 +736,7 @@
 .zona-evidencias:hover,
 .zona-evidencias--activa {
     border-color: var(--gold-500);
+
     background: rgba(201, 162, 39, 0.06);
 }
 
@@ -662,22 +751,26 @@
 
 .lista-evidencias {
     list-style: none;
+
     margin: 10px 0 0;
     padding: 0;
 
     display: flex;
     flex-direction: column;
+
     gap: 6px;
 }
 
 .lista-evidencias__item {
     display: flex;
     align-items: center;
+
     gap: 8px;
 
     padding: 6px 10px;
 
     background: var(--ink-850);
+
     border: 1px solid var(--ink-700);
     border-radius: var(--radius-tab);
 
@@ -689,6 +782,7 @@
     min-width: 0;
 
     overflow: hidden;
+
     white-space: nowrap;
     text-overflow: ellipsis;
 
@@ -697,8 +791,10 @@
 
 .lista-evidencias__peso {
     color: var(--text-500);
+
     font-family: var(--font-mono);
     font-size: 10.5px;
+
     flex-shrink: 0;
 }
 
@@ -709,6 +805,7 @@
     border: none;
 
     color: var(--text-500);
+
     font-size: 16px;
     line-height: 1;
 
@@ -729,7 +826,9 @@
 
 .intento-form__acciones {
     display: flex;
+
     justify-content: flex-end;
+
     gap: 12px;
 
     margin-top: 6px;
@@ -737,11 +836,14 @@
 
 .boton-borrar {
     background: none;
+
     border: 1px solid var(--ink-700);
     border-radius: var(--radius-tab);
+
     padding: 11px 18px;
 
     color: var(--text-500);
+
     font-family: var(--font-sans);
     font-size: 13.5px;
     font-weight: 600;
@@ -760,25 +862,10 @@
 
 .intento-form__enviar {
     width: auto;
+
     margin-top: 0;
+
     padding: 11px 22px;
-}
-
-/* ---------- Responsive ---------- */
-
-@media (max-width: 520px) {
-    .intento-form__fila {
-        grid-template-columns: 1fr;
-    }
-
-    .intento-form__acciones {
-        flex-direction: column-reverse;
-    }
-
-    .boton-borrar,
-    .intento-form__enviar {
-        width: 100%;
-    }
 }
 
 /* ─────────────────────────────────────────────
@@ -818,8 +905,15 @@
         column-gap: 18px;
     }
 
+    .vista-expediente__derecha {
+        flex-direction: column;
+        align-items: flex-end;
+
+        gap: 10px;
+    }
+
     .vista-expediente__cliente .u-titulo {
-        font-size: 26px;
+        font-size: 20px;
     }
 
     .expediente-datos__encabezado {
@@ -860,6 +954,7 @@
         row-gap: 10px;
 
         margin-bottom: 18px;
+
         padding-bottom: 15px;
     }
 
@@ -884,5 +979,18 @@
 
     .expediente-comentarios {
         padding: 13px 14px;
+    }
+
+    .vista-expediente__derecha {
+        align-items: stretch;
+    }
+
+    .vista-expediente__acciones {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .vista-expediente__acciones .boton {
+        width: 100%;
     }
 }

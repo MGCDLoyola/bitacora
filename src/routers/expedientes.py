@@ -345,3 +345,25 @@ def generar_pdf_consolidacion(
         media_type="application/pdf",
         filename=ruta.name,
     )
+
+@router.patch(
+    "/{id_expediente}/cerrar",
+    response_model=ExpedienteRead,
+)
+def cerrar_expediente(
+    id_expediente: int,
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(
+        requiere_rol(
+            "Administrador",
+            "Supervisor",
+            "Cobranza",
+        )
+    ),
+):
+    servicio = ExpedienteService(session)
+
+    return servicio.cerrar(
+        id_expediente=id_expediente,
+        usuario_actual=usuario_actual,
+    )
