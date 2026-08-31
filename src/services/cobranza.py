@@ -166,22 +166,9 @@ class CobranzaService(BaseService):
         )
 
     def _validar_horario(self, orden: int, fecha: datetime) -> None:
-
         inicio = HORARIOS_GESTION[orden]
-        ahora = datetime.now()
-
-        if ahora.hour < inicio:
-            raise OperacionInvalida(
-                f"El intento {orden} solo se puede registrar "
-                f"a partir de las {inicio}:00 horas."
-            )
 
         fecha_naive = fecha.replace(tzinfo=None) if fecha.tzinfo else fecha
-
-        if fecha_naive.date() != ahora.date():
-            raise OperacionInvalida(
-                "La hora capturada debe corresponder al día de hoy."
-            )
 
         if fecha_naive.hour < inicio:
             raise OperacionInvalida(

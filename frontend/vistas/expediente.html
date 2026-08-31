@@ -265,25 +265,93 @@
 
             <div id="modal-cerrar-con-firma" hidden>
                 <div class="modal__cuerpo">
-                    <p class="u-cuerpo u-texto-secundario">
-                        Se generarán los siguientes documentos con tu firma
-                        estampada:
-                    </p>
-
-                    <!--
-                        Placeholder de diseño: la lista real de PDFs
-                        se arma cuando exista el endpoint. Por ahora
-                        se deja un ejemplo estático para validar la
-                        vista.
-                    -->
-                    <ul
-                        id="modal-cerrar-lista-pdfs"
-                        class="modal-cerrar__lista"
+                    <div
+                        id="modal-cerrar-carga-previa"
+                        class="carrusel-bitacoras__carga"
+                        hidden
                     >
-                        <li>Reporte de gestión — Día 1</li>
-                        <li>Reporte de gestión — Día 2</li>
-                        <li>Consolidado de expediente</li>
-                    </ul>
+                        <span class="boton__spinner"></span>
+
+                        <span class="u-cuerpo u-texto-terciario">
+                            Generando vista previa de las bitácoras...
+                        </span>
+                    </div>
+
+                    <div
+                        id="modal-cerrar-error-previa"
+                        class="mensaje-error modal__error"
+                        role="alert"
+                        aria-live="polite"
+                        hidden
+                    >
+                        <span class="mensaje-error__sello"> Error </span>
+
+                        <span id="modal-cerrar-error-previa-texto"></span>
+
+                        <button
+                            type="button"
+                            class="enlace"
+                            id="boton-reintentar-vista-previa"
+                        >
+                            Reintentar
+                        </button>
+                    </div>
+
+                    <div
+                        id="modal-cerrar-carrusel"
+                        class="carrusel-bitacoras"
+                        hidden
+                    >
+                        <p
+                            id="carrusel-bitacoras-titulo"
+                            class="carrusel-bitacoras__titulo u-etiqueta u-texto-terciario"
+                        >
+                            —
+                        </p>
+
+                        <div class="carrusel-bitacoras__visor">
+                            <button
+                                type="button"
+                                class="carrusel-bitacoras__flecha carrusel-bitacoras__flecha--izquierda"
+                                id="carrusel-bitacoras-anterior"
+                                aria-label="Bitácora anterior"
+                            >
+                                ‹
+                            </button>
+
+                            <div
+                                id="carrusel-bitacoras-marco"
+                                class="carrusel-bitacoras__marco"
+                            >
+                                <img
+                                    id="carrusel-bitacoras-imagen"
+                                    class="carrusel-bitacoras__imagen"
+                                    alt=""
+                                />
+                            </div>
+
+                            <button
+                                type="button"
+                                class="carrusel-bitacoras__flecha carrusel-bitacoras__flecha--derecha"
+                                id="carrusel-bitacoras-siguiente"
+                                aria-label="Bitácora siguiente"
+                            >
+                                ›
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        id="modal-cerrar-error-confirmar"
+                        class="mensaje-error modal__error"
+                        role="alert"
+                        aria-live="polite"
+                        hidden
+                    >
+                        <span class="mensaje-error__sello"> Error </span>
+
+                        <span id="modal-cerrar-error-confirmar-texto"></span>
+                    </div>
                 </div>
 
                 <div class="modal__acciones">

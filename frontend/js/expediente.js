@@ -8,6 +8,9 @@ let modoGestionExpediente = null;
 
 let cobranzasExpediente = [];
 
+let bitacorasCierre = [];
+let indiceBitacoraCierre = 0;
+
 const HORA_INTENTO = {
     1: 9,
     2: 13,
@@ -96,6 +99,46 @@ async function obtenerCobranzas(idExpediente) {
         method: "GET",
         credentials: "include",
     });
+
+    if (!respuesta.ok) {
+        const error = new Error(await mensajeDeError(respuesta));
+
+        error.status = respuesta.status;
+
+        throw error;
+    }
+
+    return await respuesta.json();
+}
+
+async function obtenerVistaPreviaCierre(idExpediente) {
+    const respuesta = await fetch(
+        `/expedientes/${idExpediente}/cierre/vista-previa`,
+        {
+            method: "POST",
+            credentials: "include",
+        }
+    );
+
+    if (!respuesta.ok) {
+        const error = new Error(await mensajeDeError(respuesta));
+
+        error.status = respuesta.status;
+
+        throw error;
+    }
+
+    return await respuesta.json();
+}
+
+async function confirmarCierreExpediente(idExpediente) {
+    const respuesta = await fetch(
+        `/expedientes/${idExpediente}/cierre/confirmar`,
+        {
+            method: "POST",
+            credentials: "include",
+        }
+    );
 
     if (!respuesta.ok) {
         const error = new Error(await mensajeDeError(respuesta));
@@ -221,6 +264,18 @@ function configurarModalCerrar(contenedor) {
         "#boton-confirmar-cierre"
     );
 
+    const botonReintentarPrevia = contenedor.querySelector(
+        "#boton-reintentar-vista-previa"
+    );
+
+    const flechaAnterior = contenedor.querySelector(
+        "#carrusel-bitacoras-anterior"
+    );
+
+    const flechaSiguiente = contenedor.querySelector(
+        "#carrusel-bitacoras-siguiente"
+    );
+
     modal.querySelectorAll("[data-cerrar-modal-cierre]").forEach((elemento) => {
         elemento.addEventListener("click", () => {
             cerrarModalCerrar(contenedor);
@@ -231,9 +286,26 @@ function configurarModalCerrar(contenedor) {
         window.navegar("perfil");
     });
 
+    botonReintentarPrevia.addEventListener("click", () => {
+        cargarVistaPreviaCierre(contenedor);
+    });
+
+    flechaAnterior.addEventListener("click", () => {
+        irABitacoraAnterior(contenedor);
+    });
+
+    flechaSiguiente.addEventListener("click", () => {
+        irABitacoraSiguiente(contenedor);
+    });
+
     botonConfirmarCierre.addEventListener("click", () => {
-        // TODO: sin back todavía. Cuando exista el endpoint,
-        // pegarle aquí para confirmar el cierre/firma.
+        confirmarCierre(contenedor);
+    });
+
+    configurarSwipeCarrusel(contenedor);
+
+    document.addEventListener("keydown", (evento) => {
+        manejarTecladoCarrusel(contenedor, evento);
     });
 }
 
@@ -251,17 +323,241 @@ function abrirModalCerrar(contenedor) {
 
     modal.hidden = false;
 
-    const botonPrincipal = tieneFirma
-        ? contenedor.querySelector("#boton-confirmar-cierre")
-        : contenedor.querySelector("#boton-ir-a-perfil");
+    if (!tieneFirma) {
+        contenedor.querySelector("#boton-ir-a-perfil").focus();
 
-    botonPrincipal.focus();
+        return;
+    }
+
+    ocultarErrorConfirmar(contenedor);
+
+    cargarVistaPreviaCierre(contenedor);
+
+    contenedor.querySelector("#boton-confirmar-cierre").focus();
 }
 
 function cerrarModalCerrar(contenedor) {
     const modal = contenedor.querySelector("#modal-cerrar-expediente");
 
     modal.hidden = true;
+}
+
+/* ─────────────────────────────────────────────
+   CARRUSEL DE VISTA PREVIA (CIERRE)
+   ───────────────────────────────────────────── */
+
+async function cargarVistaPreviaCierre(contenedor) {
+    ocultarErrorPrevia(contenedor);
+    ocultarCarrusel(contenedor);
+
+    deshabilitarConfirmarCierre(contenedor, true);
+
+    mostrarCargaPrevia(contenedor);
+
+    try {
+        bitacorasCierre = await obtenerVistaPreviaCierre(idExpedienteActual);
+
+        indiceBitacoraCierre = 0;
+
+        mostrarCarrusel(contenedor);
+        renderizarSlideCarrusel(contenedor);
+
+        deshabilitarConfirmarCierre(contenedor, false);
+    } catch (error) {
+        mostrarErrorPrevia(
+            contenedor,
+            error.message || "No se pudo generar la vista previa."
+        );
+    } finally {
+        ocultarCargaPrevia(contenedor);
+    }
+}
+
+function renderizarSlideCarrusel(contenedor) {
+    const titulo = contenedor.querySelector("#carrusel-bitacoras-titulo");
+
+    const imagen = contenedor.querySelector("#carrusel-bitacoras-imagen");
+
+    const flechaAnterior = contenedor.querySelector(
+        "#carrusel-bitacoras-anterior"
+    );
+
+    const flechaSiguiente = contenedor.querySelector(
+        "#carrusel-bitacoras-siguiente"
+    );
+
+    const bitacora = bitacorasCierre[indiceBitacoraCierre];
+
+    titulo.textContent = `Bitácora ${bitacora.dia}`;
+
+    imagen.src = bitacora.imagen_base64;
+
+    const haySoloUna = bitacorasCierre.length <= 1;
+
+    flechaAnterior.hidden = haySoloUna;
+    flechaSiguiente.hidden = haySoloUna;
+}
+
+function irABitacoraAnterior(contenedor) {
+    if (bitacorasCierre.length <= 1) {
+        return;
+    }
+
+    indiceBitacoraCierre =
+        (indiceBitacoraCierre - 1 + bitacorasCierre.length) %
+        bitacorasCierre.length;
+
+    renderizarSlideCarrusel(contenedor);
+}
+
+function irABitacoraSiguiente(contenedor) {
+    if (bitacorasCierre.length <= 1) {
+        return;
+    }
+
+    indiceBitacoraCierre = (indiceBitacoraCierre + 1) % bitacorasCierre.length;
+
+    renderizarSlideCarrusel(contenedor);
+}
+
+function manejarTecladoCarrusel(contenedor, evento) {
+    const modal = contenedor.querySelector("#modal-cerrar-expediente");
+
+    if (!modal || modal.hidden) {
+        return;
+    }
+
+    const carrusel = contenedor.querySelector("#modal-cerrar-carrusel");
+
+    if (carrusel.hidden || bitacorasCierre.length <= 1) {
+        return;
+    }
+
+    if (evento.key === "ArrowLeft") {
+        evento.preventDefault();
+        irABitacoraAnterior(contenedor);
+    } else if (evento.key === "ArrowRight") {
+        evento.preventDefault();
+        irABitacoraSiguiente(contenedor);
+    }
+}
+
+function configurarSwipeCarrusel(contenedor) {
+    const marco = contenedor.querySelector("#carrusel-bitacoras-marco");
+
+    const UMBRAL_SWIPE = 40;
+
+    let xInicial = null;
+
+    marco.addEventListener(
+        "touchstart",
+        (evento) => {
+            xInicial = evento.touches[0].clientX;
+        },
+        { passive: true }
+    );
+
+    marco.addEventListener("touchend", (evento) => {
+        if (xInicial === null) {
+            return;
+        }
+
+        const delta = evento.changedTouches[0].clientX - xInicial;
+
+        if (delta > UMBRAL_SWIPE) {
+            irABitacoraAnterior(contenedor);
+        } else if (delta < -UMBRAL_SWIPE) {
+            irABitacoraSiguiente(contenedor);
+        }
+
+        xInicial = null;
+    });
+}
+
+/* ─────────────────────────────────────────────
+   CONFIRMAR CIERRE
+   ───────────────────────────────────────────── */
+
+async function confirmarCierre(contenedor) {
+    const boton = contenedor.querySelector("#boton-confirmar-cierre");
+
+    const textoOriginal = boton.textContent;
+
+    ocultarErrorConfirmar(contenedor);
+
+    boton.disabled = true;
+    boton.textContent = "Cerrando...";
+
+    try {
+        await confirmarCierreExpediente(idExpedienteActual);
+
+        cerrarModalCerrar(contenedor);
+
+        modoGestionExpediente = "cerrado";
+
+        contenedor.querySelector("#boton-cerrar-expediente").hidden = true;
+
+        contenedor.querySelector("#modal-cerrar-expediente").remove();
+
+        renderizarDias(contenedor, diaActualExpediente, "cerrado");
+    } catch (error) {
+        mostrarErrorConfirmar(
+            contenedor,
+            error.message || "No se pudo confirmar el cierre."
+        );
+    } finally {
+        boton.disabled = false;
+        boton.textContent = textoOriginal;
+    }
+}
+
+/* ─────────────────────────────────────────────
+   ESTADOS DEL MODAL DE CIERRE
+   ───────────────────────────────────────────── */
+
+function mostrarCargaPrevia(contenedor) {
+    contenedor.querySelector("#modal-cerrar-carga-previa").hidden = false;
+}
+
+function ocultarCargaPrevia(contenedor) {
+    contenedor.querySelector("#modal-cerrar-carga-previa").hidden = true;
+}
+
+function mostrarCarrusel(contenedor) {
+    contenedor.querySelector("#modal-cerrar-carrusel").hidden = false;
+}
+
+function ocultarCarrusel(contenedor) {
+    contenedor.querySelector("#modal-cerrar-carrusel").hidden = true;
+}
+
+function deshabilitarConfirmarCierre(contenedor, deshabilitado) {
+    contenedor.querySelector("#boton-confirmar-cierre").disabled =
+        deshabilitado;
+}
+
+function mostrarErrorPrevia(contenedor, mensaje) {
+    contenedor.querySelector(
+        "#modal-cerrar-error-previa-texto"
+    ).textContent = mensaje;
+
+    contenedor.querySelector("#modal-cerrar-error-previa").hidden = false;
+}
+
+function ocultarErrorPrevia(contenedor) {
+    contenedor.querySelector("#modal-cerrar-error-previa").hidden = true;
+}
+
+function mostrarErrorConfirmar(contenedor, mensaje) {
+    contenedor.querySelector(
+        "#modal-cerrar-error-confirmar-texto"
+    ).textContent = mensaje;
+
+    contenedor.querySelector("#modal-cerrar-error-confirmar").hidden = false;
+}
+
+function ocultarErrorConfirmar(contenedor) {
+    contenedor.querySelector("#modal-cerrar-error-confirmar").hidden = true;
 }
 
 /* ─────────────────────────────────────────────
@@ -1216,6 +1512,24 @@ function inicializarFormularioIntento(
 
     function ocultarMensajeFormulario() {
         mensaje.hidden = true;
+    }
+
+    async function subirEvidencia(idCobranza, archivo, tipo) {
+        const datos = new FormData();
+
+        datos.append("tipo", tipo);
+
+        datos.append("archivo", archivo);
+
+        const respuesta = await fetch(`/cobranzas/${idCobranza}/evidencias`, {
+            method: "POST",
+            credentials: "include",
+            body: datos,
+        });
+
+        if (!respuesta.ok) {
+            throw new Error(await mensajeDeError(respuesta));
+        }
     }
 }
 

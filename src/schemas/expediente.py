@@ -71,6 +71,12 @@ class ExpedienteAsignacionMasiva(SchemaBase):
     id_usuario: int | None = None
 
 
+class ExpedienteBitacoraPreview(SchemaBase):
+    dia: int
+
+    imagen_base64: str
+
+
 class ExpedienteResumenEliminacion(SchemaBase):
     cobranzas: int
 

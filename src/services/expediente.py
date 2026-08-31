@@ -450,5 +450,3 @@ class ExpedienteService(BaseService):
             raise OperacionInvalida(
                 f"No se pudieron eliminar todos los expedientes: {'; '.join(errores)}."
             )
-
-        

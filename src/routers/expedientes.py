@@ -10,6 +10,7 @@ from src.models.usuario import Usuario
 from src.schemas.cobranza import CobranzaCreate, CobranzaRead
 from src.schemas.expediente import (
     ExpedienteAsignacionMasiva,
+    ExpedienteBitacoraPreview,
     ExpedienteGestionRead,
     ExpedienteRead,
     ExpedienteResumenEliminacion,
@@ -345,6 +346,55 @@ def generar_pdf_consolidacion(
         media_type="application/pdf",
         filename=ruta.name,
     )
+
+
+@router.post(
+    "/{id_expediente}/cierre/vista-previa",
+    response_model=list[ExpedienteBitacoraPreview],
+)
+def previsualizar_cierre_expediente(
+    id_expediente: int,
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(
+        requiere_rol(
+            "Administrador",
+            "Supervisor",
+            "Cobranza",
+        )
+    ),
+):
+    servicio = PDFCobranzaService(session)
+
+    return servicio.previsualizar_cierre(
+        id_expediente,
+        usuario_actual=usuario_actual,
+    )
+
+
+@router.post(
+    "/{id_expediente}/cierre/confirmar",
+    response_model=ExpedienteRead,
+)
+def confirmar_cierre_expediente(
+    id_expediente: int,
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(
+        requiere_rol(
+            "Administrador",
+            "Supervisor",
+            "Cobranza",
+        )
+    ),
+):
+    servicio = PDFCobranzaService(session)
+
+    servicio.cerrar_con_bitacoras(
+        id_expediente,
+        usuario_actual=usuario_actual,
+    )
+
+    return ExpedienteService(session).obtener_read(id_expediente)
+
 
 @router.patch(
     "/{id_expediente}/cerrar",
