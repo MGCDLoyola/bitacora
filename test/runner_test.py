@@ -24,7 +24,7 @@ def main():
     pg.conectar()
 
     auth = GraphAuth(
-        GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, verify_ssl=False
+        GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, verify_ssl=True
     )
 
     client = GraphClient(auth)

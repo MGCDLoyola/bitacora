@@ -59,7 +59,7 @@ def requiere_rol(*roles: str):
 def graph_client() -> GraphClient:
 
     auth = GraphAuth(
-        GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, verify_ssl=False
+        GRAPH_TENANT_ID, GRAPH_CLIENT_ID, GRAPH_CLIENT_SECRET, verify_ssl=True
     )
 
     return GraphClient(auth)

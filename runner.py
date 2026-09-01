@@ -61,7 +61,7 @@ def main() -> None:
         GRAPH_TENANT_ID,
         GRAPH_CLIENT_ID,
         GRAPH_CLIENT_SECRET,
-        verify_ssl=False,
+        verify_ssl=True,
     )
 
     client = GraphClient(auth)
