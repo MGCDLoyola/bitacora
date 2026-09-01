@@ -35,19 +35,13 @@ HORARIOS_GESTION = {
     3: 16,
 }
 
-SESION_DURACION_HORAS = int(
-    os.getenv("SESION_DURACION_HORAS", "8")
-)
+SESION_DURACION_HORAS = int(os.getenv("SESION_DURACION_HORAS", "8"))
 
-COOKIE_SECURE = (
-    os.getenv("COOKIE_SECURE", "false").lower() == "true"
-)
+COOKIE_SECURE = os.getenv("COOKIE_SECURE", "false").lower() == "true"
 
 NOMBRE_COOKIE_SESION = "id_sesion"
 
-RECUPERACION_DURACION_MINUTOS = int(
-    os.getenv("RECUPERACION_DURACION_MINUTOS", "15")
-)
+RECUPERACION_DURACION_MINUTOS = int(os.getenv("RECUPERACION_DURACION_MINUTOS", "15"))
 
 LOGIN_RATE_LIMIT = os.getenv(
     "LOGIN_RATE_LIMIT",

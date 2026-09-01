@@ -23,11 +23,20 @@ from src.services.usuario import UsuarioService
 
 
 class ExpedienteService(BaseService):
-    def listar(self) -> Sequence[Expediente]:
+    def listar(self) -> Sequence[ExpedienteRead]:
 
-        stmt = select(Expediente).order_by(Expediente.id)
+        stmt = (
+            select(Expediente)
+            .options(
+                joinedload(Expediente.cliente),
+                joinedload(Expediente.usuario),
+            )
+            .order_by(Expediente.id)
+        )
 
-        return self.session.execute(stmt).scalars().all()
+        expedientes = self.session.execute(stmt).unique().scalars().all()
+
+        return [self._a_read(expediente) for expediente in expedientes]
 
     def obtener(self, id_expediente: int) -> Expediente:
 
@@ -71,11 +80,19 @@ class ExpedienteService(BaseService):
 
         expediente, ultimo_comentario_cobranza = resultado
 
-        modo_gestion = self._obtener_gestion(expediente)
-
         comentarios = (
             ultimo_comentario_cobranza if expediente.estado else expediente.comentarios
         )
+
+        return self._a_read(expediente, comentarios=comentarios)
+
+    _SIN_COMENTARIOS = object()
+
+    def _a_read(
+        self,
+        expediente: Expediente,
+        comentarios=_SIN_COMENTARIOS,
+    ) -> ExpedienteRead:
 
         return ExpedienteRead(
             id=expediente.id,
@@ -88,8 +105,12 @@ class ExpedienteService(BaseService):
             usuario=(
                 expediente.usuario.nombre if expediente.usuario is not None else None
             ),
-            comentarios=comentarios,
-            modo_gestion=modo_gestion,
+            comentarios=(
+                expediente.comentarios
+                if comentarios is self._SIN_COMENTARIOS
+                else comentarios
+            ),
+            modo_gestion=self._obtener_gestion(expediente),
         )
 
     def _obtener_gestion(self, expediente: Expediente) -> str:
@@ -154,9 +175,12 @@ class ExpedienteService(BaseService):
         interlocutor: str | None = None,
         fecha_desde: date | None = None,
         fecha_hasta: date | None = None,
-    ) -> Sequence[Expediente]:
+    ) -> Sequence[ExpedienteRead]:
 
-        stmt = select(Expediente)
+        stmt = select(Expediente).options(
+            joinedload(Expediente.cliente),
+            joinedload(Expediente.usuario),
+        )
 
         if interlocutor is not None:
             stmt = stmt.where(Expediente.interlocutor == interlocutor)
@@ -169,7 +193,9 @@ class ExpedienteService(BaseService):
 
         stmt = stmt.order_by(Expediente.id)
 
-        return self.session.execute(stmt).scalars().all()
+        expedientes = self.session.execute(stmt).unique().scalars().all()
+
+        return [self._a_read(expediente) for expediente in expedientes]
 
     def actualizar(self, id_expediente: int, data: ExpedienteUpdate) -> Expediente:
 
@@ -224,15 +250,21 @@ class ExpedienteService(BaseService):
 
         self._commit()
 
-    def listar_por_asignado(self, id_usuario: int) -> Sequence[Expediente]:
+    def listar_por_asignado(self, id_usuario: int) -> Sequence[ExpedienteRead]:
 
         stmt = (
             select(Expediente)
+            .options(
+                joinedload(Expediente.cliente),
+                joinedload(Expediente.usuario),
+            )
             .where(Expediente.id_usuario == id_usuario)
             .order_by(Expediente.id)
         )
 
-        return self.session.execute(stmt).scalars().all()
+        expedientes = self.session.execute(stmt).unique().scalars().all()
+
+        return [self._a_read(expediente) for expediente in expedientes]
 
     def listar_gestiones_del_dia(
         self, id_usuario: int
