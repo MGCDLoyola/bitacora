@@ -52,9 +52,7 @@ async function cargar() {
 
         renderizar(agrupar(expedientes));
     } catch (error) {
-        mostrarError(
-            error.message || "No se pudieron cargar los expedientes."
-        );
+        mostrarError(error.message || "No se pudieron cargar los expedientes.");
     } finally {
         ocultarCarga();
     }

@@ -587,9 +587,8 @@ function deshabilitarConfirmarCierre(contenedor, deshabilitado) {
 }
 
 function mostrarErrorPrevia(contenedor, mensaje) {
-    contenedor.querySelector(
-        "#modal-cerrar-error-previa-texto"
-    ).textContent = mensaje;
+    contenedor.querySelector("#modal-cerrar-error-previa-texto").textContent =
+        mensaje;
 
     contenedor.querySelector("#modal-cerrar-error-previa").hidden = false;
 }
@@ -695,10 +694,7 @@ function crearTarjetaIntento(dia, orden) {
 
     const bloqueada =
         !realizada &&
-        (
-            !puedeGestionarExpediente() ||
-            calcularBloqueo(dia, orden)
-        );
+        (!puedeGestionarExpediente() || calcularBloqueo(dia, orden));
 
     const tarjeta = document.createElement("article");
 
