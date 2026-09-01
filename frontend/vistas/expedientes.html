@@ -1,0 +1,41 @@
+<section class="vista-expedientes">
+    <div class="vista-expedientes__encabezado">
+        <div>
+            <h2 class="vista-expedientes__titulo u-titulo">Expedientes</h2>
+
+            <p
+                class="vista-expedientes__descripcion u-subtitulo u-texto-terciario"
+            >
+                Historial completo de expedientes, abiertos y cerrados.
+            </p>
+        </div>
+    </div>
+
+    <div class="filtros-expedientes">
+        <input
+            id="filtro-expedientes"
+            type="search"
+            class="filtro-expedientes__input"
+            placeholder="Buscar por cliente, interlocutor o contrato..."
+            autocomplete="off"
+        />
+    </div>
+
+    <div id="estado-expedientes" class="estado-vista u-texto-terciario" hidden>
+        Cargando expedientes...
+    </div>
+
+    <div
+        id="mensaje-expedientes"
+        class="mensaje-error"
+        role="alert"
+        aria-live="polite"
+        hidden
+    >
+        <span class="mensaje-error__sello"> Error </span>
+
+        <span id="texto-mensaje-expedientes"></span>
+    </div>
+
+    <div id="lista-expedientes" class="lista-expedientes"></div>
+</section>

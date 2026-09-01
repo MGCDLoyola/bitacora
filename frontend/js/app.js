@@ -27,6 +27,10 @@ const navegacionPorRol = {
             texto: "Gestión de expedientes",
         },
         {
+            id: "expedientes",
+            texto: "Expedientes",
+        },
+        {
             id: "usuarios",
             texto: "Usuarios",
         },
@@ -36,6 +40,10 @@ const navegacionPorRol = {
         {
             id: "gestiones",
             texto: "Gestión de expedientes",
+        },
+        {
+            id: "expedientes",
+            texto: "Expedientes",
         },
         {
             id: "usuarios",
@@ -48,12 +56,20 @@ const navegacionPorRol = {
             id: "gestiones",
             texto: "Gestión de expedientes",
         },
+        {
+            id: "expedientes",
+            texto: "Expedientes",
+        },
     ],
 
     Visualizador: [
         {
             id: "gestiones",
             texto: "Gestión de expedientes",
+        },
+        {
+            id: "expedientes",
+            texto: "Expedientes",
         },
     ],
 };
@@ -66,6 +82,8 @@ const vistas = {
     gestiones: {},
     usuarios: {},
     expediente: {},
+    expedientes: {},
+    expediente_c: {},
     perfil: {},
 };
 
@@ -300,6 +318,12 @@ async function obtenerModuloVista(idVista) {
 
         case "expediente":
             return await import("./expediente.js");
+
+        case "expedientes":
+            return await import("./expedientes.js");
+
+        case "expediente_c":
+            return await import("./expediente_c.js");
 
         case "perfil":
             return await import("./perfil.js");
