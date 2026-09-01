@@ -249,7 +249,9 @@ function configurarAcciones(contenedor, expediente) {
     const modalCerrar = contenedor.querySelector("#modal-cerrar-expediente");
 
     const puedeCerrar =
-        puedeGestionarExpediente() && expediente.modo_gestion !== "cerrado";
+        puedeGestionarExpediente() &&
+        expediente.modo_gestion !== "cerrado" &&
+        expediente.modo_gestion !== "consolidacion";
 
     if (!puedeCerrar) {
         // El modal solo existe en el DOM cuando el usuario en
@@ -682,6 +684,11 @@ function renderizarIntentos(contenedor, dia) {
 
     contenido.innerHTML = "";
 
+    if (modoGestionExpediente === "consolidacion" && dia === 5) {
+        renderizarConsolidacion(contenedor);
+        return;
+    }
+
     for (let orden = 1; orden <= 3; orden++) {
         contenido.appendChild(crearTarjetaIntento(dia, orden));
     }
@@ -791,6 +798,222 @@ function crearTarjetaIntento(dia, orden) {
     }
 
     return tarjeta;
+}
+
+/* ─────────────────────────────────────────────
+   CONSOLIDACION
+   ───────────────────────────────────────────── */
+
+function renderizarConsolidacion(contenedor) {
+    const contenido = contenedor.querySelector(
+        "#expediente-dias-contenido"
+    );
+
+    contenido.innerHTML = plantillaConsolidacion();
+
+    inicializarConsolidacion(contenido);
+}
+
+function plantillaConsolidacion() {
+    return `
+        <div class="consolidacion">
+
+            <div class="consolidacion__modulo">
+
+                <span class="u-etiqueta u-texto-terciario">
+                    Estado de cuenta SAP
+                </span>
+
+                <div class="evidencia-modulo">
+
+                    <label class="zona-evidencias">
+
+                        <input
+                            type="file"
+                            class="zona-evidencias__input estado-cuenta-sap__input"
+                            hidden
+                            accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls"
+                        />
+
+                        <svg
+                            class="zona-evidencias__icono"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M10 3v10m0-10 4 4m-4-4-4 4M4 15v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1"
+                                stroke="currentColor"
+                                stroke-width="1.4"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+
+                        <span class="zona-evidencias__texto">
+                            Arrastra archivos aquí o haz clic para subir
+                        </span>
+
+                    </label>
+
+                    <ul
+                        class="lista-evidencias estado-cuenta-sap__lista"
+                    ></ul>
+
+                </div>
+
+            </div>
+
+            <div class="consolidacion__modulo">
+
+                <span class="u-etiqueta u-texto-terciario">
+                    Decisión de consolidación
+                </span>
+
+                <div
+                    class="resultado-contacto consolidacion__decisiones"
+                    role="radiogroup"
+                    aria-label="Decisión de consolidación"
+                >
+
+                    <div class="resultado-contacto__opciones">
+
+                        <button
+                            type="button"
+                            class="resultado-contacto__opcion"
+                            data-valor="Continuar gestión extrajudicial"
+                        >
+                            Continuar gestión extrajudicial
+                        </button>
+
+                        <button
+                            type="button"
+                            class="resultado-contacto__opcion"
+                            data-valor="Escalar a jurídico (formal)"
+                        >
+                            Escalar a jurídico (formal)
+                        </button>
+
+                        <button
+                            type="button"
+                            class="resultado-contacto__opcion"
+                            data-valor="Cierre por pago"
+                        >
+                            Cierre por pago
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="consolidacion__modulo">
+
+                <span class="u-etiqueta u-texto-terciario">
+                    Justificación/Fundamento
+                </span>
+
+                <div class="campo campo--intento">
+
+                    <textarea
+                        class="intento-form__comentarios consolidacion__justificacion"
+                        rows="5"
+                        placeholder="Escribe la justificación o fundamento de la decisión…"
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+            <div class="consolidacion__acciones">
+
+                <button
+                    type="button"
+                    class="boton boton--primario consolidacion__cerrar"
+                >
+                    Cerrar y firmar consolidación
+                </button>
+
+                <button
+                    type="button"
+                    class="boton-borrar consolidacion__borrar"
+                >
+                    Borrar todo
+                </button>
+
+            </div>
+
+        </div>
+    `;
+}
+
+function inicializarConsolidacion(contenido) {
+    const entradaEstadoCuenta = contenido.querySelector(
+        ".estado-cuenta-sap__input"
+    );
+
+    const listaEstadoCuenta = contenido.querySelector(
+        ".estado-cuenta-sap__lista"
+    );
+
+    const decisiones = contenido.querySelectorAll(
+        ".resultado-contacto__opcion"
+    );
+
+    entradaEstadoCuenta.addEventListener("change", () => {
+        const archivo = entradaEstadoCuenta.files?.[0];
+
+        listaEstadoCuenta.innerHTML = "";
+
+        if (!archivo) {
+            return;
+        }
+
+        const item = document.createElement("li");
+
+        item.className = "lista-evidencias__item";
+
+        item.innerHTML = `
+            <span class="lista-evidencias__nombre">
+                ${archivo.name}
+            </span>
+
+            <span class="lista-evidencias__peso">
+                ${formatearPeso(archivo.size)}
+            </span>
+
+            <button
+                type="button"
+                class="lista-evidencias__quitar"
+                aria-label="Quitar archivo"
+            >
+                ×
+            </button>
+        `;
+
+        const botonQuitar = item.querySelector(
+            ".lista-evidencias__quitar"
+        );
+
+        botonQuitar.addEventListener("click", () => {
+            entradaEstadoCuenta.value = "";
+            listaEstadoCuenta.innerHTML = "";
+        });
+
+        listaEstadoCuenta.appendChild(item);
+    });
+
+    decisiones.forEach((decision) => {
+        decision.addEventListener("click", () => {
+            decisiones.forEach((otraDecision) => {
+                otraDecision.classList.toggle(
+                    "resultado-contacto__opcion--activa",
+                    otraDecision === decision
+                );
+            });
+        });
+    });
 }
 
 /* ─────────────────────────────────────────────
@@ -1111,7 +1334,7 @@ function plantillaFormularioIntento() {
         <div class="evidencia-modulo">
 
           <span class="u-etiqueta u-texto-terciario">
-            Evidencia de contacto
+            Contacto
           </span>
 
           <label class="zona-evidencias">
