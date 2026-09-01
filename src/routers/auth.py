@@ -6,6 +6,8 @@ from src.core.config import (
     COOKIE_SECURE,
     LOGIN_RATE_LIMIT,
     NOMBRE_COOKIE_SESION,
+    RECUPERACION_CONFIRMAR_RATE_LIMIT,
+    RECUPERACION_RATE_LIMIT,
     SESION_DURACION_HORAS,
 )
 from src.core.database import get_session
@@ -22,6 +24,7 @@ from src.schemas.auth import (
 from src.schemas.usuario import UsuarioRead
 from src.services.auth import AuthService
 
+
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
@@ -34,7 +37,11 @@ def login(
     session: Session = Depends(get_session),
 ):
     servicio = AuthService(session)
-    usuario, sesion = servicio.login(data.correo, data.password)
+
+    usuario, sesion = servicio.login(
+        data.correo,
+        data.password,
+    )
 
     response.set_cookie(
         key=NOMBRE_COOKIE_SESION,
@@ -56,15 +63,21 @@ def cambiar_password(
     session: Session = Depends(get_session),
 ):
     servicio = AuthService(session)
+
     servicio.cambiar_password(
-        sesion.usuario, sesion, data.password_actual, data.password_nueva
+        sesion.usuario,
+        sesion,
+        data.password_actual,
+        data.password_nueva,
     )
 
     response.delete_cookie(NOMBRE_COOKIE_SESION)
 
 
 @router.post("/recuperar-pw", status_code=204)
+@limiter.limit(RECUPERACION_RATE_LIMIT)
 def recuperar_password(
+    request: Request,
     data: RecuperarPasswordRequest,
     session: Session = Depends(get_session),
     mail: Mail = Depends(mail),
@@ -80,7 +93,9 @@ def recuperar_password(
 
 
 @router.post("/recuperar-pw/confirmar", status_code=204)
+@limiter.limit(RECUPERACION_CONFIRMAR_RATE_LIMIT)
 def confirmar_recuperacion(
+    request: Request,
     data: ConfirmarRecuperacionRequest,
     session: Session = Depends(get_session),
 ):
@@ -107,6 +122,7 @@ def logout(
     session: Session = Depends(get_session),
 ):
     servicio = AuthService(session)
+
     servicio.logout(sesion)
 
     response.delete_cookie(NOMBRE_COOKIE_SESION)
