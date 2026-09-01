@@ -4,7 +4,7 @@ from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 from src.core.base import Base
-from src.core.config import DATABASE_URL
+from src.core.config import DATABASE_MIGRACIONES_URL
 from src.models import (
     Cliente,
     Cobranza,
@@ -18,7 +18,7 @@ from src.models import (
 )
 
 config = context.config
-config.set_main_option("sqlalchemy.url", DATABASE_URL)
+config.set_main_option("sqlalchemy.url", DATABASE_MIGRACIONES_URL)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
