@@ -307,7 +307,18 @@ class ExpedienteService(BaseService):
 
     def listar_gestiones_activas(self) -> Sequence[ExpedienteGestionRead]:
 
-        return self._listar_gestiones(Expediente.fecha_consolidacion.is_(None))
+        tiene_documento_consolidacion = exists(
+            select(Documento.id)
+            .join(TipoDocumento, Documento.id_tipo_documento == TipoDocumento.id)
+            .where(
+                Documento.id_expediente == Expediente.id,
+                TipoDocumento.nombre == "Consolidación",
+            )
+        )
+
+        return self._listar_gestiones(
+            ~tiene_documento_consolidacion,
+        )
 
     def contar_gestiones(self, id_usuario: int, rol: str) -> dict[str, int]:
 
@@ -349,7 +360,8 @@ class ExpedienteService(BaseService):
         )
 
         activos = select(func.count(Expediente.id)).where(
-            Expediente.estado.is_(True), Expediente.fecha_consolidacion.is_(None)
+            Expediente.estado.is_(True),
+            ~tiene_documento_consolidacion,
         )
 
         return {
