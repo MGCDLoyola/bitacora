@@ -81,3 +81,13 @@ class ExpedienteResumenEliminacion(SchemaBase):
     cobranzas: int
 
     documentos: int
+
+
+class ExpedienteConsolidacion(SchemaBase):
+    decision: Literal[
+        "Continuar gestión extrajudicial",
+        "Escalar a jurídico (formal)",
+        "Cierre por pago",
+    ]
+
+    justificacion: str

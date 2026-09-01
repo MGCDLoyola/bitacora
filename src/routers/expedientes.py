@@ -1,6 +1,6 @@
 from datetime import date
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.responses import FileResponse, Response
 from sqlalchemy.orm import Session
 
@@ -8,9 +8,11 @@ from src.core.database import get_session
 from src.core.deps import requiere_rol, usuario_actual
 from src.models.usuario import Usuario
 from src.schemas.cobranza import CobranzaCreate, CobranzaRead
+from src.schemas.documento import DocumentoRead
 from src.schemas.expediente import (
     ExpedienteAsignacionMasiva,
     ExpedienteBitacoraPreview,
+    ExpedienteConsolidacion,
     ExpedienteGestionRead,
     ExpedienteRead,
     ExpedienteResumenEliminacion,
@@ -329,6 +331,7 @@ def generar_pdf_cobranza(
 )
 def generar_pdf_consolidacion(
     id_expediente: int,
+    data: ExpedienteConsolidacion,
     session: Session = Depends(get_session),
     usuario_actual: Usuario = Depends(
         requiere_rol(
@@ -338,6 +341,14 @@ def generar_pdf_consolidacion(
         )
     ),
 ):
+    expediente_service = ExpedienteService(session)
+
+    expediente_service.guardar_consolidacion(
+        id_expediente=id_expediente,
+        decision=data.decision,
+        justificacion=data.justificacion,
+    )
+
     servicio = PDFConsolidacionService(session)
 
     ruta = servicio.generar(id_expediente)
@@ -346,6 +357,31 @@ def generar_pdf_consolidacion(
         path=ruta,
         media_type="application/pdf",
         filename=ruta.name,
+    )
+
+
+@router.post(
+    "/{id_expediente}/estado-cuenta",
+    response_model=DocumentoRead,
+)
+def subir_estado_cuenta(
+    id_expediente: int,
+    archivo: UploadFile = File(...),
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(
+        requiere_rol(
+            "Administrador",
+            "Supervisor",
+            "Cobranza",
+        )
+    ),
+):
+    servicio = DocumentoService(session)
+
+    return servicio.crear_estado_cuenta(
+        id_expediente=id_expediente,
+        id_usuario=usuario_actual.id,
+        archivo=archivo,
     )
 
 

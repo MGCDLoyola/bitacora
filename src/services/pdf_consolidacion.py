@@ -28,6 +28,12 @@ _entorno = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
 class PDFConsolidacionService(BaseService):
     NOMBRE_ARCHIVO = "Consolidación.pdf"
 
+    DECISIONES_VALIDAS = {
+        "Continuar gestión extrajudicial",
+        "Escalar a jurídico (formal)",
+        "Cierre por pago",
+    }
+
     def generar(self, id_expediente: int) -> Path:
 
         expediente = ExpedienteService(self.session).obtener(id_expediente)
@@ -38,6 +44,10 @@ class PDFConsolidacionService(BaseService):
 
         cobranzas = preconsolidacion["cobranzas"]
         documentos_edc = preconsolidacion["documentos_edc"]
+
+        decision, justificacion = self._obtener_decision_y_justificacion(
+            expediente.comentarios
+        )
 
         cliente = expediente.cliente
         responsable = expediente.usuario
@@ -92,7 +102,9 @@ class PDFConsolidacionService(BaseService):
                     "intentos": [
                         {
                             "orden": intento.orden,
-                            "horario_programado": f"{HORARIOS_GESTION[intento.orden]:02d}:00",
+                            "horario_programado": (
+                                f"{HORARIOS_GESTION[intento.orden]:02d}:00"
+                            ),
                             "hora": intento.fecha.strftime("%H:%M"),
                             "medio": intento.medio,
                             "contacto": intento.contacto,
@@ -118,6 +130,8 @@ class PDFConsolidacionService(BaseService):
             "cliente": cliente,
             "responsable": responsable,
             "comentarios_expediente": expediente.comentarios,
+            "decision": decision,
+            "justificacion": justificacion,
             "firma_base64": firma_base64,
             "logo_base64": imagen_base64(LOGO_PATH),
             "dias": dias,
@@ -174,3 +188,33 @@ class PDFConsolidacionService(BaseService):
             raise
 
         return ruta
+
+    def _obtener_decision_y_justificacion(
+        self,
+        comentarios: str | None,
+    ) -> tuple[str, str]:
+
+        if not comentarios or not comentarios.strip():
+            raise ConflictoNegocio(
+                "Debes seleccionar una decisión y proporcionar la "
+                "justificación antes de generar la consolidación."
+            )
+
+        contenido = comentarios.strip()
+
+        for decision in self.DECISIONES_VALIDAS:
+            prefijo = f"{decision}:"
+
+            if contenido.startswith(prefijo):
+                justificacion = contenido[len(prefijo) :].strip()
+
+                if not justificacion:
+                    raise ConflictoNegocio(
+                        "Debes proporcionar la justificación de la decisión."
+                    )
+
+                return decision, justificacion
+
+        raise ConflictoNegocio(
+            "El expediente no tiene una decisión de consolidación válida."
+        )

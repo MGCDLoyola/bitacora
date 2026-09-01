@@ -72,6 +72,41 @@ class DocumentoService(BaseService):
 
         return documento
 
+    def crear_estado_cuenta(
+        self,
+        id_expediente: int,
+        id_usuario: int,
+        archivo: UploadFile,
+    ) -> Documento:
+
+        expediente = ExpedienteService(self.session).obtener(id_expediente)
+
+        if not expediente.estado:
+            raise ConflictoNegocio(
+                "No se puede subir un Estado de Cuenta SAP a un expediente cerrado."
+            )
+
+        if expediente.fecha_consolidacion is None:
+            raise ConflictoNegocio(
+                "El expediente todavía no se encuentra en etapa de consolidación."
+            )
+
+        tipo_documento = self.session.scalar(
+            select(TipoDocumento).where(TipoDocumento.nombre == "Estado de Cuenta SAP")
+        )
+
+        if tipo_documento is None:
+            raise ConflictoNegocio(
+                "No existe el tipo de documento 'Estado de Cuenta SAP'."
+            )
+
+        return self.crear(
+            id_expediente=id_expediente,
+            id_usuario=id_usuario,
+            id_tipo_documento=tipo_documento.id,
+            archivo=archivo,
+        )
+
     def eliminar(self, id_documento: int) -> None:
 
         documento = self.obtener(id_documento)

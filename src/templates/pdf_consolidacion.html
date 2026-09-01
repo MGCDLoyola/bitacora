@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="es">
     <head>
         <meta charset="UTF-8" />
@@ -354,8 +355,8 @@
             .card-comentarios .texto {
                 font-size: 10.5px;
                 color: #444b54;
-                font-style: italic;
                 line-height: 1.6;
+                white-space: pre-wrap;
             }
 
             .pie {
@@ -421,7 +422,7 @@
         <div class="titulo-bloque">
             <h1>Consolidación de Expediente</h1>
 
-            <span class="badge-dia"> Cierre de gestión </span>
+            <span class="badge-dia">Consolidación</span>
         </div>
 
         <div class="seccion-label">Datos generales</div>
@@ -445,6 +446,7 @@
                         <div class="valor">{{ fecha_registro }}</div>
                     </div>
                 </td>
+
                 <td class="col-der">
                     <div class="dato-card">
                         <div class="etiqueta">Responsable de cobranza</div>
@@ -460,12 +462,13 @@
 
         <div class="dia-bloque">
             <div class="dia-header">
-                <span class="titulo"
-                    >Día {{ dia.dia }} &middot; {{ dia.fecha_dia }}</span
-                >
-                <span class="badge-dia"
-                    >Monto vencido: {{ dia.monto_vencido or "N/D" }}</span
-                >
+                <span class="titulo">
+                    Día {{ dia.dia }} &middot; {{ dia.fecha_dia }}
+                </span>
+
+                <span class="badge-dia">
+                    Monto vencido: {{ dia.monto_vencido or "N/D" }}
+                </span>
             </div>
 
             {% for intento in dia.intentos %}
@@ -587,11 +590,12 @@
 
         {% endif %}
 
-        <div class="seccion-label">Conclusión y siguiente acción</div>
+        <div class="seccion-label">Decisión y fundamentos de la gestión</div>
 
         <div class="card-comentarios">
             <div class="texto">
-                {{ comentarios_expediente or "Sin comentarios registrados." }}
+                {{ comentarios_expediente or "Sin decisión ni fundamentos
+                registrados." }}
             </div>
         </div>
 

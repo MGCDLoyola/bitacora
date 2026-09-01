@@ -210,6 +210,41 @@ class ExpedienteService(BaseService):
 
         return expediente
 
+    def guardar_consolidacion(
+        self,
+        id_expediente: int,
+        decision: str,
+        justificacion: str,
+    ) -> Expediente:
+
+        expediente = self.obtener(id_expediente)
+
+        if expediente.id_usuario is None:
+            raise OperacionInvalida(
+                "No se puede consolidar un expediente que no tiene responsable asignado."
+            )
+
+        if not expediente.estado:
+            raise OperacionInvalida("No se puede consolidar un expediente cerrado.")
+
+        if expediente.fecha_consolidacion is None:
+            raise OperacionInvalida(
+                "El expediente todavía no se encuentra en etapa de consolidación."
+            )
+
+        justificacion = justificacion.strip()
+
+        if not justificacion:
+            raise OperacionInvalida(
+                "Debes proporcionar una justificación para la consolidación."
+            )
+
+        expediente.comentarios = f"{decision}:\n\n{justificacion}"
+
+        self._guardar(expediente)
+
+        return expediente
+
     def cerrar(
         self,
         id_expediente: int,
