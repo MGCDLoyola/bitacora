@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from src.core.database import SessionLocal
 from src.models.rol import Rol
 
+
 def seed_roles(session: Session) -> None:
     roles = [
         {
@@ -24,16 +25,13 @@ def seed_roles(session: Session) -> None:
     ]
 
     for datos in roles:
-        existe = (
-            session.query(Rol)
-            .filter_by(nombre=datos["nombre"])
-            .first()
-        )
+        existe = session.query(Rol).filter_by(nombre=datos["nombre"]).first()
 
         if existe is None:
             session.add(Rol(**datos))
 
     session.commit()
+
 
 def main() -> None:
     session = SessionLocal()
@@ -42,6 +40,7 @@ def main() -> None:
         seed_roles(session)
     finally:
         session.close()
+
 
 if __name__ == "__main__":
     main()
