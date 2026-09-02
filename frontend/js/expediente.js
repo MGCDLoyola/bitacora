@@ -158,7 +158,7 @@ async function confirmarCierreExpediente(idExpediente) {
 
 async function subirEstadoCuentaSAP(idExpediente, archivo) {
     const formData = new FormData();
-    formData.append('archivo', archivo);
+    formData.append("archivo", archivo);
 
     const respuesta = await fetch(
         `/expedientes/${idExpediente}/estado-cuenta`,
@@ -178,7 +178,11 @@ async function subirEstadoCuentaSAP(idExpediente, archivo) {
     return await respuesta.json();
 }
 
-async function obtenerVistaPreviaConsolidacion(idExpediente, decision, justificacion) {
+async function obtenerVistaPreviaConsolidacion(
+    idExpediente,
+    decision,
+    justificacion
+) {
     const respuesta = await fetch(
         `/expedientes/${idExpediente}/consolidacion/vista-previa`,
         {
@@ -200,7 +204,11 @@ async function obtenerVistaPreviaConsolidacion(idExpediente, decision, justifica
     return await respuesta.json();
 }
 
-async function confirmarConsolidacionExpediente(idExpediente, decision, justificacion) {
+async function confirmarConsolidacionExpediente(
+    idExpediente,
+    decision,
+    justificacion
+) {
     const respuesta = await fetch(
         `/expedientes/${idExpediente}/consolidacion/confirmar`,
         {
@@ -720,7 +728,12 @@ function configurarModalConsolidacion(contenedor) {
     });
 }
 
-function abrirModalConsolidacion(contenedor, decision, justificacion, archivoSAP) {
+function abrirModalConsolidacion(
+    contenedor,
+    decision,
+    justificacion,
+    archivoSAP
+) {
     decisionConsolidacionPendiente = decision;
     justificacionConsolidacionPendiente = justificacion;
     archivoSAPPendiente = archivoSAP;
@@ -818,7 +831,7 @@ async function confirmarConsolidacion(contenedor) {
         cerrarModalConsolidacion(contenedor);
 
         mostrarConsolidacionConfirmada(contenedor);
-        
+
         archivoSAPPendiente = null;
     } catch (error) {
         mostrarErrorConfirmarConsolidacion(
@@ -856,8 +869,7 @@ function mostrarCargaPreviaConsolidacion(contenedor) {
 }
 
 function ocultarCargaPreviaConsolidacion(contenedor) {
-    contenedor.querySelector("#modal-consolidacion-carga-previa").hidden =
-        true;
+    contenedor.querySelector("#modal-consolidacion-carga-previa").hidden = true;
 }
 
 function mostrarVisorConsolidacion(contenedor) {
@@ -883,8 +895,7 @@ function mostrarErrorPreviaConsolidacion(contenedor, mensaje) {
 }
 
 function ocultarErrorPreviaConsolidacion(contenedor) {
-    contenedor.querySelector("#modal-consolidacion-error-previa").hidden =
-        true;
+    contenedor.querySelector("#modal-consolidacion-error-previa").hidden = true;
 }
 
 function mostrarErrorConfirmarConsolidacion(contenedor, mensaje) {
@@ -1095,9 +1106,7 @@ function crearTarjetaIntento(dia, orden) {
    ───────────────────────────────────────────── */
 
 function renderizarConsolidacion(contenedor) {
-    const contenido = contenedor.querySelector(
-        "#expediente-dias-contenido"
-    );
+    const contenido = contenedor.querySelector("#expediente-dias-contenido");
 
     contenido.innerHTML = plantillaConsolidacion();
 
@@ -1299,9 +1308,7 @@ function inicializarConsolidacion(contenedor, contenido) {
             </button>
         `;
 
-        const botonQuitar = item.querySelector(
-            ".lista-evidencias__quitar"
-        );
+        const botonQuitar = item.querySelector(".lista-evidencias__quitar");
 
         botonQuitar.addEventListener("click", () => {
             entradaEstadoCuenta.value = "";
@@ -1327,9 +1334,7 @@ function inicializarConsolidacion(contenedor, contenido) {
         ".consolidacion__justificacion"
     );
 
-    const errorConsolidacion = contenido.querySelector(
-        ".consolidacion__error"
-    );
+    const errorConsolidacion = contenido.querySelector(".consolidacion__error");
 
     const errorConsolidacionTexto = contenido.querySelector(
         ".consolidacion__error-texto"
