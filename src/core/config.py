@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+HOST_RUN = os.environ["HOST_RUN"]
+
 DATABASE_URL = os.environ["DATABASE_URL"]
 DATABASE_MIGRACIONES_URL = os.environ["DATABASE_MIGRACIONES_URL"]
 

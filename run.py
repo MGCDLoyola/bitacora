@@ -1,8 +1,9 @@
 import uvicorn
+from src.core.config import HOST_RUN
 
 if __name__ == "__main__":
     uvicorn.run(
         "src.main:app",
-        host="127.0.0.1",
+        host=HOST_RUN,
         port=5000,
     )
