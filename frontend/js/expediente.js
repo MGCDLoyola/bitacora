@@ -11,6 +11,11 @@ let cobranzasExpediente = [];
 let bitacorasCierre = [];
 let indiceBitacoraCierre = 0;
 
+let decisionConsolidacionPendiente = null;
+let justificacionConsolidacionPendiente = null;
+let pdfPreviaConsolidacion = null;
+let archivoSAPPendiente = null;
+
 const HORA_INTENTO = {
     1: 9,
     2: 13,
@@ -151,6 +156,72 @@ async function confirmarCierreExpediente(idExpediente) {
     return await respuesta.json();
 }
 
+async function subirEstadoCuentaSAP(idExpediente, archivo) {
+    const formData = new FormData();
+    formData.append('archivo', archivo);
+
+    const respuesta = await fetch(
+        `/expedientes/${idExpediente}/estado-cuenta`,
+        {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+        }
+    );
+
+    if (!respuesta.ok) {
+        const error = new Error(await mensajeDeError(respuesta));
+        error.status = respuesta.status;
+        throw error;
+    }
+
+    return await respuesta.json();
+}
+
+async function obtenerVistaPreviaConsolidacion(idExpediente, decision, justificacion) {
+    const respuesta = await fetch(
+        `/expedientes/${idExpediente}/consolidacion/vista-previa`,
+        {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ decision, justificacion }),
+        }
+    );
+
+    if (!respuesta.ok) {
+        const error = new Error(await mensajeDeError(respuesta));
+
+        error.status = respuesta.status;
+
+        throw error;
+    }
+
+    return await respuesta.json();
+}
+
+async function confirmarConsolidacionExpediente(idExpediente, decision, justificacion) {
+    const respuesta = await fetch(
+        `/expedientes/${idExpediente}/consolidacion/confirmar`,
+        {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ decision, justificacion }),
+        }
+    );
+
+    if (!respuesta.ok) {
+        const error = new Error(await mensajeDeError(respuesta));
+
+        error.status = respuesta.status;
+
+        throw error;
+    }
+
+    return await respuesta.json();
+}
+
 async function descargarBitacorasZip(idExpediente) {
     const respuesta = await fetch(
         `/expedientes/${idExpediente}/bitacoras/zip`,
@@ -254,20 +325,18 @@ function configurarAcciones(contenedor, expediente) {
         expediente.modo_gestion !== "consolidacion";
 
     if (!puedeCerrar) {
-        // El modal solo existe en el DOM cuando el usuario en
-        // sesión es el asignado al expediente (y este sigue abierto).
         modalCerrar.remove();
+    } else {
+        botonCerrarExpediente.hidden = false;
 
-        return;
+        botonCerrarExpediente.addEventListener("click", () => {
+            abrirModalCerrar(contenedor);
+        });
+
+        configurarModalCerrar(contenedor);
     }
 
-    botonCerrarExpediente.hidden = false;
-
-    botonCerrarExpediente.addEventListener("click", () => {
-        abrirModalCerrar(contenedor);
-    });
-
-    configurarModalCerrar(contenedor);
+    configurarModalConsolidacion(contenedor);
 }
 
 async function descargarBitacoras(contenedor) {
@@ -612,6 +681,227 @@ function ocultarErrorConfirmar(contenedor) {
 }
 
 /* ─────────────────────────────────────────────
+   MODAL: CERRAR Y FIRMAR CONSOLIDACIÓN
+   ───────────────────────────────────────────── */
+
+function configurarModalConsolidacion(contenedor) {
+    const modal = contenedor.querySelector("#modal-consolidacion-expediente");
+
+    const botonIrAPerfil = contenedor.querySelector(
+        "#boton-ir-a-perfil-consolidacion"
+    );
+
+    const botonConfirmar = contenedor.querySelector(
+        "#boton-confirmar-consolidacion"
+    );
+
+    const botonReintentarPrevia = contenedor.querySelector(
+        "#boton-reintentar-vista-previa-consolidacion"
+    );
+
+    modal
+        .querySelectorAll("[data-cerrar-modal-consolidacion]")
+        .forEach((elemento) => {
+            elemento.addEventListener("click", () => {
+                cerrarModalConsolidacion(contenedor);
+            });
+        });
+
+    botonIrAPerfil.addEventListener("click", () => {
+        window.navegar("perfil");
+    });
+
+    botonReintentarPrevia.addEventListener("click", () => {
+        cargarVistaPreviaConsolidacion(contenedor);
+    });
+
+    botonConfirmar.addEventListener("click", () => {
+        confirmarConsolidacion(contenedor);
+    });
+}
+
+function abrirModalConsolidacion(contenedor, decision, justificacion, archivoSAP) {
+    decisionConsolidacionPendiente = decision;
+    justificacionConsolidacionPendiente = justificacion;
+    archivoSAPPendiente = archivoSAP;
+
+    const modal = contenedor.querySelector("#modal-consolidacion-expediente");
+
+    const bloqueSinFirma = contenedor.querySelector(
+        "#modal-consolidacion-sin-firma"
+    );
+
+    const bloqueConFirma = contenedor.querySelector(
+        "#modal-consolidacion-con-firma"
+    );
+
+    const tieneFirma = Boolean(usuarioSesion.firma);
+
+    bloqueSinFirma.hidden = tieneFirma;
+    bloqueConFirma.hidden = !tieneFirma;
+
+    modal.hidden = false;
+
+    if (!tieneFirma) {
+        contenedor.querySelector("#boton-ir-a-perfil-consolidacion").focus();
+
+        return;
+    }
+
+    ocultarErrorConfirmarConsolidacion(contenedor);
+
+    cargarVistaPreviaConsolidacion(contenedor);
+
+    contenedor.querySelector("#boton-confirmar-consolidacion").focus();
+}
+
+function cerrarModalConsolidacion(contenedor) {
+    contenedor.querySelector("#modal-consolidacion-expediente").hidden = true;
+}
+
+async function cargarVistaPreviaConsolidacion(contenedor) {
+    ocultarErrorPreviaConsolidacion(contenedor);
+    ocultarVisorConsolidacion(contenedor);
+
+    deshabilitarConfirmarConsolidacion(contenedor, true);
+
+    mostrarCargaPreviaConsolidacion(contenedor);
+
+    try {
+        const resultado = await obtenerVistaPreviaConsolidacion(
+            idExpedienteActual,
+            decisionConsolidacionPendiente,
+            justificacionConsolidacionPendiente
+        );
+
+        pdfPreviaConsolidacion = resultado.pdf_base64;
+
+        contenedor.querySelector("#consolidacion-preview-pdf").src =
+            pdfPreviaConsolidacion;
+
+        mostrarVisorConsolidacion(contenedor);
+
+        deshabilitarConfirmarConsolidacion(contenedor, false);
+    } catch (error) {
+        mostrarErrorPreviaConsolidacion(
+            contenedor,
+            error.message || "No se pudo generar la vista previa."
+        );
+    } finally {
+        ocultarCargaPreviaConsolidacion(contenedor);
+    }
+}
+
+async function confirmarConsolidacion(contenedor) {
+    const boton = contenedor.querySelector("#boton-confirmar-consolidacion");
+
+    const textoOriginal = boton.textContent;
+
+    ocultarErrorConfirmarConsolidacion(contenedor);
+
+    boton.disabled = true;
+    boton.textContent = "Guardando...";
+
+    try {
+        // PASO 1: Subir el archivo SAP
+        if (archivoSAPPendiente) {
+            await subirEstadoCuentaSAP(idExpedienteActual, archivoSAPPendiente);
+        }
+
+        // PASO 2: Confirmar la consolidación
+        await confirmarConsolidacionExpediente(
+            idExpedienteActual,
+            decisionConsolidacionPendiente,
+            justificacionConsolidacionPendiente
+        );
+
+        cerrarModalConsolidacion(contenedor);
+
+        mostrarConsolidacionConfirmada(contenedor);
+        
+        archivoSAPPendiente = null;
+    } catch (error) {
+        mostrarErrorConfirmarConsolidacion(
+            contenedor,
+            error.message || "No se pudo confirmar la consolidación."
+        );
+    } finally {
+        boton.disabled = false;
+        boton.textContent = textoOriginal;
+    }
+}
+
+function mostrarConsolidacionConfirmada(contenedor) {
+    const contenido = contenedor.querySelector("#expediente-dias-contenido");
+
+    contenido.innerHTML = `
+        <div class="consolidacion">
+            <div class="consolidacion__modulo">
+                <span class="u-etiqueta u-texto-terciario">
+                    Consolidación generada
+                </span>
+
+                <p class="u-cuerpo u-texto-secundario">
+                    La consolidación se guardó correctamente. El expediente
+                    permanece abierto hasta que se procese en el runner.
+                </p>
+            </div>
+        </div>
+    `;
+}
+
+function mostrarCargaPreviaConsolidacion(contenedor) {
+    contenedor.querySelector("#modal-consolidacion-carga-previa").hidden =
+        false;
+}
+
+function ocultarCargaPreviaConsolidacion(contenedor) {
+    contenedor.querySelector("#modal-consolidacion-carga-previa").hidden =
+        true;
+}
+
+function mostrarVisorConsolidacion(contenedor) {
+    contenedor.querySelector("#modal-consolidacion-visor").hidden = false;
+}
+
+function ocultarVisorConsolidacion(contenedor) {
+    contenedor.querySelector("#modal-consolidacion-visor").hidden = true;
+}
+
+function deshabilitarConfirmarConsolidacion(contenedor, deshabilitado) {
+    contenedor.querySelector("#boton-confirmar-consolidacion").disabled =
+        deshabilitado;
+}
+
+function mostrarErrorPreviaConsolidacion(contenedor, mensaje) {
+    contenedor.querySelector(
+        "#modal-consolidacion-error-previa-texto"
+    ).textContent = mensaje;
+
+    contenedor.querySelector("#modal-consolidacion-error-previa").hidden =
+        false;
+}
+
+function ocultarErrorPreviaConsolidacion(contenedor) {
+    contenedor.querySelector("#modal-consolidacion-error-previa").hidden =
+        true;
+}
+
+function mostrarErrorConfirmarConsolidacion(contenedor, mensaje) {
+    contenedor.querySelector(
+        "#modal-consolidacion-error-confirmar-texto"
+    ).textContent = mensaje;
+
+    contenedor.querySelector("#modal-consolidacion-error-confirmar").hidden =
+        false;
+}
+
+function ocultarErrorConfirmarConsolidacion(contenedor) {
+    contenedor.querySelector("#modal-consolidacion-error-confirmar").hidden =
+        true;
+}
+
+/* ─────────────────────────────────────────────
    DÍAS DE GESTIÓN
    ───────────────────────────────────────────── */
 
@@ -811,7 +1101,7 @@ function renderizarConsolidacion(contenedor) {
 
     contenido.innerHTML = plantillaConsolidacion();
 
-    inicializarConsolidacion(contenido);
+    inicializarConsolidacion(contenedor, contenido);
 }
 
 function plantillaConsolidacion() {
@@ -926,6 +1216,17 @@ function plantillaConsolidacion() {
 
             </div>
 
+            <div
+                class="mensaje-error consolidacion__error"
+                role="alert"
+                aria-live="polite"
+                hidden
+            >
+                <span class="mensaje-error__sello"> Error </span>
+
+                <span class="consolidacion__error-texto"></span>
+            </div>
+
             <div class="consolidacion__acciones">
 
                 <button
@@ -948,7 +1249,7 @@ function plantillaConsolidacion() {
     `;
 }
 
-function inicializarConsolidacion(contenido) {
+function inicializarConsolidacion(contenedor, contenido) {
     const entradaEstadoCuenta = contenido.querySelector(
         ".estado-cuenta-sap__input"
     );
@@ -961,8 +1262,12 @@ function inicializarConsolidacion(contenido) {
         ".resultado-contacto__opcion"
     );
 
+    let archivoSAP = null;
+
     entradaEstadoCuenta.addEventListener("change", () => {
         const archivo = entradaEstadoCuenta.files?.[0];
+
+        archivoSAP = archivo || null;
 
         listaEstadoCuenta.innerHTML = "";
 
@@ -983,6 +1288,8 @@ function inicializarConsolidacion(contenido) {
                 ${formatearPeso(archivo.size)}
             </span>
 
+            <span class="lista-evidencias__estado">Seleccionado</span>
+
             <button
                 type="button"
                 class="lista-evidencias__quitar"
@@ -999,6 +1306,7 @@ function inicializarConsolidacion(contenido) {
         botonQuitar.addEventListener("click", () => {
             entradaEstadoCuenta.value = "";
             listaEstadoCuenta.innerHTML = "";
+            archivoSAP = null;
         });
 
         listaEstadoCuenta.appendChild(item);
@@ -1013,6 +1321,84 @@ function inicializarConsolidacion(contenido) {
                 );
             });
         });
+    });
+
+    const justificacion = contenido.querySelector(
+        ".consolidacion__justificacion"
+    );
+
+    const errorConsolidacion = contenido.querySelector(
+        ".consolidacion__error"
+    );
+
+    const errorConsolidacionTexto = contenido.querySelector(
+        ".consolidacion__error-texto"
+    );
+
+    const botonCerrarConsolidacion = contenido.querySelector(
+        ".consolidacion__cerrar"
+    );
+
+    botonCerrarConsolidacion.addEventListener("click", () => {
+        const decisionActiva = contenido.querySelector(
+            ".resultado-contacto__opcion--activa"
+        );
+
+        if (!decisionActiva) {
+            errorConsolidacionTexto.textContent =
+                "Selecciona una decisión de consolidación.";
+
+            errorConsolidacion.hidden = false;
+
+            return;
+        }
+
+        const textoJustificacion = justificacion.value.trim();
+
+        if (!textoJustificacion) {
+            errorConsolidacionTexto.textContent =
+                "Escribe la justificación de la decisión.";
+
+            errorConsolidacion.hidden = false;
+
+            return;
+        }
+
+        if (!archivoSAP) {
+            errorConsolidacionTexto.textContent =
+                "Selecciona el estado de cuenta SAP.";
+
+            errorConsolidacion.hidden = false;
+
+            return;
+        }
+
+        errorConsolidacion.hidden = true;
+
+        abrirModalConsolidacion(
+            contenedor,
+            decisionActiva.dataset.valor,
+            textoJustificacion,
+            archivoSAP
+        );
+    });
+
+    const botonBorrarConsolidacion = contenido.querySelector(
+        ".consolidacion__borrar"
+    );
+
+    botonBorrarConsolidacion.addEventListener("click", () => {
+        entradaEstadoCuenta.value = "";
+        listaEstadoCuenta.innerHTML = "";
+        archivoSAP = null;
+
+        decisiones.forEach((decision) => {
+            decision.classList.remove("resultado-contacto__opcion--activa");
+        });
+
+        justificacion.value = "";
+
+        errorConsolidacion.hidden = true;
     });
 }
 
@@ -1959,35 +2345,18 @@ function marcarIntentoRealizado(tarjeta) {
    ───────────────────────────────────────────── */
 
 function calcularBloqueo(dia, orden) {
-    /*
-     * Días anteriores:
-     * los intentos están disponibles para consulta.
-     */
     if (dia < diaActualExpediente) {
         return false;
     }
 
-    /*
-     * Días futuros:
-     * completamente bloqueados.
-     */
     if (dia > diaActualExpediente) {
         return true;
     }
 
-    /*
-     * El bloqueo por hora solamente aplica
-     * a la gestión del día.
-     */
     if (modoGestionExpediente !== "del_dia") {
         return false;
     }
 
-    /*
-     * Día actual de gestión:
-     * cada intento se habilita a partir
-     * de su hora correspondiente.
-     */
     return new Date().getHours() < HORA_INTENTO[orden];
 }
 

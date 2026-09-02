@@ -11,9 +11,11 @@ from src.core.almacenamiento import (
 from src.core.config import HORARIOS_GESTION
 from src.core.exceptions import ConflictoNegocio
 from src.core.monto import obtener_monto_vencido
-from src.core.pdf import imagen_base64, renderizar_pdf
+from src.core.pdf import codificar_base64, imagen_base64, renderizar_pdf
 from src.models.documento import Documento
+from src.models.expediente import Expediente
 from src.models.tipo_documento import TipoDocumento
+from src.models.usuario import Usuario
 from src.services.base import BaseService
 from src.services.consolidacion import ConsolidacionService
 from src.services.expediente import ExpedienteService
@@ -28,13 +30,84 @@ _entorno = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
 class PDFConsolidacionService(BaseService):
     NOMBRE_ARCHIVO = "Consolidación.pdf"
 
-    DECISIONES_VALIDAS = {
-        "Continuar gestión extrajudicial",
-        "Escalar a jurídico (formal)",
-        "Cierre por pago",
-    }
+    def previsualizar(
+        self,
+        id_expediente: int,
+        decision: str,
+        justificacion: str,
+    ) -> str:
 
-    def generar(self, id_expediente: int) -> Path:
+        _, _, html = self._construir_html(id_expediente, decision, justificacion)
+
+        pdf_bytes = renderizar_pdf(html)
+
+        return codificar_base64(pdf_bytes, mime="application/pdf")
+
+    def confirmar(
+        self,
+        id_expediente: int,
+        decision: str,
+        justificacion: str,
+    ) -> Documento:
+
+        ExpedienteService(self.session).guardar_consolidacion(
+            id_expediente=id_expediente,
+            decision=decision,
+            justificacion=justificacion,
+        )
+
+        expediente, responsable, html = self._construir_html(
+            id_expediente, decision, justificacion
+        )
+
+        cliente = expediente.cliente
+
+        pdf_bytes = renderizar_pdf(html)
+
+        crear_carpeta_consolidacion(cliente, expediente)
+
+        carpeta = carpeta_consolidacion(cliente, expediente)
+
+        ruta = carpeta / self.NOMBRE_ARCHIVO
+
+        ruta.write_bytes(pdf_bytes)
+
+        tipo_documento = self.session.scalar(
+            select(TipoDocumento).where(TipoDocumento.nombre == "Consolidación")
+        )
+
+        if tipo_documento is None:
+            if ruta.exists():
+                ruta.unlink()
+
+            raise ConflictoNegocio("No existe el tipo de documento 'Consolidación'.")
+
+        documento = Documento(
+            id_expediente=expediente.id,
+            id_usuario=responsable.id,
+            id_tipo_documento=tipo_documento.id,
+            uuid_archivo=uuid.uuid4(),
+            nombre_original=self.NOMBRE_ARCHIVO,
+            ruta_archivo=str(ruta),
+        )
+
+        self.session.add(documento)
+
+        try:
+            self._commit()
+        except Exception:
+            if ruta.exists():
+                ruta.unlink()
+            raise
+
+        return documento
+
+    def _construir_html(
+        self,
+        id_expediente: int,
+        decision: str,
+        justificacion: str,
+    ) -> tuple[Expediente, Usuario, str]:
 
         expediente = ExpedienteService(self.session).obtener(id_expediente)
 
@@ -44,10 +117,6 @@ class PDFConsolidacionService(BaseService):
 
         cobranzas = preconsolidacion["cobranzas"]
         documentos_edc = preconsolidacion["documentos_edc"]
-
-        decision, justificacion = self._obtener_decision_y_justificacion(
-            expediente.comentarios
-        )
 
         cliente = expediente.cliente
         responsable = expediente.usuario
@@ -149,72 +218,4 @@ class PDFConsolidacionService(BaseService):
 
         html = plantilla.render(**contexto)
 
-        pdf_bytes = renderizar_pdf(html)
-
-        crear_carpeta_consolidacion(cliente, expediente)
-
-        carpeta = carpeta_consolidacion(cliente, expediente)
-
-        ruta = carpeta / self.NOMBRE_ARCHIVO
-
-        ruta.write_bytes(pdf_bytes)
-
-        tipo_documento = self.session.scalar(
-            select(TipoDocumento).where(TipoDocumento.nombre == "Consolidación")
-        )
-
-        if tipo_documento is None:
-            if ruta.exists():
-                ruta.unlink()
-
-            raise ConflictoNegocio("No existe el tipo de documento 'Consolidación'.")
-
-        documento = Documento(
-            id_expediente=expediente.id,
-            id_usuario=responsable.id,
-            id_tipo_documento=tipo_documento.id,
-            uuid_archivo=uuid.uuid4(),
-            nombre_original=self.NOMBRE_ARCHIVO,
-            ruta_archivo=str(ruta),
-        )
-
-        self.session.add(documento)
-
-        try:
-            self._commit()
-        except Exception:
-            if ruta.exists():
-                ruta.unlink()
-            raise
-
-        return ruta
-
-    def _obtener_decision_y_justificacion(
-        self,
-        comentarios: str | None,
-    ) -> tuple[str, str]:
-
-        if not comentarios or not comentarios.strip():
-            raise ConflictoNegocio(
-                "Debes seleccionar una decisión y proporcionar la "
-                "justificación antes de generar la consolidación."
-            )
-
-        contenido = comentarios.strip()
-
-        for decision in self.DECISIONES_VALIDAS:
-            prefijo = f"{decision}:"
-
-            if contenido.startswith(prefijo):
-                justificacion = contenido[len(prefijo) :].strip()
-
-                if not justificacion:
-                    raise ConflictoNegocio(
-                        "Debes proporcionar la justificación de la decisión."
-                    )
-
-                return decision, justificacion
-
-        raise ConflictoNegocio(
-            "El expediente no tiene una decisión de consolidación válida."
-        )
+        return expediente, responsable, html

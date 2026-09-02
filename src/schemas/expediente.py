@@ -91,3 +91,7 @@ class ExpedienteConsolidacion(SchemaBase):
     ]
 
     justificacion: str
+
+
+class ExpedienteConsolidacionPreview(SchemaBase):
+    pdf_base64: str

@@ -1,4 +1,5 @@
 from datetime import date
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, UploadFile
 from fastapi.responses import FileResponse, Response
@@ -13,6 +14,7 @@ from src.schemas.expediente import (
     ExpedienteAsignacionMasiva,
     ExpedienteBitacoraPreview,
     ExpedienteConsolidacion,
+    ExpedienteConsolidacionPreview,
     ExpedienteGestionRead,
     ExpedienteRead,
     ExpedienteResumenEliminacion,
@@ -341,22 +343,72 @@ def generar_pdf_consolidacion(
         )
     ),
 ):
-    expediente_service = ExpedienteService(session)
+    servicio = PDFConsolidacionService(session)
 
-    expediente_service.guardar_consolidacion(
-        id_expediente=id_expediente,
+    documento = servicio.confirmar(
+        id_expediente,
         decision=data.decision,
         justificacion=data.justificacion,
     )
 
-    servicio = PDFConsolidacionService(session)
-
-    ruta = servicio.generar(id_expediente)
+    ruta = Path(documento.ruta_archivo)
 
     return FileResponse(
         path=ruta,
         media_type="application/pdf",
         filename=ruta.name,
+    )
+
+
+@router.post(
+    "/{id_expediente}/consolidacion/vista-previa",
+    response_model=ExpedienteConsolidacionPreview,
+)
+def previsualizar_consolidacion_expediente(
+    id_expediente: int,
+    data: ExpedienteConsolidacion,
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(
+        requiere_rol(
+            "Administrador",
+            "Supervisor",
+            "Cobranza",
+        )
+    ),
+):
+    servicio = PDFConsolidacionService(session)
+
+    pdf_base64 = servicio.previsualizar(
+        id_expediente,
+        decision=data.decision,
+        justificacion=data.justificacion,
+    )
+
+    return {"pdf_base64": pdf_base64}
+
+
+@router.post(
+    "/{id_expediente}/consolidacion/confirmar",
+    response_model=DocumentoRead,
+)
+def confirmar_consolidacion_expediente(
+    id_expediente: int,
+    data: ExpedienteConsolidacion,
+    session: Session = Depends(get_session),
+    usuario_actual: Usuario = Depends(
+        requiere_rol(
+            "Administrador",
+            "Supervisor",
+            "Cobranza",
+        )
+    ),
+):
+    servicio = PDFConsolidacionService(session)
+
+    return servicio.confirmar(
+        id_expediente,
+        decision=data.decision,
+        justificacion=data.justificacion,
     )
 
 

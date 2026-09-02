@@ -375,4 +375,139 @@
             </div>
         </div>
     </div>
+
+    <!-- ─────────────────────────────────────────────
+         MODAL: CERRAR Y FIRMAR CONSOLIDACIÓN
+         ───────────────────────────────────────────── -->
+
+    <div
+        id="modal-consolidacion-expediente"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-consolidacion-titulo"
+        hidden
+    >
+        <div class="modal__fondo" data-cerrar-modal-consolidacion></div>
+
+        <div class="modal__contenido">
+            <div class="modal__encabezado">
+                <h3
+                    id="modal-consolidacion-titulo"
+                    class="modal__titulo u-titulo"
+                >
+                    Cerrar y firmar consolidación
+                </h3>
+            </div>
+
+            <!-- Camino A: el usuario todavía no registra firma -->
+
+            <div id="modal-consolidacion-sin-firma" hidden>
+                <div class="modal__cuerpo">
+                    <p class="u-cuerpo u-texto-secundario">
+                        Necesitas registrar tu firma antes de generar la
+                        consolidación.
+                    </p>
+                </div>
+
+                <div class="modal__acciones">
+                    <button
+                        type="button"
+                        class="boton boton--secundario"
+                        data-cerrar-modal-consolidacion
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="boton"
+                        id="boton-ir-a-perfil-consolidacion"
+                    >
+                        Ir a mi perfil
+                    </button>
+                </div>
+            </div>
+
+            <!-- Camino B: ya tiene firma registrada -->
+
+            <div id="modal-consolidacion-con-firma" hidden>
+                <div class="modal__cuerpo">
+                    <div
+                        id="modal-consolidacion-carga-previa"
+                        class="carrusel-bitacoras__carga"
+                        hidden
+                    >
+                        <span class="boton__spinner"></span>
+
+                        <span class="u-cuerpo u-texto-terciario">
+                            Generando vista previa de la consolidación...
+                        </span>
+                    </div>
+
+                    <div
+                        id="modal-consolidacion-error-previa"
+                        class="mensaje-error modal__error"
+                        role="alert"
+                        aria-live="polite"
+                        hidden
+                    >
+                        <span class="mensaje-error__sello"> Error </span>
+
+                        <span id="modal-consolidacion-error-previa-texto">
+                        </span>
+
+                        <button
+                            type="button"
+                            class="enlace"
+                            id="boton-reintentar-vista-previa-consolidacion"
+                        >
+                            Reintentar
+                        </button>
+                    </div>
+
+                    <div id="modal-consolidacion-visor" hidden>
+                        <div class="carrusel-bitacoras__marco">
+                            <iframe
+                                id="consolidacion-preview-pdf"
+                                class="carrusel-bitacoras__pdf"
+                                title="Vista previa de la consolidación"
+                            ></iframe>
+                        </div>
+                    </div>
+
+                    <div
+                        id="modal-consolidacion-error-confirmar"
+                        class="mensaje-error modal__error"
+                        role="alert"
+                        aria-live="polite"
+                        hidden
+                    >
+                        <span class="mensaje-error__sello"> Error </span>
+
+                        <span id="modal-consolidacion-error-confirmar-texto">
+                        </span>
+                    </div>
+                </div>
+
+                <div class="modal__acciones">
+                    <button
+                        type="button"
+                        class="boton boton--secundario"
+                        data-cerrar-modal-consolidacion
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        type="button"
+                        class="boton"
+                        id="boton-confirmar-consolidacion"
+                    >
+                        Confirmar consolidación
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>

@@ -282,6 +282,34 @@
     flex: 0 0 auto;
 }
 
+#modal-consolidacion-expediente .modal__contenido {
+    max-width: 860px;
+
+    display: flex;
+    flex-direction: column;
+
+    max-height: calc(100vh - 48px);
+}
+
+#modal-consolidacion-con-firma {
+    display: flex;
+    flex-direction: column;
+
+    min-height: 0;
+    flex: 1;
+}
+
+#modal-consolidacion-con-firma .modal__cuerpo {
+    flex: 1;
+    min-height: 0;
+
+    overflow-y: auto;
+}
+
+#modal-consolidacion-con-firma .modal__acciones {
+    flex: 0 0 auto;
+}
+
 .carrusel-bitacoras__carga {
     display: flex;
     align-items: center;
@@ -382,7 +410,8 @@
 }
 
 @media (max-width: 520px) {
-    #modal-cerrar-expediente .modal__contenido {
+    #modal-cerrar-expediente .modal__contenido,
+    #modal-consolidacion-expediente .modal__contenido {
         max-width: 440px;
     }
 
