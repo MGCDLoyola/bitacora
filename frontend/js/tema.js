@@ -4,7 +4,8 @@ function aplicarTema(tema) {
 }
 
 function alternarTema() {
-    const actual = document.documentElement.getAttribute("data-theme") || "dark";
+    const actual =
+        document.documentElement.getAttribute("data-theme") || "dark";
     aplicarTema(actual === "dark" ? "light" : "dark");
 }
 
