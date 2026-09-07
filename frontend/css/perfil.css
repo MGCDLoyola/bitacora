@@ -13,8 +13,8 @@
 }
 
 .perfil__tarjeta {
-    background: var(--ink-900);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-2);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-card);
 }
 
@@ -26,12 +26,12 @@
 .perfil__seccion-encabezado {
     padding-bottom: 18px;
     margin-bottom: 22px;
-    border-bottom: 1px solid var(--ink-700);
+    border-bottom: 1px solid var(--surface-5);
 }
 
 .perfil__titulo {
     margin: 5px 0 0;
-    color: var(--text-100);
+    color: var(--text-1);
     font-family: var(--font-display);
     font-size: 21px;
     font-weight: 600;
@@ -56,7 +56,7 @@
 
 .perfil__nombre {
     margin: 0;
-    color: var(--text-100);
+    color: var(--text-1);
     font-family: var(--font-display);
     font-size: 22px;
     font-weight: 600;
@@ -70,9 +70,9 @@
     align-items: center;
     padding: 4px 10px;
     background: rgba(201, 162, 39, 0.08);
-    border: 1px solid var(--gold-700);
+    border: 1px solid var(--accent-3);
     border-radius: 999px;
-    color: var(--gold-300);
+    color: var(--accent-1);
     font-family: var(--font-mono);
     font-size: 10.5px;
     text-transform: uppercase;
@@ -85,7 +85,7 @@
     gap: 10px;
     margin-top: 18px;
     padding-top: 16px;
-    border-top: 1px dashed var(--ink-700);
+    border-top: 1px dashed var(--surface-5);
 }
 
 .perfil__correo {
@@ -111,8 +111,8 @@
     gap: 3px;
     padding: 3px;
     margin-bottom: 12px;
-    background: var(--ink-950);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-tab);
 }
 
@@ -121,7 +121,7 @@
     background: transparent;
     border: none;
     border-radius: 2px;
-    color: var(--text-500);
+    color: var(--text-3);
     font-family: var(--font-mono);
     font-size: 11px;
     text-transform: uppercase;
@@ -133,18 +133,18 @@
 }
 
 .perfil__firma-tab:hover {
-    color: var(--text-100);
+    color: var(--text-1);
 }
 
 .perfil__firma-tab[aria-pressed="true"] {
     background: rgba(201, 162, 39, 0.1);
-    color: var(--gold-300);
+    color: var(--accent-1);
 }
 
 .perfil__firma-lienzo {
     position: relative;
     min-height: 200px;
-    border: 1px solid var(--ink-700);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-card);
     overflow: hidden;
 }
@@ -163,7 +163,7 @@
     left: 26px;
     right: 26px;
     bottom: 46px;
-    border-bottom: 1px dashed var(--gold-700);
+    border-bottom: 1px dashed var(--accent-3);
     pointer-events: none;
 }
 
@@ -179,7 +179,7 @@
     min-height: 200px;
     height: 100%;
     padding: 24px;
-    background: var(--ink-950);
+    background: var(--surface-1);
     cursor: pointer;
     transition: background 0.15s ease;
 }
@@ -205,14 +205,14 @@
 }
 
 .perfil__firma-vacia-titulo {
-    color: var(--text-300);
+    color: var(--text-2);
     font-family: var(--font-sans);
     font-size: 13.5px;
     font-weight: 500;
 }
 
 .perfil__firma-vacia-nota {
-    color: var(--text-500);
+    color: var(--text-3);
     font-family: var(--font-mono);
     font-size: 11px;
 }
@@ -259,16 +259,16 @@
 
 .perfil .boton--secundario {
     background: transparent;
-    border: 1px solid var(--ink-700);
-    color: var(--text-300);
+    border: 1px solid var(--surface-5);
+    color: var(--text-2);
     text-decoration: none;
     text-align: center;
     margin-top: 0;
 }
 
 .perfil .boton--secundario:hover {
-    background: var(--ink-850);
-    color: var(--text-100);
+    background: var(--surface-3);
+    color: var(--text-1);
 }
 
 .perfil__firma-formatos {
@@ -301,7 +301,7 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--text-500);
+    background: var(--text-3);
 }
 
 .perfil__coincidencia--ok {

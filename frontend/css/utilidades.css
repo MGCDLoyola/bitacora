@@ -34,19 +34,19 @@
 }
 
 .u-texto-primario {
-    color: var(--text-100);
+    color: var(--text-1);
 }
 
 .u-texto-secundario {
-    color: var(--text-300);
+    color: var(--text-2);
 }
 
 .u-texto-terciario {
-    color: var(--text-500);
+    color: var(--text-3);
 }
 
 .u-texto-oro {
-    color: var(--gold-500);
+    color: var(--accent-2);
 }
 
 .u-texto-error {
@@ -54,15 +54,15 @@
 }
 
 .u-bg-fondo {
-    background: var(--ink-950);
+    background: var(--surface-1);
 }
 
 .u-bg-tarjeta {
-    background: var(--ink-900);
+    background: var(--surface-2);
 }
 
 .u-bg-oro {
-    background: var(--gold-500);
+    background: var(--accent-2);
 }
 
 .u-mt-xs {

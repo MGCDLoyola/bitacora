@@ -5,15 +5,21 @@
     --ink-800: #1e2c48;
     --ink-700: #2a3a5c;
 
+    --paper-50: #f7f3e8;
     --paper-100: #ece7da;
     --paper-200: #dcd5c1;
+    --paper-300: #c7ba95;
 
     --gold-300: #e0c468;
     --gold-500: #c9a227;
     --gold-700: #8f7419;
 
+    --orange-500: #d9752c;
+    --orange-700: #a8571e;
+
     --forest-600: #2f6c4f;
 
+    --rose-300: #e8b4b4;
     --rose-500: #b24c4c;
     --rose-700: #7a2e2e;
 
@@ -27,6 +33,42 @@
 
     --radius-card: 3px;
     --radius-tab: 2px;
+}
+
+[data-theme="dark"] {
+    --surface-1: var(--ink-950);
+    --surface-2: var(--ink-900);
+    --surface-3: var(--ink-850);
+    --surface-4: var(--ink-800);
+    --surface-5: var(--ink-700);
+
+    --text-1: var(--text-100);
+    --text-2: var(--text-300);
+    --text-3: var(--text-500);
+
+    --accent-1: var(--gold-300);
+    --accent-2: var(--gold-500);
+    --accent-3: var(--gold-700);
 
     --shadow-card: 0 24px 48px -12px rgba(0, 0, 0, 0.55);
+    color-scheme: dark;
+}
+
+[data-theme="light"] {
+    --surface-1: var(--paper-200);
+    --surface-2: var(--paper-100);
+    --surface-3: var(--paper-50);
+    --surface-4: var(--paper-200);
+    --surface-5: var(--paper-300);
+
+    --text-1: var(--ink-950);
+    --text-2: var(--ink-800);
+    --text-3: var(--ink-700);
+
+    --accent-1: var(--orange-700);
+    --accent-2: var(--orange-500);
+    --accent-3: var(--orange-700);
+
+    --shadow-card: 0 24px 48px -12px rgba(60, 50, 30, 0.25);
+    color-scheme: light;
 }

@@ -37,7 +37,7 @@
 
     margin-bottom: 18px;
 
-    border-bottom: 1px solid var(--ink-700);
+    border-bottom: 1px solid var(--surface-5);
 }
 
 .vista-gestiones__tab {
@@ -53,7 +53,7 @@
     margin-bottom: -1px;
     padding: 11px 18px 12px;
 
-    color: var(--text-500);
+    color: var(--text-3);
 
     font-family: var(--font-mono);
     font-size: 11.5px;
@@ -70,16 +70,16 @@
 }
 
 .vista-gestiones__tab:hover {
-    color: var(--text-100);
+    color: var(--text-1);
 }
 
 .vista-gestiones__tab--activo {
-    color: var(--gold-300);
-    border-bottom-color: var(--gold-500);
+    color: var(--accent-1);
+    border-bottom-color: var(--accent-2);
 }
 
 .vista-gestiones__tab:focus-visible {
-    outline: 2px solid var(--gold-300);
+    outline: 2px solid var(--accent-1);
     outline-offset: -2px;
 }
 
@@ -98,11 +98,11 @@
     margin-left: 8px;
     padding: 0 5px;
 
-    background: var(--ink-850);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-3);
+    border: 1px solid var(--surface-5);
     border-radius: 3px;
 
-    color: var(--text-300);
+    color: var(--text-2);
 
     font-family: var(--font-mono);
     font-size: 11px;
@@ -111,8 +111,8 @@
 }
 
 .vista-gestiones__tab--activo .vista-gestiones__contador {
-    background: var(--gold-500);
-    border-color: var(--gold-500);
+    background: var(--accent-2);
+    border-color: var(--accent-2);
     color: var(--ink-950);
 }
 
@@ -138,11 +138,11 @@
 
     padding: 10px 13px;
 
-    background: var(--ink-900);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-2);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-card);
 
-    color: var(--text-100);
+    color: var(--text-1);
 
     font-family: var(--font-mono);
     font-size: 12px;
@@ -155,20 +155,20 @@
 }
 
 .filtro-gestiones__input::placeholder {
-    color: var(--text-500);
+    color: var(--text-3);
 }
 
 .filtro-gestiones__input:hover {
-    border-color: var(--ink-800);
+    border-color: var(--surface-4);
 }
 
 .filtro-gestiones__input:focus {
-    border-color: var(--gold-500);
-    background: var(--ink-850);
+    border-color: var(--accent-2);
+    background: var(--surface-3);
 }
 
 .filtro-gestiones__input:focus-visible {
-    outline: 2px solid var(--gold-300);
+    outline: 2px solid var(--accent-1);
     outline-offset: 1px;
 }
 
@@ -192,8 +192,8 @@
     height: 100%;
     min-height: 0;
 
-    background: var(--ink-900);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-2);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-card);
 
     overflow: hidden;
@@ -218,7 +218,7 @@
     overflow-x: hidden;
 
     scrollbar-width: thin;
-    scrollbar-color: var(--ink-700) transparent;
+    scrollbar-color: var(--surface-5) transparent;
 }
 
 .gestiones-tarjetas::-webkit-scrollbar {
@@ -230,12 +230,12 @@
 }
 
 .gestiones-tarjetas::-webkit-scrollbar-thumb {
-    background: var(--ink-700);
+    background: var(--surface-5);
     border-radius: 10px;
 }
 
 .gestiones-tarjetas::-webkit-scrollbar-thumb:hover {
-    background: var(--ink-800);
+    background: var(--surface-4);
 }
 
 /* ─────────────────────────────────────────────
@@ -249,8 +249,8 @@
 
     min-width: 0;
 
-    background: var(--ink-900);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-2);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-card);
 
     box-shadow: var(--shadow-card);
@@ -263,8 +263,8 @@
 }
 
 .gestion-card:hover {
-    border-color: var(--ink-800);
-    background: var(--ink-850);
+    border-color: var(--surface-4);
+    background: var(--surface-3);
 }
 
 /* ─────────────────────────────────────────────
@@ -278,7 +278,7 @@
 
     padding: 14px 18px;
 
-    border-bottom: 1px solid var(--ink-700);
+    border-bottom: 1px solid var(--surface-5);
 }
 
 /* ─────────────────────────────────────────────
@@ -288,7 +288,7 @@
 .gestion-card__cliente {
     margin: 0;
 
-    color: var(--text-100);
+    color: var(--text-1);
 
     font-family: var(--font-display);
     font-size: 20px;
@@ -305,7 +305,7 @@
 
     margin-top: 4px;
 
-    color: var(--gold-500);
+    color: var(--accent-2);
 
     font-family: var(--font-mono);
     font-size: 15px;
@@ -325,7 +325,7 @@
 
     flex-shrink: 0;
 
-    color: var(--text-500);
+    color: var(--text-3);
 }
 
 .gestion-card__acciones {
@@ -357,7 +357,7 @@
 
     gap: 1px;
 
-    background: var(--ink-700);
+    background: var(--surface-5);
 }
 
 .gestion-card__dato {
@@ -371,13 +371,13 @@
 
     padding: 10px 14px;
 
-    background: var(--ink-900);
+    background: var(--surface-2);
 }
 
 .gestion-card__dato .u-cuerpo {
     overflow: hidden;
 
-    color: var(--text-300);
+    color: var(--text-2);
 
     font-size: 13px;
 
@@ -396,8 +396,8 @@
 
     text-align: center;
 
-    background: var(--ink-900);
-    border: 1px dashed var(--ink-700);
+    background: var(--surface-2);
+    border: 1px dashed var(--surface-5);
     border-radius: var(--radius-card);
 }
 
@@ -418,8 +418,8 @@
     height: 100%;
     min-height: 0;
 
-    background: var(--ink-900);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-2);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-card);
 
     overflow: hidden;
@@ -432,7 +432,7 @@
     overflow: auto;
 
     scrollbar-width: thin;
-    scrollbar-color: var(--ink-700) transparent;
+    scrollbar-color: var(--surface-5) transparent;
 }
 
 .seccion-gestiones[data-seccion-contenido="activos"]
@@ -448,13 +448,13 @@
 
 .seccion-gestiones[data-seccion-contenido="activos"]
     .tabla-scroll::-webkit-scrollbar-thumb {
-    background: var(--ink-700);
+    background: var(--surface-5);
     border-radius: 10px;
 }
 
 .seccion-gestiones[data-seccion-contenido="activos"]
     .tabla-scroll::-webkit-scrollbar-thumb:hover {
-    background: var(--ink-800);
+    background: var(--surface-4);
 }
 
 /* ─────────────────────────────────────────────

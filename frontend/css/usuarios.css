@@ -53,10 +53,10 @@
 .campo-filtro__input {
     width: 100%;
     height: 38px;
-    background: var(--ink-900);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-2);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-tab);
-    color: var(--text-100);
+    color: var(--text-1);
     font-family: var(--font-sans);
     font-size: 14px;
     padding: 8px 10px;
@@ -67,13 +67,13 @@
 }
 
 .campo-filtro__input::placeholder {
-    color: var(--text-500);
+    color: var(--text-3);
     opacity: 0.6;
 }
 
 .campo-filtro__input:focus {
-    border-color: var(--gold-500);
-    box-shadow: 0 0 0 1px var(--gold-500);
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 1px var(--accent-2);
 }
 
 .campo-filtro__input:focus-visible {
@@ -92,8 +92,8 @@ select.campo-filtro__input {
     flex: 1;
     min-height: 0;
     width: 100%;
-    background: var(--ink-900);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-2);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-card);
     overflow: hidden;
 }
@@ -103,7 +103,7 @@ select.campo-filtro__input {
     height: 100%;
     overflow: auto;
     scrollbar-width: thin;
-    scrollbar-color: var(--ink-700) transparent;
+    scrollbar-color: var(--surface-5) transparent;
 }
 
 .tabla-scroll::-webkit-scrollbar {
@@ -116,12 +116,12 @@ select.campo-filtro__input {
 }
 
 .tabla-scroll::-webkit-scrollbar-thumb {
-    background: var(--ink-700);
+    background: var(--surface-5);
     border-radius: 10px;
 }
 
 .tabla-scroll::-webkit-scrollbar-thumb:hover {
-    background: var(--ink-800);
+    background: var(--surface-4);
 }
 
 .tabla {
@@ -135,8 +135,8 @@ select.campo-filtro__input {
     position: sticky;
     top: 0;
     z-index: 2;
-    background: var(--ink-850);
-    color: var(--text-500);
+    background: var(--surface-3);
+    color: var(--text-3);
     font-family: var(--font-mono);
     font-size: 10.5px;
     font-weight: 500;
@@ -144,14 +144,14 @@ select.campo-filtro__input {
     letter-spacing: 0.07em;
     text-align: left;
     padding: 13px 16px;
-    border-bottom: 1px solid var(--ink-700);
+    border-bottom: 1px solid var(--surface-5);
     white-space: nowrap;
 }
 
 .tabla td {
-    color: var(--text-300);
+    color: var(--text-2);
     padding: 14px 16px;
-    border-bottom: 1px solid var(--ink-700);
+    border-bottom: 1px solid var(--surface-5);
     vertical-align: middle;
 }
 
@@ -164,16 +164,16 @@ select.campo-filtro__input {
 }
 
 .tabla tbody tr:hover {
-    background: var(--ink-850);
+    background: var(--surface-3);
 }
 
 .tabla__nombre {
-    color: var(--text-100);
+    color: var(--text-1);
     font-weight: 500;
 }
 
 .tabla__correo {
-    color: var(--text-300);
+    color: var(--text-2);
 }
 
 .tabla__estado {
@@ -214,7 +214,7 @@ select.campo-filtro__input {
     background: none;
     border: none;
     padding: 4px 0;
-    color: var(--gold-300);
+    color: var(--accent-1);
     font-family: var(--font-mono);
     font-size: 11.5px;
     text-decoration: underline;
@@ -223,19 +223,19 @@ select.campo-filtro__input {
 }
 
 .tabla__accion:hover {
-    color: var(--text-100);
+    color: var(--text-1);
 }
 
 .tabla__accion--estado {
-    color: var(--text-500);
+    color: var(--text-3);
 }
 
 .tabla__accion--estado:hover {
-    color: var(--text-100);
+    color: var(--text-1);
 }
 
 .tabla__accion:focus-visible {
-    outline: 2px solid var(--gold-300);
+    outline: 2px solid var(--accent-1);
     outline-offset: 3px;
 }
 
@@ -281,8 +281,8 @@ select.campo-filtro__input {
     z-index: 1;
     width: 100%;
     max-width: 440px;
-    background: var(--ink-900);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-2);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
 }
@@ -291,7 +291,7 @@ select.campo-filtro__input {
     display: flex;
     align-items: center;
     padding: 22px 24px;
-    border-bottom: 1px solid var(--ink-700);
+    border-bottom: 1px solid var(--surface-5);
 }
 
 .modal__titulo {
@@ -317,7 +317,7 @@ select.campo-filtro__input {
     justify-content: flex-end;
     gap: 10px;
     padding: 18px 24px 22px;
-    border-top: 1px solid var(--ink-700);
+    border-top: 1px solid var(--surface-5);
 }
 
 .modal__acciones .boton {
@@ -328,13 +328,13 @@ select.campo-filtro__input {
 
 .boton--secundario {
     background: transparent;
-    border: 1px solid var(--ink-700);
-    color: var(--text-300);
+    border: 1px solid var(--surface-5);
+    color: var(--text-2);
 }
 
 .boton--secundario:hover:not(:disabled) {
-    background: var(--ink-850);
-    color: var(--text-100);
+    background: var(--surface-3);
+    color: var(--text-1);
 }
 
 /* ─────────────────────────────────────────────
@@ -407,8 +407,8 @@ select.campo-filtro__input {
     position: relative;
     width: 15px;
     height: 15px;
-    background: var(--ink-850);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-3);
+    border: 1px solid var(--surface-5);
     border-radius: 2px;
     cursor: pointer;
     transition:
@@ -417,12 +417,12 @@ select.campo-filtro__input {
 }
 
 .tabla__checkbox:hover {
-    border-color: var(--gold-500);
+    border-color: var(--accent-2);
 }
 
 .tabla__checkbox:checked {
-    background: var(--gold-500);
-    border-color: var(--gold-500);
+    background: var(--accent-2);
+    border-color: var(--accent-2);
 }
 
 .tabla__checkbox:checked::after {
@@ -438,8 +438,8 @@ select.campo-filtro__input {
 }
 
 .tabla__checkbox:indeterminate {
-    background: var(--ink-700);
-    border-color: var(--ink-700);
+    background: var(--surface-5);
+    border-color: var(--surface-5);
 }
 
 .tabla__checkbox:indeterminate::after {
@@ -449,11 +449,11 @@ select.campo-filtro__input {
     top: 6px;
     width: 7px;
     height: 2px;
-    background: var(--gold-300);
+    background: var(--accent-1);
 }
 
 .tabla__checkbox:focus-visible {
-    outline: 2px solid var(--gold-300);
+    outline: 2px solid var(--accent-1);
     outline-offset: 2px;
 }
 
@@ -465,8 +465,8 @@ select.campo-filtro__input {
     gap: 16px;
     padding: 11px 6px;
     margin-bottom: 14px;
-    border-top: 1px dashed var(--ink-700);
-    border-bottom: 1px dashed var(--ink-700);
+    border-top: 1px dashed var(--surface-5);
+    border-bottom: 1px dashed var(--surface-5);
     background: linear-gradient(
         to right,
         rgba(201, 162, 39, 0.07),
@@ -484,12 +484,12 @@ select.campo-filtro__input {
     width: 6px;
     height: 6px;
     flex-shrink: 0;
-    background: var(--gold-500);
+    background: var(--accent-2);
     border-radius: 1px;
 }
 
 .barra-seleccion__texto {
-    color: var(--gold-300);
+    color: var(--accent-1);
 }
 
 .barra-seleccion__acciones {
@@ -500,7 +500,7 @@ select.campo-filtro__input {
 
 .barra-seleccion__acciones > * + * {
     padding-left: 18px;
-    border-left: 1px solid var(--ink-700);
+    border-left: 1px solid var(--surface-5);
 }
 
 .barra-seleccion__accion {
@@ -511,7 +511,7 @@ select.campo-filtro__input {
     background: none;
     border: none;
     padding: 0;
-    color: var(--gold-300);
+    color: var(--accent-1);
     text-decoration: underline;
     text-underline-offset: 3px;
     cursor: pointer;
@@ -519,11 +519,11 @@ select.campo-filtro__input {
 }
 
 .barra-seleccion__accion:hover {
-    color: var(--text-100);
+    color: var(--text-1);
 }
 
 .barra-seleccion__accion:focus-visible {
-    outline: 2px solid var(--gold-300);
+    outline: 2px solid var(--accent-1);
     outline-offset: 3px;
 }
 
@@ -532,7 +532,7 @@ select.campo-filtro__input {
 }
 
 .barra-seleccion__accion--activar:hover {
-    color: var(--text-100);
+    color: var(--text-1);
 }
 
 .barra-seleccion__accion--desactivar {
@@ -540,7 +540,7 @@ select.campo-filtro__input {
 }
 
 .barra-seleccion__accion--desactivar:hover {
-    color: #e8b4b4;
+    color: var(--rose-300);
 }
 
 .barra-seleccion__cancelar {
@@ -551,7 +551,7 @@ select.campo-filtro__input {
     background: none;
     border: none;
     padding: 0;
-    color: var(--text-500);
+    color: var(--text-3);
     text-decoration: underline;
     text-underline-offset: 3px;
     cursor: pointer;
@@ -559,7 +559,7 @@ select.campo-filtro__input {
 }
 
 .barra-seleccion__cancelar:hover {
-    color: var(--text-100);
+    color: var(--text-1);
 }
 
 @media (max-width: 720px) {

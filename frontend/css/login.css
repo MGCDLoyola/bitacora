@@ -14,14 +14,14 @@ body {
 }
 
 body {
-    background: var(--ink-950);
+    background: var(--surface-1);
     background-image: repeating-linear-gradient(
         180deg,
         transparent,
         transparent 34px,
         rgba(237, 239, 243, 0.028) 35px
     );
-    color: var(--text-100);
+    color: var(--text-1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -48,7 +48,7 @@ body {
     padding: 9px 18px 12px;
     border-top-left-radius: var(--radius-tab);
     border-top-right-radius: var(--radius-tab);
-    border: 1px solid var(--gold-700);
+    border: 1px solid var(--accent-3);
     border-bottom: none;
     margin-left: 22px;
     opacity: 0;
@@ -58,8 +58,8 @@ body {
 
 .ficha {
     width: 100%;
-    background: var(--ink-900);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-2);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-card);
     padding: 40px 36px 32px;

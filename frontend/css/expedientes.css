@@ -41,11 +41,11 @@
 
     padding: 10px 13px;
 
-    background: var(--ink-900);
-    border: 1px solid var(--ink-700);
+    background: var(--surface-2);
+    border: 1px solid var(--surface-5);
     border-radius: var(--radius-card);
 
-    color: var(--text-100);
+    color: var(--text-1);
 
     font-family: var(--font-mono);
     font-size: 12px;
@@ -58,20 +58,20 @@
 }
 
 .filtro-expedientes__input::placeholder {
-    color: var(--text-500);
+    color: var(--text-3);
 }
 
 .filtro-expedientes__input:hover {
-    border-color: var(--ink-800);
+    border-color: var(--surface-4);
 }
 
 .filtro-expedientes__input:focus {
-    border-color: var(--gold-500);
+    border-color: var(--accent-2);
     background: var(--ink-850);
 }
 
 .filtro-expedientes__input:focus-visible {
-    outline: 2px solid var(--gold-300);
+    outline: 2px solid var(--accent-1);
     outline-offset: 1px;
 }
 
@@ -98,7 +98,7 @@
 
 .bloque-cliente {
     padding: 18px 4px;
-    border-top: 1px solid var(--ink-700);
+    border-top: 1px solid var(--surface-5);
 }
 
 .bloque-cliente:first-child {
@@ -119,12 +119,12 @@
     font-family: var(--font-sans);
     font-size: 15px;
     font-weight: 600;
-    color: var(--text-100);
+    color: var(--text-1);
 }
 
 .bloque-cliente__interlocutor,
 .bloque-cliente__contrato {
-    color: var(--text-500);
+    color: var(--text-3);
 }
 
 .bloque-cliente__expedientes {
@@ -156,18 +156,18 @@
 }
 
 .fila-expediente:focus-visible {
-    outline: 2px solid var(--gold-300);
+    outline: 2px solid var(--accent-1);
     outline-offset: -2px;
 }
 
 .fila-expediente__fecha {
-    color: var(--text-300);
+    color: var(--text-2);
 }
 
 .fila-expediente__monto {
     font-family: var(--font-sans);
     font-size: 13.5px;
-    color: var(--text-100);
+    color: var(--text-1);
 }
 
 .fila-expediente__responsable {
@@ -192,7 +192,7 @@
 }
 
 .fila-expediente__estado--del-dia {
-    color: var(--gold-300);
+    color: var(--accent-1);
     background: rgba(224, 196, 104, 0.12);
     border: 1px solid rgba(224, 196, 104, 0.35);
 }
@@ -210,9 +210,9 @@
 }
 
 .fila-expediente__estado--cerrado {
-    color: var(--text-500);
+    color: var(--text-3);
     background: rgba(140, 147, 166, 0.08);
-    border: 1px solid var(--ink-700);
+    border: 1px solid var(--surface-5);
 }
 
 /* ─────────────────────────────────────────────
