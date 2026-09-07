@@ -67,7 +67,7 @@
 
 .filtro-expedientes__input:focus {
     border-color: var(--accent-2);
-    background: var(--ink-850);
+    background: var(--surface-3);
 }
 
 .filtro-expedientes__input:focus-visible {
