@@ -81,7 +81,9 @@ class ExpedienteService(BaseService):
         expediente, ultimo_comentario_cobranza = resultado
 
         comentarios = (
-            ultimo_comentario_cobranza if expediente.estado else expediente.comentarios
+            expediente.comentarios
+            if expediente.comentarios and expediente.comentarios.strip()
+            else ultimo_comentario_cobranza
         )
 
         return self._a_read(expediente, comentarios=comentarios)

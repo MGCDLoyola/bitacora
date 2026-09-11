@@ -44,9 +44,7 @@ class PDFConsolidacionService(BaseService):
         usuario_actual: Usuario,
     ) -> str:
 
-        documento_edc_simulado = self._documento_edc_simulado(
-            archivo, usuario_actual
-        )
+        documento_edc_simulado = self._documento_edc_simulado(archivo, usuario_actual)
 
         _, _, html = self._construir_html(
             id_expediente,
