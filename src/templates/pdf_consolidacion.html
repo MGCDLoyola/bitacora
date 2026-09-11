@@ -594,8 +594,8 @@
 
         <div class="card-comentarios">
             <div class="texto">
-                {{ comentarios_expediente or "Sin decisión ni fundamentos
-                registrados." }}
+                <b>{{ decision or "Sin decisión registrada." }}</b><br />
+                {{ justificacion or "Sin fundamentos registrados." }}
             </div>
         </div>
 
