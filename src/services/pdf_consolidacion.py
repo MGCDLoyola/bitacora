@@ -81,6 +81,7 @@ class PDFConsolidacionService(BaseService):
             id_expediente=id_expediente,
             id_usuario=usuario_actual.id,
             archivo=archivo,
+            requiere_consolidacion_previa=False,
         )
 
         try:
