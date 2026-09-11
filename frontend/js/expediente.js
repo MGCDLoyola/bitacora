@@ -15,6 +15,7 @@ let decisionConsolidacionPendiente = null;
 let justificacionConsolidacionPendiente = null;
 let pdfPreviaConsolidacion = null;
 let archivoSAPPendiente = null;
+let archivoSAPSubido = false;
 
 const HORA_INTENTO = {
     1: 9,
@@ -737,6 +738,7 @@ function abrirModalConsolidacion(
     decisionConsolidacionPendiente = decision;
     justificacionConsolidacionPendiente = justificacion;
     archivoSAPPendiente = archivoSAP;
+    archivoSAPSubido = false;
 
     const modal = contenedor.querySelector("#modal-consolidacion-expediente");
 
@@ -781,6 +783,11 @@ async function cargarVistaPreviaConsolidacion(contenedor) {
     mostrarCargaPreviaConsolidacion(contenedor);
 
     try {
+        if (archivoSAPPendiente && !archivoSAPSubido) {
+            await subirEstadoCuentaSAP(idExpedienteActual, archivoSAPPendiente);
+            archivoSAPSubido = true;
+        }
+
         const resultado = await obtenerVistaPreviaConsolidacion(
             idExpedienteActual,
             decisionConsolidacionPendiente,
@@ -816,12 +823,7 @@ async function confirmarConsolidacion(contenedor) {
     boton.textContent = "Guardando...";
 
     try {
-        // PASO 1: Subir el archivo SAP
-        if (archivoSAPPendiente) {
-            await subirEstadoCuentaSAP(idExpedienteActual, archivoSAPPendiente);
-        }
-
-        // PASO 2: Confirmar la consolidación
+        // El archivo SAP ya se subió en cargarVistaPreviaConsolidacion
         await confirmarConsolidacionExpediente(
             idExpedienteActual,
             decisionConsolidacionPendiente,
@@ -833,6 +835,7 @@ async function confirmarConsolidacion(contenedor) {
         mostrarConsolidacionConfirmada(contenedor);
 
         archivoSAPPendiente = null;
+        archivoSAPSubido = false;
     } catch (error) {
         mostrarErrorConfirmarConsolidacion(
             contenedor,
