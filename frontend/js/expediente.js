@@ -839,8 +839,7 @@ function mostrarConsolidacionConfirmada(contenedor) {
                 </span>
 
                 <p class="u-cuerpo u-texto-secundario">
-                    La consolidación se guardó correctamente. El expediente
-                    permanece abierto hasta que se procese en el runner.
+                    La consolidación se guardó correctamente.
                 </p>
             </div>
         </div>
