@@ -83,12 +83,15 @@ class ExpedienteResumenEliminacion(SchemaBase):
     documentos: int
 
 
+DecisionConsolidacion = Literal[
+    "Continuar gestión extrajudicial",
+    "Escalar a jurídico (formal)",
+    "Cierre por pago",
+]
+
+
 class ExpedienteConsolidacion(SchemaBase):
-    decision: Literal[
-        "Continuar gestión extrajudicial",
-        "Escalar a jurídico (formal)",
-        "Cierre por pago",
-    ]
+    decision: DecisionConsolidacion
 
     justificacion: str
 

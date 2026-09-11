@@ -91,6 +91,21 @@ class DocumentoService(BaseService):
                 "El expediente todavía no se encuentra en etapa de consolidación."
             )
 
+        documento_consolidacion = self.session.scalar(
+            select(Documento)
+            .join(TipoDocumento, Documento.id_tipo_documento == TipoDocumento.id)
+            .where(
+                Documento.id_expediente == id_expediente,
+                TipoDocumento.nombre == "Consolidación",
+            )
+        )
+
+        if documento_consolidacion is None:
+            raise ConflictoNegocio(
+                "Solo se puede subir un Estado de Cuenta SAP de corrección "
+                "una vez que la consolidación del expediente ya fue generada."
+            )
+
         tipo_documento = self.session.scalar(
             select(TipoDocumento).where(TipoDocumento.nombre == "Estado de Cuenta SAP")
         )

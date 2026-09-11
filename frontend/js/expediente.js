@@ -15,7 +15,6 @@ let decisionConsolidacionPendiente = null;
 let justificacionConsolidacionPendiente = null;
 let pdfPreviaConsolidacion = null;
 let archivoSAPPendiente = null;
-let archivoSAPSubido = false;
 
 const HORA_INTENTO = {
     1: 9,
@@ -157,40 +156,23 @@ async function confirmarCierreExpediente(idExpediente) {
     return await respuesta.json();
 }
 
-async function subirEstadoCuentaSAP(idExpediente, archivo) {
-    const formData = new FormData();
-    formData.append("archivo", archivo);
-
-    const respuesta = await fetch(
-        `/expedientes/${idExpediente}/estado-cuenta`,
-        {
-            method: "POST",
-            credentials: "include",
-            body: formData,
-        }
-    );
-
-    if (!respuesta.ok) {
-        const error = new Error(await mensajeDeError(respuesta));
-        error.status = respuesta.status;
-        throw error;
-    }
-
-    return await respuesta.json();
-}
-
 async function obtenerVistaPreviaConsolidacion(
     idExpediente,
     decision,
-    justificacion
+    justificacion,
+    archivo
 ) {
+    const formData = new FormData();
+    formData.append("decision", decision);
+    formData.append("justificacion", justificacion);
+    formData.append("archivo", archivo);
+
     const respuesta = await fetch(
         `/expedientes/${idExpediente}/consolidacion/vista-previa`,
         {
             method: "POST",
             credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ decision, justificacion }),
+            body: formData,
         }
     );
 
@@ -208,15 +190,20 @@ async function obtenerVistaPreviaConsolidacion(
 async function confirmarConsolidacionExpediente(
     idExpediente,
     decision,
-    justificacion
+    justificacion,
+    archivo
 ) {
+    const formData = new FormData();
+    formData.append("decision", decision);
+    formData.append("justificacion", justificacion);
+    formData.append("archivo", archivo);
+
     const respuesta = await fetch(
         `/expedientes/${idExpediente}/consolidacion/confirmar`,
         {
             method: "POST",
             credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ decision, justificacion }),
+            body: formData,
         }
     );
 
@@ -738,7 +725,6 @@ function abrirModalConsolidacion(
     decisionConsolidacionPendiente = decision;
     justificacionConsolidacionPendiente = justificacion;
     archivoSAPPendiente = archivoSAP;
-    archivoSAPSubido = false;
 
     const modal = contenedor.querySelector("#modal-consolidacion-expediente");
 
@@ -783,15 +769,11 @@ async function cargarVistaPreviaConsolidacion(contenedor) {
     mostrarCargaPreviaConsolidacion(contenedor);
 
     try {
-        if (archivoSAPPendiente && !archivoSAPSubido) {
-            await subirEstadoCuentaSAP(idExpedienteActual, archivoSAPPendiente);
-            archivoSAPSubido = true;
-        }
-
         const resultado = await obtenerVistaPreviaConsolidacion(
             idExpedienteActual,
             decisionConsolidacionPendiente,
-            justificacionConsolidacionPendiente
+            justificacionConsolidacionPendiente,
+            archivoSAPPendiente
         );
 
         pdfPreviaConsolidacion = resultado.pdf_base64;
@@ -823,11 +805,11 @@ async function confirmarConsolidacion(contenedor) {
     boton.textContent = "Guardando...";
 
     try {
-        // El archivo SAP ya se subió en cargarVistaPreviaConsolidacion
         await confirmarConsolidacionExpediente(
             idExpedienteActual,
             decisionConsolidacionPendiente,
-            justificacionConsolidacionPendiente
+            justificacionConsolidacionPendiente,
+            archivoSAPPendiente
         );
 
         cerrarModalConsolidacion(contenedor);
@@ -835,7 +817,6 @@ async function confirmarConsolidacion(contenedor) {
         mostrarConsolidacionConfirmada(contenedor);
 
         archivoSAPPendiente = null;
-        archivoSAPSubido = false;
     } catch (error) {
         mostrarErrorConfirmarConsolidacion(
             contenedor,

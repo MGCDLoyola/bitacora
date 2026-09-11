@@ -1,7 +1,6 @@
 from datetime import date
-from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Form, UploadFile
 from fastapi.responses import FileResponse, Response
 from sqlalchemy.orm import Session
 
@@ -11,9 +10,9 @@ from src.models.usuario import Usuario
 from src.schemas.cobranza import CobranzaCreate, CobranzaRead
 from src.schemas.documento import DocumentoRead
 from src.schemas.expediente import (
+    DecisionConsolidacion,
     ExpedienteAsignacionMasiva,
     ExpedienteBitacoraPreview,
-    ExpedienteConsolidacion,
     ExpedienteConsolidacionPreview,
     ExpedienteGestionRead,
     ExpedienteRead,
@@ -329,44 +328,14 @@ def generar_pdf_cobranza(
 
 
 @router.post(
-    "/{id_expediente}/consolidacion/pdf",
-)
-def generar_pdf_consolidacion(
-    id_expediente: int,
-    data: ExpedienteConsolidacion,
-    session: Session = Depends(get_session),
-    usuario_actual: Usuario = Depends(
-        requiere_rol(
-            "Administrador",
-            "Supervisor",
-            "Cobranza",
-        )
-    ),
-):
-    servicio = PDFConsolidacionService(session)
-
-    documento = servicio.confirmar(
-        id_expediente,
-        decision=data.decision,
-        justificacion=data.justificacion,
-    )
-
-    ruta = Path(documento.ruta_archivo)
-
-    return FileResponse(
-        path=ruta,
-        media_type="application/pdf",
-        filename=ruta.name,
-    )
-
-
-@router.post(
     "/{id_expediente}/consolidacion/vista-previa",
     response_model=ExpedienteConsolidacionPreview,
 )
 def previsualizar_consolidacion_expediente(
     id_expediente: int,
-    data: ExpedienteConsolidacion,
+    decision: DecisionConsolidacion = Form(...),
+    justificacion: str = Form(...),
+    archivo: UploadFile = File(...),
     session: Session = Depends(get_session),
     usuario_actual: Usuario = Depends(
         requiere_rol(
@@ -380,8 +349,10 @@ def previsualizar_consolidacion_expediente(
 
     pdf_base64 = servicio.previsualizar(
         id_expediente,
-        decision=data.decision,
-        justificacion=data.justificacion,
+        decision=decision,
+        justificacion=justificacion,
+        archivo=archivo,
+        usuario_actual=usuario_actual,
     )
 
     return {"pdf_base64": pdf_base64}
@@ -393,7 +364,9 @@ def previsualizar_consolidacion_expediente(
 )
 def confirmar_consolidacion_expediente(
     id_expediente: int,
-    data: ExpedienteConsolidacion,
+    decision: DecisionConsolidacion = Form(...),
+    justificacion: str = Form(...),
+    archivo: UploadFile = File(...),
     session: Session = Depends(get_session),
     usuario_actual: Usuario = Depends(
         requiere_rol(
@@ -407,8 +380,10 @@ def confirmar_consolidacion_expediente(
 
     return servicio.confirmar(
         id_expediente,
-        decision=data.decision,
-        justificacion=data.justificacion,
+        decision=decision,
+        justificacion=justificacion,
+        archivo=archivo,
+        usuario_actual=usuario_actual,
     )
 
 

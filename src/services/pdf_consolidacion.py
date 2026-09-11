@@ -1,6 +1,10 @@
 import uuid
+from collections.abc import Sequence
+from datetime import datetime
 from pathlib import Path
+from types import SimpleNamespace
 
+from fastapi import UploadFile
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy import select
 
@@ -18,6 +22,7 @@ from src.models.tipo_documento import TipoDocumento
 from src.models.usuario import Usuario
 from src.services.base import BaseService
 from src.services.consolidacion import ConsolidacionService
+from src.services.documento import DocumentoService
 from src.services.expediente import ExpedienteService
 from src.utils.money import money
 
@@ -35,9 +40,21 @@ class PDFConsolidacionService(BaseService):
         id_expediente: int,
         decision: str,
         justificacion: str,
+        archivo: UploadFile,
+        usuario_actual: Usuario,
     ) -> str:
 
-        _, _, html = self._construir_html(id_expediente, decision, justificacion)
+        documento_edc_simulado = self._documento_edc_simulado(
+            archivo, usuario_actual
+        )
+
+        _, _, html = self._construir_html(
+            id_expediente,
+            decision,
+            justificacion,
+            validar_edc_persistido=False,
+            documentos_edc_override=[documento_edc_simulado],
+        )
 
         pdf_bytes = renderizar_pdf(html)
 
@@ -48,77 +65,84 @@ class PDFConsolidacionService(BaseService):
         id_expediente: int,
         decision: str,
         justificacion: str,
+        archivo: UploadFile,
+        usuario_actual: Usuario,
     ) -> Documento:
 
-        ExpedienteService(self.session).guardar_consolidacion(
+        expediente = ExpedienteService(self.session).obtener(id_expediente)
+
+        ConsolidacionService(self.session).preconsolidar(
+            id_expediente, validar_edc_persistido=False
+        )
+
+        self._validar_responsable_firma(expediente)
+
+        documento_edc = DocumentoService(self.session).crear_estado_cuenta(
             id_expediente=id_expediente,
-            decision=decision,
-            justificacion=justificacion,
+            id_usuario=usuario_actual.id,
+            archivo=archivo,
         )
-
-        expediente, responsable, html = self._construir_html(
-            id_expediente, decision, justificacion
-        )
-
-        cliente = expediente.cliente
-
-        pdf_bytes = renderizar_pdf(html)
-
-        crear_carpeta_consolidacion(cliente, expediente)
-
-        carpeta = carpeta_consolidacion(cliente, expediente)
-
-        ruta = carpeta / self.NOMBRE_ARCHIVO
-
-        ruta.write_bytes(pdf_bytes)
-
-        tipo_documento = self.session.scalar(
-            select(TipoDocumento).where(TipoDocumento.nombre == "Consolidación")
-        )
-
-        if tipo_documento is None:
-            if ruta.exists():
-                ruta.unlink()
-
-            raise ConflictoNegocio("No existe el tipo de documento 'Consolidación'.")
-
-        documento = Documento(
-            id_expediente=expediente.id,
-            id_usuario=responsable.id,
-            id_tipo_documento=tipo_documento.id,
-            uuid_archivo=uuid.uuid4(),
-            nombre_original=self.NOMBRE_ARCHIVO,
-            ruta_archivo=str(ruta),
-        )
-
-        self.session.add(documento)
 
         try:
-            self._commit()
+            ExpedienteService(self.session).guardar_consolidacion(
+                id_expediente=id_expediente,
+                decision=decision,
+                justificacion=justificacion,
+            )
+
+            expediente, responsable, html = self._construir_html(
+                id_expediente, decision, justificacion
+            )
+
+            cliente = expediente.cliente
+
+            pdf_bytes = renderizar_pdf(html)
+
+            crear_carpeta_consolidacion(cliente, expediente)
+
+            carpeta = carpeta_consolidacion(cliente, expediente)
+
+            ruta = carpeta / self.NOMBRE_ARCHIVO
+
+            ruta.write_bytes(pdf_bytes)
+
+            tipo_documento = self.session.scalar(
+                select(TipoDocumento).where(TipoDocumento.nombre == "Consolidación")
+            )
+
+            if tipo_documento is None:
+                if ruta.exists():
+                    ruta.unlink()
+
+                raise ConflictoNegocio(
+                    "No existe el tipo de documento 'Consolidación'."
+                )
+
+            documento = Documento(
+                id_expediente=expediente.id,
+                id_usuario=responsable.id,
+                id_tipo_documento=tipo_documento.id,
+                uuid_archivo=uuid.uuid4(),
+                nombre_original=self.NOMBRE_ARCHIVO,
+                ruta_archivo=str(ruta),
+            )
+
+            self.session.add(documento)
+
+            try:
+                self._commit()
+            except Exception:
+                if ruta.exists():
+                    ruta.unlink()
+                raise
         except Exception:
-            if ruta.exists():
-                ruta.unlink()
+            DocumentoService(self.session).eliminar(documento_edc.id)
             raise
 
         return documento
 
-    def _construir_html(
-        self,
-        id_expediente: int,
-        decision: str,
-        justificacion: str,
-    ) -> tuple[Expediente, Usuario, str]:
+    def _validar_responsable_firma(self, expediente: Expediente) -> Usuario:
 
-        expediente = ExpedienteService(self.session).obtener(id_expediente)
-
-        preconsolidacion = ConsolidacionService(self.session).preconsolidar(
-            id_expediente
-        )
-
-        cobranzas = preconsolidacion["cobranzas"]
-        documentos_edc = preconsolidacion["documentos_edc"]
-
-        cliente = expediente.cliente
         responsable = expediente.usuario
 
         if responsable is None:
@@ -131,6 +155,45 @@ class PDFConsolidacionService(BaseService):
                 "El responsable de cobranza no tiene una firma registrada. "
                 "Debe subirla antes de poder generar el PDF."
             )
+
+        return responsable
+
+    def _documento_edc_simulado(
+        self,
+        archivo: UploadFile,
+        usuario_actual: Usuario,
+    ) -> SimpleNamespace:
+
+        return SimpleNamespace(
+            nombre_original=archivo.filename,
+            fecha_creacion=datetime.now(),
+            usuario=SimpleNamespace(nombre=usuario_actual.nombre),
+        )
+
+    def _construir_html(
+        self,
+        id_expediente: int,
+        decision: str,
+        justificacion: str,
+        validar_edc_persistido: bool = True,
+        documentos_edc_override: Sequence | None = None,
+    ) -> tuple[Expediente, Usuario, str]:
+
+        expediente = ExpedienteService(self.session).obtener(id_expediente)
+
+        preconsolidacion = ConsolidacionService(self.session).preconsolidar(
+            id_expediente, validar_edc_persistido=validar_edc_persistido
+        )
+
+        cobranzas = preconsolidacion["cobranzas"]
+        documentos_edc = (
+            documentos_edc_override
+            if documentos_edc_override is not None
+            else preconsolidacion["documentos_edc"]
+        )
+
+        cliente = expediente.cliente
+        responsable = self._validar_responsable_firma(expediente)
 
         from src.services.usuario import UsuarioService
 
